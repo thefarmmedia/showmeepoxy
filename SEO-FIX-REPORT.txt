@@ -1,0 +1,4 @@
+Show Me Epoxy card fix pass
+- Updated Service Areas city card descriptions to unique local copy.
+- Target file: service-areas.html
+- No footer-after-html injections were added.

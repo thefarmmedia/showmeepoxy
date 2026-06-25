@@ -328,10 +328,23 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
           <a href="javascript:void(0)" onclick="openQuoteModal()" class="btn-gold" style="display:block;text-align:center">Get My Instant Estimate →</a>
         </div>
 
-        <div style="background:linear-gradient(135deg,var(--navy-dark),var(--navy));border-radius:var(--rl);padding:24px">
+        <div style="background:linear-gradient(135deg,var(--navy-dark),var(--navy));border-radius:var(--rl);padding:24px;margin-bottom:24px">
           <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:#fff;margin-bottom:8px">Service Areas</h3>
           <p style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:16px">We serve Jefferson City, Columbia, Lake of the Ozarks, Rolla, and surrounding Mid-Missouri communities.</p>
           <a href="/service-areas.html" style="font-size:14px;font-weight:700;color:var(--gold)">View all service areas →</a>
+        </div>
+
+        <div style="border-radius:var(--rl);overflow:hidden;border:2px solid var(--gray-200)">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d99413.15!2d-92.1735!3d38.5767!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87ddb2e1e2d32dd5%3A0x3a3a3a3a3a3a3a3a!2sJefferson%20City%2C%20MO!5e0!3m2!1sen!2sus!4v1719000000000!5m2!1sen!2sus"
+            width="100%"
+            height="280"
+            style="border:0;display:block"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Show Me Epoxy Service Area — Jefferson City, Missouri">
+          </iframe>
         </div>
       </div>
     </div>
@@ -518,6 +531,30 @@ function closeMobileMenu(){
   if(btn){btn.querySelectorAll('span').forEach(function(s){s.style.transform='';s.style.opacity='1';});}
 }
 function toggleMobileSub(id,e){e.preventDefault();var el=document.getElementById(id);if(el)el.classList.toggle('open');}
+</script>
+<!-- STICKY MOBILE CALL BAR -->
+<div id="stickyCall" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9000;background:#ebfb3b;padding:0;box-shadow:0 -3px 20px rgba(0,0,0,.25)">
+  <a href="tel:5736442422" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 20px;text-decoration:none;color:#0d2d6e;font-weight:800;font-size:16px">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0d2d6e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"></path></svg>
+    Tap to Call — (573) 644-2422
+    <span style="background:#0d2d6e;color:#ebfb3b;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.5px">FREE QUOTE</span>
+  </a>
+</div>
+<script>
+(function(){
+  var bar=document.getElementById('stickyCall');
+  if(!bar)return;
+  function checkMobile(){
+    if(window.innerWidth<=768){bar.style.display='block';}
+    else{bar.style.display='none';}
+  }
+  checkMobile();
+  window.addEventListener('resize',checkMobile);
+  // Add bottom padding to body so content isn't hidden behind bar
+  if(window.innerWidth<=768){
+    document.body.style.paddingBottom='56px';
+  }
+})();
 </script>
 </body>
 </html>

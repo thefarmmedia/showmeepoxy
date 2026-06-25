@@ -374,8 +374,9 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 <div>
 <div class="section-label">Built For Tipton &amp; Missouri Weather</div>
 <h2 class="section-title">Contractor-Grade Coatings For Local Conditions</h2>
-<p style="font-size:16px;color:var(--gray-600);line-height:1.75;margin-bottom:18px">Tipton homeowners and property owners often need durable coating systems for garages, shops, and concrete spaces exposed to Mid-Missouri weather.</p>
-<p style="font-size:16px;color:var(--gray-600);line-height:1.75;margin-bottom:18px">Show Me Epoxy uses industrial-grade materials available through professional contractor channels — not big-box DIY kits. Combined with mechanical diamond grinding, crack repair, and proper topcoat selection, our systems are built to give homeowners peace of mind with a professional installation.</p>
+<p style="font-size:16px;color:var(--gray-600);line-height:1.75;margin-bottom:18px">Tipton is a small Moniteau County community at the crossroads of central Missouri — close to Sedalia, Jefferson City, and Versailles. It's a town where neighbors know neighbors, which means our reputation matters more here than anywhere. We've done floors in Tipton and the surrounding Moniteau County area for homeowners who found us through a neighbor's recommendation or a Google search and decided to call. Either way, the process is the same: we show up, assess the slab honestly, and give you a real price.</p>
+<p style="font-size:16px;color:var(--gray-600);line-height:1.75;margin-bottom:18px">Moniteau County agricultural land means clay soils in many areas, which creates more slab movement than homeowners expect. We've seen Tipton-area garages with significant heaving along the center expansion joint — that all gets addressed during prep so the finished floor is flat and the coating bonds across the entire surface.</p>
+<p style="font-size:16px;color:var(--gray-600);line-height:1.75;margin-bottom:0">Tipton's central location — roughly equidistant from Jefferson City, Sedalia, and Columbia — makes it a quiet hub for Moniteau County. Residents drive to the bigger cities for work but invest in their homes locally. A quality floor is one of the highest-ROI home improvements you can make.</p>
 </div>
 <div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--rl);padding:28px;box-shadow:var(--sh)">
 <h3 style="font-family:var(--cond);font-size:24px;color:var(--navy);margin-bottom:12px">Tipton Service Links</h3>
@@ -502,10 +503,17 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 function mcCalc(){
   var sqft=parseFloat(document.getElementById('mcSqft').value);
   var sys=document.getElementById('mcSystem').value;
-  if(!sqft||sqft<=0){document.getElementById('mcRange').textContent='Enter square footage above';return;}
+  var rangeEl=document.getElementById('mcRange');
+  if(!sqft||sqft<=0){
+    rangeEl.textContent='Enter square footage above';
+    rangeEl.style.filter='';
+    return;
+  }
   var lo=sys==='Metallic Floor'?13.0:5.50, hi=sys==='Metallic Floor'?16.0:7.50;
   var low=Math.round(sqft*lo), high=Math.round(sqft*hi);
-  document.getElementById('mcRange').textContent='$'+low.toLocaleString()+' – $'+high.toLocaleString();
+  rangeEl.textContent='$'+low.toLocaleString()+' – $'+high.toLocaleString();
+  rangeEl.style.filter='none';
+  rangeEl.style.fontSize='36px';
 }
 </script>
 <footer>
@@ -671,6 +679,30 @@ function closeMobileMenu(){
   if(btn){btn.querySelectorAll('span').forEach(function(s){s.style.transform='';s.style.opacity='1';});}
 }
 function toggleMobileSub(id,e){e.preventDefault();var el=document.getElementById(id);if(el)el.classList.toggle('open');}
+</script>
+<!-- STICKY MOBILE CALL BAR -->
+<div id="stickyCall" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9000;background:#ebfb3b;padding:0;box-shadow:0 -3px 20px rgba(0,0,0,.25)">
+  <a href="tel:5736442422" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 20px;text-decoration:none;color:#0d2d6e;font-weight:800;font-size:16px">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0d2d6e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"></path></svg>
+    Tap to Call — (573) 644-2422
+    <span style="background:#0d2d6e;color:#ebfb3b;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.5px">FREE QUOTE</span>
+  </a>
+</div>
+<script>
+(function(){
+  var bar=document.getElementById('stickyCall');
+  if(!bar)return;
+  function checkMobile(){
+    if(window.innerWidth<=768){bar.style.display='block';}
+    else{bar.style.display='none';}
+  }
+  checkMobile();
+  window.addEventListener('resize',checkMobile);
+  // Add bottom padding to body so content isn't hidden behind bar
+  if(window.innerWidth<=768){
+    document.body.style.paddingBottom='56px';
+  }
+})();
 </script>
 </body>
 </html>

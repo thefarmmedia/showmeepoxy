@@ -429,6 +429,23 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 
 
 
+<section style="padding:40px 0;background:#f4f5f7">
+<div class="wrap">
+<div style="border-radius:14px;overflow:hidden;border:2px solid var(--gray-200);box-shadow:0 4px 20px rgba(0,0,0,.08)">
+<iframe
+  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d50000!2d-92.5669!3d38.6292!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zCalifornia%2C+MO!5e0!3m2!1sen!2sus!4v1719000000000!5m2!1sen!2sus"
+  width="100%"
+  height="300"
+  style="border:0;display:block"
+  allowfullscreen=""
+  loading="lazy"
+  referrerpolicy="no-referrer-when-downgrade"
+  title="Show Me Epoxy serving California, MO">
+</iframe>
+</div>
+<p style="text-align:center;font-size:13px;color:var(--gray-500);margin-top:12px">Show Me Epoxy serves California, MO and surrounding areas. <a href="/contact.html" style="color:var(--navy);font-weight:600">Contact us for a free on-site quote →</a></p>
+</div>
+</section>
 <section style="padding:56px 0;background:#0b2f78">
 <div class="wrap" style="max-width:860px;margin:0 auto">
 <div style="text-align:center;margin-bottom:32px">
@@ -455,12 +472,20 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 </select>
 </div>
 </div>
-<div id="mcResult" style="padding:20px 24px;border-radius:14px;background:linear-gradient(180deg,rgba(235,251,59,.14),rgba(235,251,59,.04));border:1px solid rgba(235,251,59,.25);margin-bottom:18px;text-align:center">
+<div id="mcResult" style="padding:20px 24px;border-radius:14px;background:linear-gradient(180deg,rgba(235,251,59,.14),rgba(235,251,59,.04));border:1px solid rgba(235,251,59,.25);margin-bottom:18px;text-align:center;position:relative">
 <div style="font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#ebfb3b;margin-bottom:4px">Your Ballpark Estimate</div>
-<div id="mcRange" style="font-size:36px;font-weight:900;color:#fff;line-height:1">Enter square footage above</div>
+<div id="mcRange" style="font-size:36px;font-weight:900;color:#fff;line-height:1;filter:blur(8px);user-select:none;pointer-events:none">$0,000 – $0,000</div>
 <div style="font-size:12px;color:#aaa;margin-top:6px">Diamond grinding &amp; prep included in every estimate</div>
 </div>
-<div style="display:flex;gap:12px;flex-wrap:wrap">
+<div id="mcUnlockForm" style="margin-bottom:18px;padding:18px 20px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1)">
+<div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:12px;text-align:center">🔒 Enter your info to unlock your price</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+<input id="mcName" placeholder="Your name" style="padding:11px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0a2866;color:#fff;font-size:14px;outline:none;width:100%" type="text"/>
+<input id="mcPhone" placeholder="Phone number" style="padding:11px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0a2866;color:#fff;font-size:14px;outline:none;width:100%" type="tel"/>
+</div>
+<button onclick="mcUnlock()" style="width:100%;background:#ebfb3b;color:#0d2d6e;border:none;border-radius:10px;padding:13px 20px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit">Reveal My Price →</button>
+</div>
+<div id="mcUnlocked" style="display:none;display:flex;gap:12px;flex-wrap:wrap">
 <a href="javascript:void(0)" onclick="openQuoteModal()" style="flex:1;display:block;background:#ebfb3b;color:#0d2d6e;font-weight:800;font-size:15px;padding:14px 20px;border-radius:10px;text-decoration:none;text-align:center;min-width:160px">Get My Free On-Site Quote →</a>
 <a href="/index.html#calculator" style="flex:1;display:block;border:1.5px solid rgba(255,255,255,.2);color:#fff;font-weight:600;font-size:15px;padding:14px 20px;border-radius:10px;text-decoration:none;text-align:center;min-width:160px">Full Pricing Calculator →</a>
 </div>
@@ -472,16 +497,36 @@ function mcCalc(){
   var sqft=parseFloat(document.getElementById('mcSqft').value);
   var sys=document.getElementById('mcSystem').value;
   var rangeEl=document.getElementById('mcRange');
-  if(!sqft||sqft<=0){
-    rangeEl.textContent='Enter square footage above';
-    rangeEl.style.filter='';
-    return;
-  }
+  if(!sqft||sqft<=0){rangeEl.textContent='$0,000 – $0,000';rangeEl.style.filter='blur(8px)';return;}
   var lo=sys==='Metallic Floor'?13.0:5.50, hi=sys==='Metallic Floor'?16.0:7.50;
   var low=Math.round(sqft*lo), high=Math.round(sqft*hi);
+  rangeEl.dataset.low=low; rangeEl.dataset.high=high;
   rangeEl.textContent='$'+low.toLocaleString()+' – $'+high.toLocaleString();
+  rangeEl.style.filter='blur(8px)';
+  rangeEl.style.userSelect='none';
+  rangeEl.style.pointerEvents='none';
+}
+async function mcUnlock(){
+  var name=document.getElementById('mcName').value.trim();
+  var phone=document.getElementById('mcPhone').value.trim();
+  if(!name||!phone){alert('Please enter your name and phone number.');return;}
+  var btn=document.querySelector('#mcUnlockForm button');
+  btn.textContent='Unlocking...';btn.disabled=true;
+  var sqft=document.getElementById('mcSqft').value;
+  var type=document.getElementById('mcType').value;
+  var sys=document.getElementById('mcSystem').value;
+  var fd=new FormData();
+  fd.append('name',name);fd.append('phone',phone.replace(/[^\d+]/g,''));
+  fd.append('project_type',type);fd.append('sq_ft',sqft);fd.append('system',sys);
+  fd.append('lead_source','Show Me Epoxy Mini Calculator');fd.append('page_url',window.location.href);
+  try{await fetch('https://services.leadconnectorhq.com/hooks/UDCPiPWt9uV7guaCe7PH/webhook-trigger/cf22005c-1be6-4647-8009-5d5ef2c85ddd',{method:'POST',body:fd});}catch(e){}
+  var rangeEl=document.getElementById('mcRange');
   rangeEl.style.filter='none';
-  rangeEl.style.fontSize='36px';
+  rangeEl.style.userSelect='auto';
+  rangeEl.style.pointerEvents='auto';
+  document.getElementById('mcUnlockForm').style.display='none';
+  document.getElementById('mcUnlocked').style.display='flex';
+  btn.textContent='Reveal My Price →';btn.disabled=false;
 }
 </script>
 <footer>

@@ -283,6 +283,8 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 .calc-left{order:1}
 .calc-right{order:2}
 .calc-why{order:3}
+/* Standalone calculator page: center everything in a single column */
+.calc-outer-grid{grid-template-columns:minmax(0,560px)!important;justify-content:center!important}
 @media(max-width:768px){
   .calc-outer-grid{grid-template-columns:1fr!important;gap:16px}
   .calc-left{order:2!important}

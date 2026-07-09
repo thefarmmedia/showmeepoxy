@@ -447,8 +447,8 @@ function cGetData(){
   const condition=document.getElementById('cCondition').value;
   const difficulty=document.getElementById('cDifficulty').value;
   const projectType=document.getElementById('cProjectType').value;
-  let lo=system==='Metallic Floor'?13.0:5.50;
-  let hi=system==='Metallic Floor'?16.0:7.50;
+  let lo=system==='Metallic Floor'?13.0:5.75;
+  let hi=system==='Metallic Floor'?16.0:8.00;
   if(condition==='Average / Minor Repairs'){lo+=.50;hi+=.50;}
   else if(condition==='Cracks / Pitting / More Prep'){lo+=.75;hi+=.75;}
   if(difficulty.startsWith('Tight')){lo+=1.0;hi+=1.0;}

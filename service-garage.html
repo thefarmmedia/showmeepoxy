@@ -525,7 +525,7 @@ function mcCalc(){
   var sys=document.getElementById('mcSystem').value;
   var rangeEl=document.getElementById('mcRange');
   if(!sqft||sqft<=0){rangeEl.textContent='$0,000 – $0,000';rangeEl.style.filter='blur(8px)';return;}
-  var lo=sys==='Metallic Floor'?13.0:5.50, hi=sys==='Metallic Floor'?16.0:7.50;
+  var lo=sys==='Metallic Floor'?13.0:5.75, hi=sys==='Metallic Floor'?16.0:8.00;
   var low=Math.round(sqft*lo), high=Math.round(sqft*hi);
   rangeEl.dataset.low=low; rangeEl.dataset.high=high;
   rangeEl.textContent='$'+low.toLocaleString()+' – $'+high.toLocaleString();

@@ -162,7 +162,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 <a class="logo" href="/index.html"><img alt="Show Me Epoxy Epoxy Flooring Jefferson City Missouri" loading="eager" src="show-me-epoxy-logo-jefferson-city-missouri.jpg" style="height:56px;width:auto;display:block;border-radius:6px" width="1024" height="1024"></a>
 <nav><ul>
 <li><a href="/about.html">About</a></li>
-<li class="has-sub"><a href="#">Services</a><ul class="sub">
+<li class="has-sub"><a href="/service-garage.html">Services</a><ul class="sub">
 <li class="sub-label">Residential</li>
 <li><a href="/service-garage.html">Garage Floor Coatings</a></li>
 <li><a href="/service-basement.html">Basement Epoxy</a></li>
@@ -171,7 +171,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 <li class="sub-label">Commercial</li>
 <li><a href="/service-commercial.html">Commercial Epoxy</a></li>
 </ul></li>
-<li class="has-sub"><a href="#">Floor Types</a><ul class="sub">
+<li class="has-sub"><a href="/type-flake.html">Floor Types</a><ul class="sub">
 <li><a href="/type-flake.html">Flake System</a></li>
 <li><a href="/type-polyaspartic.html">Polyaspartic</a></li>
 <li><a href="/type-metallic.html">Metallic Epoxy</a></li>
@@ -204,7 +204,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 <li><a href="/faq.html">FAQ</a></li>
 <li><a href="/blog.html">Blog</a></li>
 <li><a href="/contact.html">Contact</a></li>
-<li><a class="nav-cta" href="javascript:void(0)" onclick="openQuoteModal()">Get a Free Quote</a></li>
+<li><a class="nav-cta" href="/contact.html" onclick="openQuoteModal();return false;">Get a Free Quote</a></li>
 </ul></nav>
 <button aria-label="Open menu" id="hamburgerBtn" onclick="toggleMobileMenu()" style="display:none;flex-direction:column;justify-content:center;gap:5px;cursor:pointer;padding:10px;background:none;border:none;z-index:201;min-width:44px;min-height:44px">
 <span style="display:block;width:26px;height:3px;background:#134db4;border-radius:2px;transition:all .3s"></span>
@@ -216,7 +216,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 <ul>
 <li><a href="/about.html">About</a></li>
 <li>
-<a href="#" onclick="toggleMobileSub('sub-services',event)">Services ▾</a>
+<a href="/service-garage.html" onclick="toggleMobileSub('sub-services',event)">Services ▾</a>
 <ul class="mobile-sub" id="sub-services">
 <li><a href="/service-garage.html">Garage Floor Coatings</a></li>
 <li><a href="/service-basement.html">Basement Epoxy</a></li>
@@ -226,7 +226,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 </ul>
 </li>
 <li>
-<a href="#" onclick="toggleMobileSub('sub-types',event)">Floor Types ▾</a>
+<a href="/type-flake.html" onclick="toggleMobileSub('sub-types',event)">Floor Types ▾</a>
 <ul class="mobile-sub" id="sub-types">
 <li><a href="/type-flake.html">Flake System</a></li>
 <li><a href="/type-polyaspartic.html">Polyaspartic</a></li>
@@ -235,7 +235,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 </ul>
 </li>
 <li>
-      <a href="#" onclick="toggleMobileSub('sub-areas',event)">Areas ▾</a>
+      <a href="/service-areas.html" onclick="toggleMobileSub('sub-areas',event)">Areas ▾</a>
       <ul class="mobile-sub" id="sub-areas">
         <li><a href="/area-jefferson-city.html">Jefferson City, MO</a></li>
         <li><a href="/area-columbia.html">Columbia, MO</a></li>
@@ -263,7 +263,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 <li><a href="/faq.html">FAQ</a></li>
 <li><a href="/blog.html">Blog</a></li>
 <li><a href="/contact.html">Contact</a></li>
-<li><a class="mobile-menu-cta" href="javascript:void(0)" onclick="closeMobileMenu();openQuoteModal()">Get a Free Quote →</a></li>
+<li><a class="mobile-menu-cta" href="/contact.html" onclick="closeMobileMenu();openQuoteModal();return false;">Get a Free Quote →</a></li>
 </ul>
 </div>
 <div class="breadcrumb"><div class="wrap"><a href="/index.html">Home</a><span>›</span><strong>Service Areas</strong></div></div>
@@ -273,7 +273,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 <h1>Epoxy Flooring Service Areas<br/>in Mid-Missouri</h1>
 <p>Show Me Epoxy installs professional <a href="/service-garage.html" title="Garage Floor Coatings Jefferson City MO">garage floor coatings</a>, basement floors, commercial epoxy, patio coatings, and concrete coating systems across Jefferson City, Columbia, Lake of the Ozarks, Rolla, Osage Beach, Camdenton, and surrounding Missouri communities.</p>
 <div class="hero-btns">
-<a class="btn-gold" href="javascript:void(0)" onclick="openQuoteModal()">Get My Free Quote →</a>
+<a class="btn-gold" href="/contact.html" onclick="openQuoteModal();return false;">Get My Free Quote →</a>
 <a class="btn-outline-w" href="tel:5736442422">📞 (573) 644-2422</a>
 </div>
 </div>
@@ -438,7 +438,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 <h2>Not Sure If We Serve Your Area?</h2>
 <p>Call Show Me Epoxy and we’ll let you know if your project is inside our Mid-Missouri service area.</p>
 <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-<a href="javascript:void(0)" onclick="openQuoteModal()" class="btn-gold">Get My Free Quote →</a>
+<a href="/contact.html" onclick="openQuoteModal();return false;" class="btn-gold">Get My Free Quote →</a>
 <a href="tel:5736442422" style="display:inline-block;border:2px solid rgba(255,255,255,.4);color:#fff;padding:12px 24px;border-radius:var(--r);text-decoration:none;font-weight:600">📞 (573) 644-2422</a>
 </div>
 </div>
@@ -484,7 +484,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 <button onclick="mcUnlock()" style="width:100%;background:#ebfb3b;color:#0d2d6e;border:none;border-radius:10px;padding:13px 20px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit">Reveal My Price →</button>
 </div>
 <div id="mcUnlocked" style="display:none;display:flex;gap:12px;flex-wrap:wrap">
-<a href="javascript:void(0)" onclick="openQuoteModal()" style="flex:1;display:block;background:#ebfb3b;color:#0d2d6e;font-weight:800;font-size:15px;padding:14px 20px;border-radius:10px;text-decoration:none;text-align:center;min-width:160px">Get My Free On-Site Quote →</a>
+<a href="/contact.html" onclick="openQuoteModal();return false;" style="flex:1;display:block;background:#ebfb3b;color:#0d2d6e;font-weight:800;font-size:15px;padding:14px 20px;border-radius:10px;text-decoration:none;text-align:center;min-width:160px">Get My Free On-Site Quote →</a>
 <a href="/calculator.html" style="flex:1;display:block;border:1.5px solid rgba(255,255,255,.2);color:#fff;font-weight:600;font-size:15px;padding:14px 20px;border-radius:10px;text-decoration:none;text-align:center;min-width:160px">Full Pricing Calculator →</a>
 </div>
 </div>

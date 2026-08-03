@@ -98,7 +98,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 <a href="/index.html" class="logo"><img src="show-me-epoxy-logo-jefferson-city-missouri.jpg" alt="Show Me Epoxy Epoxy Flooring Jefferson City Missouri" style="height:56px;width:auto;display:block;border-radius:6px" loading="eager" width="1024" height="1024"></a>
 <nav><ul>
 <li><a href="/about.html">About</a></li>
-<li class="has-sub"><a href="#">Services</a><ul class="sub">
+<li class="has-sub"><a href="/service-garage.html">Services</a><ul class="sub">
 <li class="sub-label">Residential</li>
 <li><a href="/service-garage.html">Garage Floor Coatings</a></li>
 <li><a href="/service-basement.html">Basement Epoxy</a></li>
@@ -107,7 +107,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 <li class="sub-label">Commercial</li>
 <li><a href="/service-commercial.html">Commercial Epoxy</a></li>
 </ul></li>
-<li class="has-sub"><a href="#">Floor Types</a><ul class="sub">
+<li class="has-sub"><a href="/type-flake.html">Floor Types</a><ul class="sub">
 <li><a href="/type-flake.html">Flake System</a></li>
 <li><a href="/type-polyaspartic.html">Polyaspartic</a></li>
 <li><a href="/type-metallic.html">Metallic Epoxy</a></li>
@@ -131,7 +131,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 <li><a href="/faq.html">FAQ</a></li>
 <li><a href="/blog.html" class="active">Blog</a></li>
 <li><a href="/contact.html">Contact</a></li>
-<li><a href="javascript:void(0)" onclick="openQuoteModal()" class="nav-cta">Get a Free Quote</a></li>
+<li><a href="/contact.html" onclick="openQuoteModal();return false;" class="nav-cta">Get a Free Quote</a></li>
 </ul></nav>
 <button id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Open menu" style="display:none;flex-direction:column;justify-content:center;gap:5px;cursor:pointer;padding:10px;background:none;border:none;z-index:201;min-width:44px;min-height:44px">
 <span style="display:block;width:26px;height:3px;background:#134db4;border-radius:2px;transition:all .3s"></span>
@@ -144,13 +144,13 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 <div class="mobile-menu" id="mobileMenu">
 <ul>
 <li><a href="/about.html">About</a></li>
-<li><a href="#" onclick="toggleMobileSub('sub-services',event)">Services ▾</a><ul class="mobile-sub" id="sub-services"><li><a href="/service-garage.html">Garage Floor Coatings</a></li><li><a href="/service-basement.html">Basement Epoxy</a></li><li><a href="/service-patio.html">Patio &amp; Outdoor Coatings</a></li><li><a href="/service-countertops.html">Epoxy Countertops</a></li><li><a href="/service-commercial.html">Commercial Epoxy</a></li></ul></li>
+<li><a href="/service-garage.html" onclick="toggleMobileSub('sub-services',event)">Services ▾</a><ul class="mobile-sub" id="sub-services"><li><a href="/service-garage.html">Garage Floor Coatings</a></li><li><a href="/service-basement.html">Basement Epoxy</a></li><li><a href="/service-patio.html">Patio &amp; Outdoor Coatings</a></li><li><a href="/service-countertops.html">Epoxy Countertops</a></li><li><a href="/service-commercial.html">Commercial Epoxy</a></li></ul></li>
 <li><a href="/colors.html">Colors</a></li>
 <li><a href="/gallery.html">Gallery</a></li>
 <li><a href="/faq.html">FAQ</a></li>
 <li><a href="/blog.html">Blog</a></li>
 <li><a href="/contact.html">Contact</a></li>
-<li><a href="javascript:void(0)" onclick="closeMobileMenu();openQuoteModal()" class="mobile-menu-cta">Get a Free Quote →</a></li>
+<li><a href="/contact.html" onclick="closeMobileMenu();openQuoteModal();return false;" class="mobile-menu-cta">Get a Free Quote →</a></li>
 </ul>
 </div>
 
@@ -266,7 +266,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
   <div class="article-cta">
     <h3>Get a Free Estimate in Mid-Missouri</h3>
     <p>We serve Jefferson City, Columbia, Rolla, Lake of the Ozarks, and surrounding communities. Every install includes diamond grinding, crack repair, full flake broadcast, and a polyaspartic topcoat.</p>
-    <a href="javascript:void(0)" onclick="openQuoteModal()" class="btn-gold">Request My Free Estimate →</a>
+    <a href="/contact.html" onclick="openQuoteModal();return false;" class="btn-gold">Request My Free Estimate →</a>
   </div>
 </article>
 

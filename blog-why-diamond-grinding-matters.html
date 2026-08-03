@@ -35,7 +35,7 @@
 }
 </script>
 
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@700;800;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&amp;family=Barlow+Condensed:wght@700;800;900&amp;display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&amp;family=Barlow+Condensed:wght@700;800;900&amp;display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&amp;family=Barlow+Condensed:wght@700;800;900&amp;display=swap"></noscript>
 <style>
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -308,6 +308,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 </div>
 
 
+<main>
 <div class="breadcrumb"><div class="wrap"><a href="/index.html">Home</a><span>›</span><strong>About Us</strong></div></div>
 <div class="breadcrumb"><div class="wrap"><a href="/index.html">Home</a><span>›</span><a href="/blog.html">Blog</a><span>›</span><strong>Why Diamond Grinding Matters</strong></div></div>
 <div class="article-wrap">
@@ -391,6 +392,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 
 
 
+</main>
 <footer>
 <div class="wrap">
 <div class="footer-grid">
@@ -466,7 +468,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
         </div>
       </div>
       <div style="margin-bottom:12px">
-        <label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px">Project Type</label>
+        <label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qProject">Project Type</label>
         <select id="qProject" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit">
           <option>Garage Floor</option>
           <option>Basement Floor</option>

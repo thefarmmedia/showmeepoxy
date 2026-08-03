@@ -19,7 +19,7 @@
 
 <link rel="canonical" href="https://showmeepoxy.com/area-versailles.html"><link rel="preload" as="image" href="/epoxy-garage-floor-blue-gray-flake-finish-show-me-epoxy-missouri.webp" fetchpriority="high">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"We have a lake house in Versailles that sits empty part of the year. Does that affect the coating?","acceptedAnswer":{"@type":"Answer","text":"Not at all \u2014 once cured, our epoxy and polyaspartic systems hold up fine in unoccupied lake homes. We do recommend good ventilation during the install and initial cure, which we'll plan around your schedule."}},{"@type":"Question","name":"Will an epoxy floor handle boat trailers and gravel from the driveway?","acceptedAnswer":{"@type":"Answer","text":"Yes. For garages that see trailers, ATVs, or a lot of gravel traffic, we recommend our full-broadcast flake or polyaspartic systems \u2014 they resist scuffing and chipping better than paint or bare concrete."}},{"@type":"Question","name":"Can you work around our lake season schedule?","acceptedAnswer":{"@type":"Answer","text":"Many Versailles-area customers prefer fall or winter installs when the lake is quieter. We book these slots early, so it's worth reaching out a season ahead if you can."}},{"@type":"Question","name":"How far is Versailles from your Jefferson City shop?","acceptedAnswer":{"@type":"Answer","text":"About 45 minutes \u2014 Versailles is within our standard Mid-Missouri and Lake of the Ozarks service area with no travel fee."}}]}</script>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@700;800;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&amp;family=Barlow+Condensed:wght@700;800;900&amp;display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&amp;family=Barlow+Condensed:wght@700;800;900&amp;display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&amp;family=Barlow+Condensed:wght@700;800;900&amp;display=swap"></noscript>
 <style>
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -274,6 +274,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 </div>
 
 
+<main>
 <div class="breadcrumb"><div class="wrap"><a href="/index.html">Home</a><span>›</span><a href="/service-areas.html">Service Areas</a><span>›</span><strong>Versailles, MO</strong></div></div>
 
 <section class="page-hero">
@@ -493,7 +494,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 <div style="background:#0e3a90;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:32px">
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
 <div>
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px">Project Type</label>
+<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px" for="mcType">Project Type</label>
 <select id="mcType" onchange="mcCalc()" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0a2866;color:#fff;font-size:14px;outline:none">
 <option>Garage Floor</option><option>Basement</option><option>Patio / Porch</option><option>Shop / Outbuilding</option>
 </select>
@@ -503,7 +504,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 <input id="mcSqft" type="number" min="1" placeholder="e.g. 500" onInput="mcCalc()" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0a2866;color:#fff;font-size:14px;outline:none"/>
 </div>
 <div>
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px">Coating System</label>
+<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px" for="mcSystem">Coating System</label>
 <select id="mcSystem" onchange="mcCalc()" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0a2866;color:#fff;font-size:14px;outline:none">
 <option>Full Broadcast Flake</option><option>Metallic Floor</option>
 </select>
@@ -566,6 +567,7 @@ async function mcUnlock(){
   btn.textContent='Reveal My Price →';btn.disabled=false;
 }
 </script>
+</main>
 <footer>
 <div class="wrap">
 <div class="footer-grid">
@@ -641,7 +643,7 @@ async function mcUnlock(){
         </div>
       </div>
       <div style="margin-bottom:12px">
-        <label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px">Project Type</label>
+        <label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qProject">Project Type</label>
         <select id="qProject" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit">
           <option>Garage Floor</option>
           <option>Basement Floor</option>

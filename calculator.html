@@ -20,7 +20,7 @@
 
 <link href="https://showmeepoxy.com/service-garage.html" rel="canonical"/>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Service","name":"Epoxy Flooring Cost Calculator","provider":{"@type":"LocalBusiness","name":"Show Me Epoxy","telephone":"(573) 644-2422","address":{"@type":"PostalAddress","addressLocality":"Jefferson City","addressRegion":"MO"}},"areaServed":"Jefferson City, Columbia, Lake of the Ozarks, Missouri","description":"Free instant pricing calculator for epoxy garage floors, basements, and metallic floor coatings in Mid-Missouri."}</script>
-<link href="https://fonts.googleapis.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&amp;family=Barlow+Condensed:wght@700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&amp;family=Barlow+Condensed:wght@700;800;900&amp;display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&amp;family=Barlow+Condensed:wght@700;800;900&amp;display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&amp;family=Barlow+Condensed:wght@700;800;900&amp;display=swap"></noscript>
 <style>
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -267,6 +267,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 <li><a class="mobile-menu-cta" href="/contact.html" onclick="closeMobileMenu();openQuoteModal();return false;">Get a Free Quote →</a></li>
 </ul>
 </div>
+<main>
 <section style="padding:48px 0 0;background:#134db4;text-align:center">
 <div class="container">
 <div style="font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#ebfb3b;margin-bottom:10px">Free Online Tool</div>
@@ -315,7 +316,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 <p style="font-size:13px;color:#aaa;margin-bottom:22px">Build your project so the calculator can start working immediately.</p>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
 <div>
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px">Project Type</label>
+<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px" for="cProjectType">Project Type</label>
 <select id="cProjectType" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0a2866;color:#fff;font-size:15px;outline:none;font-family:var(--font)">
 <option>Garage Floor</option><option>Patio / Porch</option><option>Basement</option><option>Shop / Outbuilding</option>
 </select>
@@ -327,20 +328,20 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
 <div>
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px">Coating System</label>
+<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px" for="cSystem">Coating System</label>
 <select id="cSystem" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0a2866;color:#fff;font-size:15px;outline:none;font-family:var(--font)">
 <option>Full Broadcast Flake</option><option>Metallic Floor</option>
 </select>
 </div>
 <div>
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px">Concrete Condition</label>
+<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px" for="cCondition">Concrete Condition</label>
 <select id="cCondition" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0a2866;color:#fff;font-size:15px;outline:none;font-family:var(--font)">
 <option>Good Condition</option><option>Average / Minor Repairs</option><option>Cracks / Pitting / More Prep</option>
 </select>
 </div>
 </div>
 <div style="margin-bottom:20px">
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px">Project Layout</label>
+<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px" for="cDifficulty">Project Layout</label>
 <select id="cDifficulty" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0a2866;color:#fff;font-size:15px;outline:none;font-family:var(--font)">
 <option>Standard Open Area</option><option>Some Edges / Obstacles</option><option>Tight / Detailed Layout (More Labor Required)</option>
 </select>
@@ -548,6 +549,7 @@ cUpdatePreview();
 </div>
 </section>
 
+</main>
 <footer>
 <div class="wrap">
 <div class="footer-grid">
@@ -620,7 +622,7 @@ cUpdatePreview();
 </div>
 </div>
 <div style="margin-bottom:12px">
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px">Project Type</label>
+<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qProject">Project Type</label>
 <select id="qProject" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit">
 <option>Garage Floor</option>
 <option>Basement Floor</option>

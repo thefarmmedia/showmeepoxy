@@ -19,7 +19,7 @@
 
 <link rel="canonical" href="https://showmeepoxy.com/area-tipton.html"><link rel="preload" as="image" href="/epoxy-garage-floor-gray-small-flake-finished-jefferson-city-mo.webp" fetchpriority="high">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Can you coat a large machine shed or ag shop floor, not just a 2-car garage?","acceptedAnswer":{"@type":"Answer","text":"Yes \u2014 we regularly coat shop and outbuilding floors of all sizes around Tipton. The process is the same: diamond grinding, crack repair, and an industrial epoxy or polyaspartic topcoat rated for heavy equipment."}},{"@type":"Question","name":"Will the coating hold up to motor oil and fertilizer?","acceptedAnswer":{"@type":"Answer","text":"Our industrial systems are chemical-resistant and built to handle the oil, fuel, and ag-chemical exposure common in farm shops. Spills wipe up instead of staining the concrete."}},{"@type":"Question","name":"Can we schedule around planting or harvest?","acceptedAnswer":{"@type":"Answer","text":"Of course. Many of our Moniteau County customers prefer to schedule shop floor work in the off-season \u2014 we'll work around your operation's calendar."}},{"@type":"Question","name":"How far is Tipton from your shop?","acceptedAnswer":{"@type":"Answer","text":"Tipton is roughly 30 minutes from Jefferson City along US-50, well within our standard service area with no travel fee."}}]}</script>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&family=Barlow+Condensed:wght@700;800;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&amp;family=Barlow+Condensed:wght@700;800;900&amp;display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&amp;family=Barlow+Condensed:wght@700;800;900&amp;display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&amp;family=Barlow+Condensed:wght@700;800;900&amp;display=swap"></noscript>
 <style>
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -274,6 +274,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 </div>
 
 
+<main>
 <div class="breadcrumb"><div class="wrap"><a href="/index.html">Home</a><span>›</span><a href="/service-areas.html">Service Areas</a><span>›</span><strong>Tipton, MO</strong></div></div>
 
 <section class="page-hero">
@@ -493,7 +494,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 <div style="background:#0e3a90;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:32px">
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
 <div>
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px">Project Type</label>
+<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px" for="mcType">Project Type</label>
 <select id="mcType" onchange="mcCalc()" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0a2866;color:#fff;font-size:14px;outline:none">
 <option>Garage Floor</option><option>Basement</option><option>Patio / Porch</option><option>Shop / Outbuilding</option>
 </select>
@@ -503,7 +504,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
 <input id="mcSqft" type="number" min="1" placeholder="e.g. 500" onInput="mcCalc()" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0a2866;color:#fff;font-size:14px;outline:none"/>
 </div>
 <div>
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px">Coating System</label>
+<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px" for="mcSystem">Coating System</label>
 <select id="mcSystem" onchange="mcCalc()" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0a2866;color:#fff;font-size:14px;outline:none">
 <option>Full Broadcast Flake</option><option>Metallic Floor</option>
 </select>
@@ -566,6 +567,7 @@ async function mcUnlock(){
   btn.textContent='Reveal My Price →';btn.disabled=false;
 }
 </script>
+</main>
 <footer>
 <div class="wrap">
 <div class="footer-grid">
@@ -641,7 +643,7 @@ async function mcUnlock(){
         </div>
       </div>
       <div style="margin-bottom:12px">
-        <label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px">Project Type</label>
+        <label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qProject">Project Type</label>
         <select id="qProject" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit">
           <option>Garage Floor</option>
           <option>Basement Floor</option>

@@ -20,8 +20,8 @@
 
 <link href="https://showmeepoxy.com/index.html" rel="canonical"/>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"HomeAndConstructionBusiness","additionalType":"https://schema.org/FlooringContractor","name":"Show Me Epoxy","image":"https://showmeepoxy.com/show-me-epoxy-logo-jefferson-city-missouri.png","telephone":"(573) 644-2422","url":"https://showmeepoxy.com","address":{"@type":"PostalAddress","streetAddress":"Jefferson City","addressLocality":"Jefferson City","addressRegion":"MO","postalCode":"65101","addressCountry":"US"},"geo":{"@type":"GeoCoordinates","latitude":38.5767,"longitude":-92.1735},"openingHours":"Mo-Sa 08:00-18:00","priceRange":"$$","description":"Professional epoxy and polyaspartic floor coatings in Jefferson City, Columbia & Lake of the Ozarks. Diamond-ground prep, industrial-grade materials, 1-day installs. Free on-site quotes.","hasOfferCatalog":{"@type":"OfferCatalog","name":"Epoxy Floor Coating Services","itemListElement":[{"@type":"Offer","itemOffered":{"@type":"Service","name":"Garage Floor Epoxy Coatings","description":"Full broadcast flake epoxy with polyaspartic topcoat for residential garages"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Basement Floor Coatings","description":"Moisture-tolerant epoxy systems for basement floors"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Metallic Epoxy Floors","description":"Decorative metallic epoxy flooring systems"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Commercial Epoxy Flooring","description":"Heavy-duty commercial epoxy coatings for shops, warehouses, and businesses"}}]},"areaServed":[{"@type":"City","name":"Jefferson City","containedIn":"Cole County, MO"},{"@type":"City","name":"Columbia","containedIn":"Boone County, MO"},{"@type":"City","name":"Lake of the Ozarks","containedIn":"Miller/Morgan County, MO"},{"@type":"City","name":"Osage Beach","containedIn":"Camden County, MO"},{"@type":"City","name":"Rolla","containedIn":"Phelps County, MO"},{"@type":"City","name":"Fulton","containedIn":"Callaway County, MO"},{"@type":"City","name":"Camdenton","containedIn":"Camden County, MO"},{"@type":"City","name":"Eldon","containedIn":"Miller County, MO"},{"@type":"City","name":"Holts Summit","containedIn":"Callaway County, MO"},{"@type":"City","name":"Sedalia","containedIn":"Pettis County, MO"}],"review":[{"@type":"Review","author":{"@type":"Person","name":"Joel Smith"},"reviewRating":{"@type":"Rating","ratingValue":"5","bestRating":"5"},"reviewBody":"Eric and team are amazing! Definitely the best in Missouri for epoxy floors!","publisher":{"@type":"Organization","name":"Google"}},{"@type":"Review","author":{"@type":"Person","name":"Michael Bohannon"},"reviewRating":{"@type":"Rating","ratingValue":"5","bestRating":"5"},"reviewBody":"Eric and his crew were very easy to work with, they installed my new garage flooring on Sunday of all days. The price is reasonable for the quality of work. I am very pleased with the outcome.","publisher":{"@type":"Organization","name":"Google"}}],"aggregateRating":{"@type":"AggregateRating","ratingValue":"5","reviewCount":"7","bestRating":"5"}}</script>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&amp;family=Barlow+Condensed:wght@700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&amp;family=Barlow+Condensed:wght@700;800;900&amp;display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&amp;family=Barlow+Condensed:wght@700;800;900&amp;display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800;900&amp;family=Barlow+Condensed:wght@700;800;900&amp;display=swap"></noscript>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -338,6 +338,7 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 <li><a class="mobile-menu-cta" href="/contact.html" onclick="closeMobileMenu();openQuoteModal();return false;">Get a Free Quote →</a></li>
 </ul>
 </div>
+<main>
 <section class="hero">
 <div class="container" style="position:relative;z-index:2">
 <div class="hero-content">
@@ -362,7 +363,7 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 <input id="hqName" placeholder="Your name" type="text"/>
 <input id="hqPhone" placeholder="Phone number" type="tel"/>
 <input id="hqAddress" placeholder="Property address" type="text"/>
-<select id="hqType">
+<select id="hqType" aria-label="Project Type">
 <option disabled="" selected="" value="">What type of project?</option>
 <option>Garage Floor</option>
 <option>Basement</option>
@@ -691,7 +692,7 @@ async function submitHeroQuote(){
 <p style="font-size:13px;color:#aaa;margin-bottom:22px">Build your project so the calculator can start working immediately.</p>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
 <div>
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px">Project Type</label>
+<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px" for="cProjectType">Project Type</label>
 <select id="cProjectType" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0a2866;color:#fff;font-size:15px;outline:none;font-family:var(--font)">
 <option>Garage Floor</option><option>Patio / Porch</option><option>Basement</option><option>Shop / Outbuilding</option>
 </select>
@@ -703,20 +704,20 @@ async function submitHeroQuote(){
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
 <div>
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px">Coating System</label>
+<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px" for="cSystem">Coating System</label>
 <select id="cSystem" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0a2866;color:#fff;font-size:15px;outline:none;font-family:var(--font)">
 <option>Full Broadcast Flake</option><option>Metallic Floor</option>
 </select>
 </div>
 <div>
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px">Concrete Condition</label>
+<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px" for="cCondition">Concrete Condition</label>
 <select id="cCondition" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0a2866;color:#fff;font-size:15px;outline:none;font-family:var(--font)">
 <option>Good Condition</option><option>Average / Minor Repairs</option><option>Cracks / Pitting / More Prep</option>
 </select>
 </div>
 </div>
 <div style="margin-bottom:20px">
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px">Project Layout</label>
+<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px" for="cDifficulty">Project Layout</label>
 <select id="cDifficulty" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0a2866;color:#fff;font-size:15px;outline:none;font-family:var(--font)">
 <option>Standard Open Area</option><option>Some Edges / Obstacles</option><option>Tight / Detailed Layout (More Labor Required)</option>
 </select>
@@ -1061,6 +1062,7 @@ cUpdatePreview();
 <!-- FOOTER -->
 
 
+</main>
 <footer>
 <div class="container">
 <div class="footer-grid">
@@ -1133,7 +1135,7 @@ cUpdatePreview();
 </div>
 </div>
 <div style="margin-bottom:12px">
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px">Project Type</label>
+<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qProject">Project Type</label>
 <select id="qProject" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit">
 <option>Garage Floor</option>
 <option>Basement Floor</option>

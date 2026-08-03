@@ -292,7 +292,7 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 </ul>
 </li>
 <li><a href="/contact.html">Contact</a></li>
-<li><a class="nav-cta" href="javascript:void(0)" onclick="openQuoteModal()">Get a Free Quote</a></li>
+<li><a class="nav-cta" href="/contact.html" onclick="openQuoteModal();return false;">Get a Free Quote</a></li>
 </ul>
 </nav>
 <button aria-label="Open menu" id="hamburgerBtn" onclick="toggleMobileMenu()" style="display:none;flex-direction:column;justify-content:center;gap:5px;cursor:pointer;padding:10px;background:none;border:none;z-index:201;min-width:44px;min-height:44px">
@@ -305,7 +305,7 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 <div class="mobile-menu" id="mobileMenu">
 <ul>
 <li><a href="/about.html">About</a></li>
-<li><a href="#" onclick="toggleMobileSub('sub-services',event)">Services ▾</a>
+<li><a href="/service-garage.html" onclick="toggleMobileSub('sub-services',event)">Services ▾</a>
 <ul class="mobile-sub" id="sub-services">
 <li><a href="/service-garage.html">Garage Floor Coatings</a></li>
 <li><a href="/service-basement.html">Basement Floor Coatings</a></li>
@@ -313,7 +313,7 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 <li><a href="/service-countertops.html">Epoxy Countertops</a></li>
 <li><a href="/service-commercial.html">Commercial Epoxy</a></li>
 </ul></li>
-<li><a href="#" onclick="toggleMobileSub('sub-areas',event)">Areas ▾</a>
+<li><a href="/service-areas.html" onclick="toggleMobileSub('sub-areas',event)">Areas ▾</a>
 <ul class="mobile-sub" id="sub-areas">
 <li><a href="/area-jefferson-city.html">Jefferson City, MO</a></li>
 <li><a href="/area-columbia.html">Columbia, MO</a></li>
@@ -323,7 +323,7 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 <li><a href="/area-camdenton.html">Camdenton, MO</a></li>
 <li><a href="/service-areas.html">View All Areas</a></li>
 </ul></li>
-<li><a href="#" onclick="toggleMobileSub('sub-types',event)">Floor Types ▾</a>
+<li><a href="/type-flake.html" onclick="toggleMobileSub('sub-types',event)">Floor Types ▾</a>
 <ul class="mobile-sub" id="sub-types">
 <li><a href="/type-flake.html">Flake System</a></li>
 <li><a href="/type-polyaspartic.html">Polyaspartic</a></li>
@@ -335,7 +335,7 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 <li><a href="/faq.html">FAQ</a></li>
 <li><a href="/blog.html">Blog</a></li>
 <li><a href="/contact.html">Contact</a></li>
-<li><a class="mobile-menu-cta" href="javascript:void(0)" onclick="closeMobileMenu();openQuoteModal()">Get a Free Quote →</a></li>
+<li><a class="mobile-menu-cta" href="/contact.html" onclick="closeMobileMenu();openQuoteModal();return false;">Get a Free Quote →</a></li>
 </ul>
 </div>
 <section class="hero">
@@ -479,7 +479,7 @@ async function submitHeroQuote(){
 <li>1-day installation available</li>
 <li>Walk in 24 hrs / Drive in 48 hrs</li>
 </ul>
-<a class="service-link" href="/service-garage.html">Learn more</a>
+<a class="service-link" href="/service-garage.html">Learn More About Garage Floor Coatings</a>
 </div>
 </div>
 <div class="service-card">
@@ -493,7 +493,7 @@ async function submitHeroQuote(){
 <li>Durable for storage, gyms &amp; living</li>
 <li>Pet &amp; family friendly</li>
 </ul>
-<a class="service-link" href="/service-basement.html">Learn more</a>
+<a class="service-link" href="/service-basement.html">Learn More About Basement Epoxy Flooring</a>
 </div>
 </div>
 <div class="service-card">
@@ -507,7 +507,7 @@ async function submitHeroQuote(){
 <li>Designed for constant daily use</li>
 <li>Compliant with commercial standards</li>
 </ul>
-<a class="service-link" href="/service-commercial.html">Learn more</a>
+<a class="service-link" href="/service-commercial.html">Learn More About Commercial Epoxy Flooring</a>
 </div>
 </div>
 <div class="service-card">
@@ -521,7 +521,7 @@ async function submitHeroQuote(){
 <li>Withstands Midwest freeze/thaw cycles</li>
 <li>Ideal for entertaining spaces</li>
 </ul>
-<a class="service-link" href="/service-patio.html">Learn more</a>
+<a class="service-link" href="/service-patio.html">Learn More About Patio &amp; Outdoor Coatings</a>
 </div>
 </div>
 <div class="service-card">
@@ -535,7 +535,7 @@ async function submitHeroQuote(){
 <li>Custom designs &amp; color options</li>
 <li>Durable long-lasting surface</li>
 </ul>
-<a class="service-link" href="/service-countertops.html">Learn more</a>
+<a class="service-link" href="/service-countertops.html">Learn More About Epoxy Countertops</a>
 </div>
 </div>
 <div class="service-card">
@@ -549,7 +549,7 @@ async function submitHeroQuote(){
 <li>Same prep-first process throughout</li>
 <li>Residential &amp; commercial applications</li>
 </ul>
-<a class="service-link" href="/type-metallic.html">Learn more</a>
+<a class="service-link" href="/type-metallic.html">Learn More About Metallic &amp; Decorative Epoxy</a>
 </div>
 </div>
 </div>
@@ -782,7 +782,7 @@ async function submitHeroQuote(){
 <p style="font-size:12px;color:#999;margin:0">This is a ballpark estimate only. Final pricing confirmed after on-site measurement, slab evaluation, and finish selection.</p>
 </div>
 <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap">
-<a href="javascript:void(0)" onclick="openQuoteModal()" style="flex:1;display:block;background:#ebfb3b;color:#0d2d6e;font-weight:700;font-size:15px;padding:14px 20px;border-radius:10px;text-decoration:none;text-align:center;min-width:180px">Schedule My Free On-Site Quote →</a>
+<a href="/contact.html" onclick="openQuoteModal();return false;" style="flex:1;display:block;background:#ebfb3b;color:#0d2d6e;font-weight:700;font-size:15px;padding:14px 20px;border-radius:10px;text-decoration:none;text-align:center;min-width:180px">Schedule My Free On-Site Quote →</a>
 <a href="tel:5736442422" style="flex:1;display:block;border:1.5px solid rgba(255,255,255,.2);color:#fff;font-weight:600;font-size:15px;padding:14px 20px;border-radius:10px;text-decoration:none;text-align:center;min-width:180px">📞 (573) 644-2422</a>
 </div>
 </div>

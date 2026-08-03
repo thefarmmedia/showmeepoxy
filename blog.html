@@ -267,7 +267,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
         <li><a href="/faq.html">FAQ</a></li>
         <li><a href="/blog.html" class="active">Blog</a></li>
         <li><a href="/contact.html">Contact</a></li>
-        <li><a href="javascript:void(0)" onclick="openQuoteModal()" class="nav-cta">Get a Free Quote</a></li>
+        <li><a href="/contact.html" onclick="openQuoteModal();return false;" class="nav-cta">Get a Free Quote</a></li>
       </ul>
     </nav>
     <button id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Open menu" style="display:none;flex-direction:column;justify-content:center;gap:5px;cursor:pointer;padding:10px;background:none;border:none;z-index:201;min-width:44px;min-height:44px">
@@ -281,7 +281,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
   <ul>
     <li><a href="/about.html">About</a></li>
     <li>
-      <a href="#" onclick="toggleMobileSub('sub-services',event)">Services ▾</a>
+      <a href="/service-garage.html" onclick="toggleMobileSub('sub-services',event)">Services ▾</a>
       <ul class="mobile-sub" id="sub-services">
         <li><a href="/service-garage.html">Garage Floor Coatings</a></li>
         <li><a href="/service-basement.html">Basement Epoxy</a></li>
@@ -291,7 +291,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
       </ul>
     </li>
     <li>
-      <a href="#" onclick="toggleMobileSub('sub-types',event)">Floor Types ▾</a>
+      <a href="/type-flake.html" onclick="toggleMobileSub('sub-types',event)">Floor Types ▾</a>
       <ul class="mobile-sub" id="sub-types">
         <li><a href="/type-flake.html">Flake System</a></li>
         <li><a href="/type-polyaspartic.html">Polyaspartic</a></li>
@@ -300,7 +300,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
       </ul>
     </li>
     <li>
-      <a href="#" onclick="toggleMobileSub('sub-areas',event)">Areas ▾</a>
+      <a href="/service-areas.html" onclick="toggleMobileSub('sub-areas',event)">Areas ▾</a>
       <ul class="mobile-sub" id="sub-areas">
         <li><a href="/area-jefferson-city.html">Jefferson City, MO</a></li>
         <li><a href="/area-columbia.html">Columbia, MO</a></li>
@@ -329,7 +329,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
     <li><a href="/faq.html">FAQ</a></li>
     <li><a href="/blog.html">Blog</a></li>
     <li><a href="/contact.html">Contact</a></li>
-    <li><a href="javascript:void(0)" onclick="closeMobileMenu();openQuoteModal()" class="mobile-menu-cta">Get a Free Quote →</a></li>
+    <li><a href="/contact.html" onclick="closeMobileMenu();openQuoteModal();return false;" class="mobile-menu-cta">Get a Free Quote →</a></li>
   </ul>
 </div>
 
@@ -640,7 +640,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
       <div class="sb-cta">
         <h3>Ready to See Your Floor Price?</h3>
         <p>Get a real quote in 60 seconds — no pressure, no obligation.</p>
-        <a href="javascript:void(0)" onclick="openQuoteModal()" class="btn-gold">Get My Free Quote →</a>
+        <a href="/contact.html" onclick="openQuoteModal();return false;" class="btn-gold">Get My Free Quote →</a>
         <a href="tel:5736442422" class="btn-wht-out">📞 (573) 644-2422</a>
       </div>
 

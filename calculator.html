@@ -278,8 +278,8 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <!-- CALCULATOR SECTION -->
 <section id="calculator" style="padding:80px 0;background:#134db4;position:relative">
 <style>
-@keyframes calcGlow{0%,100%{box-shadow:0 0 30px rgba(235,251,59,.25),0 0 60px rgba(235,251,59,.1),inset 0 0 0 1px rgba(235,251,59,.3)}50%{box-shadow:0 0 50px rgba(235,251,59,.45),0 0 100px rgba(235,251,59,.18),inset 0 0 0 1px rgba(235,251,59,.55)}}
-.calc-glow-card{animation:calcGlow 3s ease-in-out infinite}
+@keyframes calcGlow{0%,100%{opacity:0}50%{opacity:1}}.calc-glow-card,#cUnlockCard,#cResultBox,#cWhyBox{position:relative;box-shadow:0 0 30px rgba(235,251,59,.25),0 0 60px rgba(235,251,59,.1),inset 0 0 0 1px rgba(235,251,59,.3)}.calc-glow-card::after,#cUnlockCard::after,#cResultBox::after,#cWhyBox::after{content:'';position:absolute;inset:0;border-radius:inherit;box-shadow:0 0 50px rgba(235,251,59,.45),0 0 100px rgba(235,251,59,.18),inset 0 0 0 1px rgba(235,251,59,.55);opacity:0;animation:calcGlow 3s ease-in-out infinite;pointer-events:none}
+
 .calc-outer-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;max-width:1000px;margin:0 auto}
 .calc-left{order:1}
 .calc-right{order:2}
@@ -363,7 +363,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <!-- RIGHT: Unlock + Result -->
 <div class="calc-right">
 <!-- Step 2 unlock form -->
-<div id="cUnlockCard" style="display:none;background:#111827;border-radius:20px;padding:32px;margin-bottom:20px;animation:calcGlow 3s ease-in-out infinite">
+<div id="cUnlockCard" style="display:none;background:#111827;border-radius:20px;padding:32px;margin-bottom:20px">
 <h3 style="font-family:var(--font-cond);font-size:22px;font-weight:800;color:#fff;margin-bottom:6px">Step 2: Unlock Your Price</h3>
 <p style="font-size:14px;color:#bbb;margin-bottom:20px">One step away. Enter your info to instantly reveal your ballpark quote.</p>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
@@ -393,7 +393,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <button id="cRevealBtn" onclick="cRevealPrice()" style="width:100%;background:#ebfb3b;color:#0d2d6e;border:none;border-radius:12px;padding:15px 20px;font-size:16px;font-weight:800;cursor:pointer;font-family:var(--font);transition:all .2s;box-shadow:0 0 24px rgba(235,251,59,.35)" onmouseover="this.style.boxShadow='0 0 40px rgba(235,251,59,.6)'" onmouseout="this.style.boxShadow='0 0 24px rgba(235,251,59,.35)'">Reveal My Exact Ballpark Price</button>
 </div>
 <!-- Result box -->
-<div id="cResultBox" style="display:none;background:#111827;border-radius:20px;padding:32px;animation:calcGlow 3s ease-in-out infinite">
+<div id="cResultBox" style="display:none;background:#111827;border-radius:20px;padding:32px">
 <div style="padding:24px;border-radius:16px;background:linear-gradient(180deg,rgba(235,251,59,.18),rgba(235,251,59,.04));border:1px solid rgba(235,251,59,.35)">
 <div style="font-size:12px;color:#aaa;margin-bottom:6px">Estimated Ballpark Investment</div>
 <div id="cPriceRange" style="font-size:48px;font-weight:900;color:#fff;line-height:1;margin-bottom:12px">$0 – $0</div>
@@ -414,7 +414,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 
 </div>
 <!-- Why box -->
-<div class="calc-why" id="cWhyBox" style="background:#111827;border-radius:20px;padding:28px;animation:calcGlow 3s ease-in-out infinite">
+<div class="calc-why" id="cWhyBox" style="background:#111827;border-radius:20px;padding:28px">
 <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#ebfb3b;margin-bottom:10px">Why Use This Calculator?</div>
 <div style="display:flex;flex-direction:column;gap:14px">
 <div style="display:flex;gap:12px;align-items:flex-start">

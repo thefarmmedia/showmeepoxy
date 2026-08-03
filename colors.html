@@ -42,22 +42,22 @@ nav ul li .sub{display:none;position:absolute;top:100%;left:0;background:var(--w
 nav ul li:hover .sub{display:block}
 .sub li a{padding:9px 18px;font-size:13px;font-weight:500;color:var(--gray-600);white-space:nowrap}
 .sub li a:hover{color:var(--navy);background:var(--gray-100)}
-.sub-label{padding:8px 18px 4px;font-size:11px;font-weight:700;color:var(--gray-400);letter-spacing:.8px;text-transform:uppercase}
+.sub-label{padding:8px 18px 4px;font-size:11px;font-weight:700;color:var(--gray-600);letter-spacing:.8px;text-transform:uppercase}
 .nav-cta{background:var(--gold);color:var(--navy-dark)!important;border-radius:var(--r);font-weight:700!important;padding:9px 18px!important;cursor:pointer}
 .nav-cta:hover{background:var(--gold-light)!important}
-.breadcrumb{background:var(--gray-50);border-bottom:1px solid var(--gray-200);padding:10px 0;font-size:13px;color:var(--gray-400)}
+.breadcrumb{background:var(--gray-50);border-bottom:1px solid var(--gray-200);padding:10px 0;font-size:13px;color:var(--gray-600)}
 .breadcrumb a{color:var(--navy);text-decoration:none}
 .breadcrumb span{margin:0 6px;color:var(--gray-300)}
-footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
+footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
 .footer-brand h3{font-family:var(--cond);font-size:22px;font-weight:800;color:var(--white);margin-bottom:10px}
 .footer-brand p{font-size:14px;line-height:1.7;margin-bottom:18px}
 .footer-col h4{font-size:13px;font-weight:700;color:var(--white);letter-spacing:.5px;margin-bottom:14px;text-transform:uppercase}
 .footer-col ul{list-style:none;display:flex;flex-direction:column;gap:7px}
-.footer-col ul li a{font-size:13px;color:rgba(255,255,255,.55);text-decoration:none;transition:color .2s}
+.footer-col ul li a{font-size:13px;color:rgba(255,255,255,.75);text-decoration:none;transition:color .2s}
 .footer-col ul li a:hover{color:var(--gold)}
 .footer-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;font-size:12px}
-.footer-bottom a{color:rgba(255,255,255,.4);text-decoration:none}
+.footer-bottom a{color:rgba(255,255,255,.75);text-decoration:none}
 .ph{color:var(--gold-light);text-decoration:none;font-weight:600}
 @media(max-width:900px){.footer-grid{grid-template-columns:1fr 1fr}}
 #standard-grid{display:grid!important;grid-template-columns:repeat(5,1fr)!important;gap:16px!important}
@@ -248,7 +248,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
     <button onclick="filterColors('all',this)" class="filter-btn active" style="padding:7px 16px;border-radius:20px;font-size:13px;font-weight:600;border:1.5px solid var(--navy);background:var(--navy);color:#fff;cursor:pointer;font-family:var(--font)">All Colors (27)</button>
     <button onclick="filterColors('standard',this)" class="filter-btn" style="padding:7px 16px;border-radius:20px;font-size:13px;font-weight:600;border:1.5px solid var(--gray-200);background:#fff;color:var(--gray-600);cursor:pointer;font-family:var(--font)">Standard ¼" Flake (19)</button>
     <button onclick="filterColors('hybrid',this)" class="filter-btn" style="padding:7px 16px;border-radius:20px;font-size:13px;font-weight:600;border:1.5px solid var(--gray-200);background:#fff;color:var(--gray-600);cursor:pointer;font-family:var(--font)">Hybrid Flake (8)</button>
-    <span style="margin-left:auto;font-size:13px;color:var(--gray-400)">Samples brought to every free quote appointment</span>
+    <span style="margin-left:auto;font-size:13px;color:var(--gray-600)">Samples brought to every free quote appointment</span>
   </div>
 </div>
 
@@ -281,7 +281,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
     <div style="margin-bottom:36px">
       <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">Standard Collection</div>
       <h2 style="font-family:var(--cond);font-size:36px;font-weight:900;color:#fff;margin-bottom:10px">Traditional ¼" Flake — 19 Blends</h2>
-      <p style="font-size:15px;color:rgba(255,255,255,.65);max-width:620px;line-height:1.65">Our most popular system. Full-broadcast ¼" vinyl flake in 16 signature color blends — textured, slip-resistant, and built to last. Included in all standard flake installs.</p>
+      <p style="font-size:15px;color:rgba(255,255,255,.75);max-width:620px;line-height:1.65">Our most popular system. Full-broadcast ¼" vinyl flake in 16 signature color blends — textured, slip-resistant, and built to last. Included in all standard flake installs.</p>
     </div>
     <div id="standard-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px">
       <div onclick="openColorModal('Arrowhead','epoxy-flake-color-arrowhead.jpg','Charcoal, gray, white & red — bold contrast, great for garages')" style="border-radius:14px;overflow:hidden;border:2px solid rgba(255,255,255,.07);cursor:pointer;transition:transform .2s,border-color .2s;position:relative" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='#ebfb3b'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.07)'">
@@ -446,7 +446,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
     <div style="margin-bottom:36px">
       <div style="display:inline-block;background:#134db4;color:#fff;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:5px 12px;border-radius:20px;margin-bottom:10px">Small Upcharge</div>
       <h2 style="font-family:var(--cond);font-size:36px;font-weight:900;color:#fff;margin-bottom:10px">Hybrid Flake — 8 Premium Blends</h2>
-      <p style="font-size:15px;color:rgba(255,255,255,.65);max-width:620px;line-height:1.65">Hybrid flake blends multiple chip sizes for a richer, more dimensional look with added depth and texture. Available for a small upcharge — ask us at your free quote appointment.</p>
+      <p style="font-size:15px;color:rgba(255,255,255,.75);max-width:620px;line-height:1.65">Hybrid flake blends multiple chip sizes for a richer, more dimensional look with added depth and texture. Available for a small upcharge — ask us at your free quote appointment.</p>
     </div>
     <div id="hybrid-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
       <div onclick="openColorModal('Cascade','epoxy-flake-color-cascade.jpg','White, tan, gray & brick red — light neutral with warm accents')" style="border-radius:14px;overflow:hidden;border:2px solid rgba(255,255,255,.07);cursor:pointer;transition:transform .2s,border-color .2s;position:relative" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='#ebfb3b'" onmouseout="this.style.transform='';this.style.borderColor='rgba(255,255,255,.07)'">
@@ -535,7 +535,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.65);padding:56px 0 28px}
     <div style="margin-bottom:36px;text-align:center">
       <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">Premium Metallic System</div>
       <h2 style="font-family:var(--cond);font-size:36px;font-weight:900;color:#fff;margin-bottom:10px">Metallic Epoxy Pigment Colors</h2>
-      <p style="font-size:15px;color:rgba(255,255,255,.65);max-width:620px;margin:0 auto;line-height:1.65">Our metallic system uses pure pigment powders suspended in <a href="/type-polyaspartic.html" title="Polyaspartic Floor Coatings Missouri">polyaspartic</a> resin — poured, manipulated, and sealed for a one-of-a-kind liquid-metal floor. No two are ever identical. Available in 59 signature pigments.</p>
+      <p style="font-size:15px;color:rgba(255,255,255,.75);max-width:620px;margin:0 auto;line-height:1.65">Our metallic system uses pure pigment powders suspended in <a href="/type-polyaspartic.html" title="Polyaspartic Floor Coatings Missouri">polyaspartic</a> resin — poured, manipulated, and sealed for a one-of-a-kind liquid-metal floor. No two are ever identical. Available in 59 signature pigments.</p>
     </div>
     <div style="padding:20px;background:rgba(235,251,59,.08);border:1px solid rgba(235,251,59,.2);border-radius:12px;text-align:center;margin-bottom:44px">
       <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">🌊 Every Metallic Floor Is One of a Kind</div>

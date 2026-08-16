@@ -16,17 +16,17 @@ Netlify serves every page at both `/page` and `/page.html` by default with no re
 
 `index.html`'s own canonical tag also points to `/` (fixed this pass — it previously pointed at `/index.html`, actively working against consolidation).
 
-## Legacy/zombie URLs (410 Gone)
+## Legacy/zombie URLs (301, preserving residual value)
 
-These don't exist anywhere in this repo or its git history — leftover from before this site was rebuilt on its current platform — but were still showing up in live Google search results for the brand query "Show Me Epoxy," cluttering the brand SERP with dead links.
+These don't exist anywhere in this repo or its git history — leftover from before this site was rebuilt on its current platform — but were still showing up in live Google search results for the brand query "Show Me Epoxy," cluttering the brand SERP with dead links. Originally set to 410 Gone; changed to 301 redirects to the closest genuinely relevant real page instead, so any residual link equity or ranking signal these URLs carried isn't simply discarded.
 
-| From | Status |
-|---|---|
-| `/holtzsummit-mo-epoxy-flooring-7586-483758-565979` | 410 Gone |
-| `/camdenton-mo-epoxy-flooring-7586-670437` | 410 Gone |
-| `/service-page` | 410 Gone |
+| From | To | Reasoning |
+|---|---|---|
+| `/holtzsummit-mo-epoxy-flooring-7586-483758-565979` | `/area-holts-summit.html` | Old URL's own title referenced "Jefferson City & Holts Summit" — closest real equivalent |
+| `/camdenton-mo-epoxy-flooring-7586-670437` | `/area-camdenton.html` | Old URL's own title referenced "Jefferson City & Camdenton" — closest real equivalent |
+| `/service-page` | `/` | No specific content match existed (generic title, ambiguous purpose) — redirected to homepage rather than left as a dead end |
 
-**Manual action still needed**: 410 status speeds up deindexing but Google may take days to weeks to fully drop these from the index on its own recrawl schedule. For faster removal, use Search Console → Removals for these 3 exact URLs (see SEO-NEXT-STEPS.md).
+**Manual action still useful**: a 301 still requires Google to recrawl and process it. For faster removal of the old URL from the index specifically, Search Console → Removals still works even though the destination now resolves — see SEO-NEXT-STEPS.md.
 
 ## Extensionless → .html (301) — every real page
 

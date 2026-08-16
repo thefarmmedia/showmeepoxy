@@ -22,6 +22,11 @@ The following claims appear on the live site. They weren't fabricated by this pa
 
 - **"Licensed & Insured"** — appears in the homepage trust bar, `about.html`, and `faq.html`. Missouri doesn't require a statewide contractor license for most flooring work, so this claim should be backed by an actual insurance policy (and license, if applicable in the specific county/municipality). If accurate, consider adding the insurer name or a policy reference somewhere verifiable; if not currently accurate, it should come down.
 - **"5-year warranty"** — this comes from a real customer's Google review (Chuck Lawson) describing what he was told, not site marketing copy. Worth confirming the actual warranty terms are documented somewhere so the business can back up a customer's public description of it.
+- **"We work with several financing options for qualified customers"** — `faq.html`, in the "Do you offer financing or payment plans?" answer. Nothing in the repo names the actual financing partner/program — confirm this is current and accurate.
+
+## No analytics/tracking pixel found in the codebase
+
+Checked the full git history — Google Analytics, Google Tag Manager, and Meta Pixel have never existed in this repository at any point. This isn't something this SEO work removed; it was never installed. The only tracking mechanism on the site is the CRM webhook (leadconnectorhq.com) that fires on form/calculator submissions, which is intact and unchanged. If the business wants visibility into traffic/behavior beyond what the CRM captures and Search Console already provides, GA4 or GTM would need to be added — that's a decision for the business, not something this pass added unprompted.
 
 ## Google Business Profile (the highest-leverage item not in this repo)
 
@@ -50,3 +55,10 @@ Nothing in this repo can build backlinks. Worth pursuing directly:
 
 - Re-check Search Console 28-day data in ~4-6 weeks to see whether the Columbia page differentiation and canonical fixes move `epoxy flooring Columbia MO` (currently position ~27) and the sibling Columbia pages.
 - Watch whether the homepage's new keyword-first title changes CTR on the 0%-CTR generic terms — if it doesn't move within a few weeks, that's stronger evidence the Local Pack (not the title) is the real ceiling, and effort should shift fully to the Google Business Profile.
+
+## One thing this environment genuinely cannot do
+
+This dev environment's network policy blocks outbound requests to showmeepoxy.com directly (confirmed: a `curl` to the live domain gets a 403 from the sandbox's own proxy, not from your site). That means live HTTP status codes, a real Lighthouse/PageSpeed run, and an actual form submission test all have to happen against the deployed site, not from here. What was done instead, as the strongest available substitute:
+- Every redirect rule was resolved by simulating Netlify's exact first-match-wins logic against `_redirects` (not just read for syntax) — confirmed 0 chains, every target resolves to a real file, `/index.html` resolves to `/` in exactly one hop.
+- All 261 inline `<script>` blocks across all 97 pages were extracted and run through Node's real JS parser (`node --check`) — 0 syntax errors, which is meaningful evidence the calculator/contact/quote form JS wasn't broken by any edit, though it doesn't prove a live submission reaches the CRM.
+- Recommended: after this deploys, run `curl -I https://showmeepoxy.com/index.html` yourself (should show a 301 to `/`) and submit one real test lead through the contact form and calculator so you can confirm delivery and then delete the test entry from your CRM.

@@ -16,13 +16,18 @@ Everything below requires action outside this repository — a Search Console cl
    - `showmeepoxy.com/camdenton-mo-epoxy-flooring-7586-670437`
    - `showmeepoxy.com/service-page`
 
-## Claims that need verification (found during the audit, not removed)
+## Claims removed pending verification
 
-The following claims appear on the live site. They weren't fabricated by this pass and weren't removed, but nothing in this repository verifies them — confirm they're accurate, or soften/remove them if not:
+Per explicit instruction, these were removed from the live site because nothing in this repository confirms them (no license number, insurer name, financing partner, or documented moisture-testing procedure anywhere in the codebase). If any of these are in fact accurate business practices, they can be re-added — ideally with something verifiable alongside them (an insurer name, a license number, a named financing partner):
 
-- **"Licensed & Insured"** — appears in the homepage trust bar, `about.html`, and `faq.html`. Missouri doesn't require a statewide contractor license for most flooring work, so this claim should be backed by an actual insurance policy (and license, if applicable in the specific county/municipality). If accurate, consider adding the insurer name or a policy reference somewhere verifiable; if not currently accurate, it should come down.
+- **"Licensed & Insured"** trust badge — removed from the homepage trust bar and the `about.html` checklist.
+- **"Are you licensed and insured in Missouri?"** FAQ entry (claimed general liability insurance and workers' compensation coverage) — removed entirely from `faq.html`.
+- **"Do you offer financing or payment plans?"** FAQ entry — removed entirely from `faq.html`.
+- **Operational "we moisture test" claims** — removed from `area-ashland.html` (both the visible FAQ answer, its FAQPage schema, and a checklist bullet) and all 5 Rolla pages + `area-rolla.html` (removed from the "our process includes..." sentences). The general educational content in `blog-can-mold-grow-under-epoxy-floor.html` about why moisture testing matters for basement installs was left as-is since it's industry guidance, not a specific "we do this on every job" operational guarantee.
+
+## Claims still flagged, not removed (softer signal, left for owner judgment)
+
 - **"5-year warranty"** — this comes from a real customer's Google review (Chuck Lawson) describing what he was told, not site marketing copy. Worth confirming the actual warranty terms are documented somewhere so the business can back up a customer's public description of it.
-- **"We work with several financing options for qualified customers"** — `faq.html`, in the "Do you offer financing or payment plans?" answer. Nothing in the repo names the actual financing partner/program — confirm this is current and accurate.
 
 ## No analytics/tracking pixel found in the codebase
 

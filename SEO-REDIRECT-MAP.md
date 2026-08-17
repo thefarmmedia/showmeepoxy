@@ -6,17 +6,21 @@ Every redirect rule currently live in `_redirects` (Netlify redirect config), ge
 
 Netlify serves every page at both `/page` and `/page.html` by default with no redirect — Google had indexed both forms of ~20+ pages separately, splitting impressions/clicks/ranking signals across duplicate URLs (confirmed in the 28-day report: e.g. `/blog-do-you-need-to-grind-concrete-before-epoxy` and the `.html` version showing as two separate rows). Rather than switch the whole site to extensionless URLs (which every internal link, canonical tag, and the sitemap already consistently use as `.html`), the fix was to 301 every extensionless duplicate to its `.html` canonical — preserving the convention that's actually implemented everywhere else in the codebase.
 
+## The force flag (`!`) — why both URL versions kept resolving live
+
+Both `/page` and `/page.html` kept serving full 200 content live even after the 301 rules above went in, despite the rules being syntactically correct. Root cause: this is Netlify's documented "shadowing" behavior — when a redirect's source path is the pretty-URL alias of a file that actually exists in the deploy (e.g. `/calculator` aliasing to `calculator.html`), Netlify's own automatic clean-URL asset serving can win over a plain redirect rule and serve the file directly, silently ignoring the 301. Netlify's fix for this is to append `!` to the status code to force the redirect to take precedence over static asset matching (e.g. `/calculator /calculator.html 301!`). All 102 rules now carry the `!` flag. This affects every rule whose source is the extensionless alias of a real file — which is effectively all of them, including the homepage/`index.html` consolidation rules, since `/index.html` is itself a real file Netlify would otherwise serve directly.
+
 ## Homepage consolidation
 
 | From | To | Type |
 |---|---|---|
-| `/home` | `/` | 301 |
-| `/index.html` | `/` | 301 |
-| `/index` | `/` | 301 |
+| `/home` | `/` | 301! |
+| `/index.html` | `/` | 301! |
+| `/index` | `/` | 301! |
 
 `index.html`'s own canonical tag also points to `/` (fixed this pass — it previously pointed at `/index.html`, actively working against consolidation).
 
-## Legacy/zombie URLs (301, preserving residual value)
+## Legacy/zombie URLs (301!, preserving residual value)
 
 These don't exist anywhere in this repo or its git history — leftover from before this site was rebuilt on its current platform — but were still showing up in live Google search results for the brand query "Show Me Epoxy," cluttering the brand SERP with dead links. Originally set to 410 Gone; changed to 301 redirects to the closest genuinely relevant real page instead, so any residual link equity or ranking signal these URLs carried isn't simply discarded.
 
@@ -28,7 +32,7 @@ These don't exist anywhere in this repo or its git history — leftover from bef
 
 **Manual action still useful**: a 301 still requires Google to recrawl and process it. For faster removal of the old URL from the index specifically, Search Console → Removals still works even though the destination now resolves — see SEO-NEXT-STEPS.md.
 
-## Extensionless → .html (301) — every real page
+## Extensionless → .html (301!) — every real page
 
 | From | To |
 |---|---|

@@ -93,7 +93,9 @@ nav ul li:hover .sub{display:block}
 .hero-card h2{font-size:17px;font-weight:700;margin-bottom:16px;color:var(--white)}
 .quick-quote{display:flex;flex-direction:column;gap:10px}
 .quick-quote input,
-.quick-quote select{width:100%;padding:11px 14px;border:1px solid rgba(255,255,255,0.2);border-radius:var(--radius);background:rgba(255,255,255,0.08);color:var(--white);font-size:14px;font-family:var(--font-main);outline:none}
+.quick-quote select,
+.quick-quote textarea{width:100%;padding:11px 14px;border:1px solid rgba(255,255,255,0.2);border-radius:var(--radius);background:rgba(255,255,255,0.08);color:var(--white);font-size:14px;font-family:var(--font-main);outline:none}
+.quick-quote textarea{resize:vertical;min-height:60px}
 .quick-quote input::placeholder{color:rgba(255,255,255,0.45)}
 .quick-quote select option{background:var(--navy);color:var(--white)}
 .quick-quote .btn-primary{text-align:center;cursor:pointer;border:none;font-family:var(--font-main);font-size:15px}
@@ -361,17 +363,20 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 <div class="hero-card">
 <h2>Request a Free Estimate</h2>
 <div class="quick-quote">
-<input id="hqName" placeholder="Your name" type="text"/>
+<input id="hqName" placeholder="Full name" type="text"/>
 <input id="hqPhone" placeholder="Phone number" type="tel"/>
-<input id="hqAddress" placeholder="Property address" type="text"/>
+<input id="hqEmail" placeholder="Email address" type="email"/>
+<input id="hqZip" placeholder="ZIP code" type="text" maxlength="5"/>
 <select id="hqType" aria-label="Project Type">
 <option disabled="" selected="" value="">What type of project?</option>
 <option>Garage Floor</option>
-<option>Basement</option>
+<option>Basement Floor</option>
 <option>Patio / Outdoor</option>
-<option>Commercial / Shop</option>
+<option>Commercial / Warehouse</option>
+<option>Epoxy Countertops</option>
+<option>Other</option>
 </select>
-<input id="hqZip" placeholder="ZIP code" type="text" maxlength="5"/>
+<textarea id="hqMessage" placeholder="Square footage, current condition, any questions... (optional)" rows="2"></textarea>
 <button class="btn-primary" onclick="submitHeroQuote()" type="button">Request My Free Estimate →</button>
 </div>
 <p style="font-size:12px;color:rgba(255,255,255,.75);margin:10px 0 0;text-align:center">No obligation · We respond within 1 business day</p>
@@ -380,15 +385,20 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 async function submitHeroQuote(){
   var name=document.getElementById('hqName').value.trim();
   var phone=document.getElementById('hqPhone').value.trim();
-  var address=document.getElementById('hqAddress').value.trim();
-  var type=document.getElementById('hqType').value;
+  var email=document.getElementById('hqEmail').value.trim();
   var zip=document.getElementById('hqZip').value.trim();
-  if(!name||!phone||!address||!type||!zip){alert('Please fill in all fields.');return;}
+  var type=document.getElementById('hqType').value;
+  var message=document.getElementById('hqMessage').value.trim();
+  if(!name||!phone||!email||!zip){alert('Please fill in all required fields.');return;}
   var btn=document.querySelector('.quick-quote .btn-primary');
   btn.textContent='Sending...';btn.disabled=true;
+  var parts=name.split(/\s+/);
+  var firstName=parts.shift()||'';
+  var lastName=parts.join(' ');
   var fd=new FormData();
-  fd.append('name',name);fd.append('phone',phone.replace(/[^\d+]/g,''));
-  fd.append('address',address);fd.append('project_type',type);fd.append('zip',zip);
+  fd.append('name',name);fd.append('first_name',firstName);fd.append('last_name',lastName);
+  fd.append('phone',phone.replace(/[^\d+]/g,''));fd.append('email',email);fd.append('zip',zip);
+  fd.append('project_type',type);fd.append('message',message);
   fd.append('lead_source','Show Me Epoxy Estimate Request Form');
   fd.append('page_url',window.location.href);
   try{await fetch('https://services.leadconnectorhq.com/hooks/UDCPiPWt9uV7guaCe7PH/webhook-trigger/09162da4-f3af-45b1-8080-acf28096d4a3',{method:'POST',body:fd});}catch(e){}

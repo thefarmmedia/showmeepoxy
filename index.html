@@ -367,6 +367,7 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 <input id="hqPhone" placeholder="Phone number" type="tel"/>
 <input id="hqEmail" placeholder="Email address" type="email"/>
 <input id="hqZip" placeholder="ZIP code" type="text" maxlength="5"/>
+<input id="hqAddress" placeholder="Property address" type="text"/>
 <select id="hqType" aria-label="Project Type">
 <option disabled="" selected="" value="">What type of project?</option>
 <option>Garage Floor</option>
@@ -387,9 +388,10 @@ async function submitHeroQuote(){
   var phone=document.getElementById('hqPhone').value.trim();
   var email=document.getElementById('hqEmail').value.trim();
   var zip=document.getElementById('hqZip').value.trim();
+  var address=document.getElementById('hqAddress').value.trim();
   var type=document.getElementById('hqType').value;
   var message=document.getElementById('hqMessage').value.trim();
-  if(!name||!phone||!email||!zip){alert('Please fill in all required fields.');return;}
+  if(!name||!phone||!email||!zip||!address){alert('Please fill in all required fields.');return;}
   var btn=document.querySelector('.quick-quote .btn-primary');
   btn.textContent='Sending...';btn.disabled=true;
   var parts=name.split(/\s+/);
@@ -397,7 +399,7 @@ async function submitHeroQuote(){
   var lastName=parts.join(' ');
   var fd=new FormData();
   fd.append('name',name);fd.append('first_name',firstName);fd.append('last_name',lastName);
-  fd.append('phone',phone.replace(/[^\d+]/g,''));fd.append('email',email);fd.append('zip',zip);
+  fd.append('phone',phone.replace(/[^\d+]/g,''));fd.append('email',email);fd.append('zip',zip);fd.append('address',address);
   fd.append('project_type',type);fd.append('message',message);
   fd.append('lead_source','Show Me Epoxy Estimate Request Form');
   fd.append('page_url',window.location.href);
@@ -897,6 +899,10 @@ async function submitHeroQuote(){
 </div>
 </div>
 <div style="margin-bottom:12px">
+<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px">Property Address *</label>
+<input id="qAddress" placeholder="123 Main St, Jefferson City, MO" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" type="text"/>
+</div>
+<div style="margin-bottom:12px">
 <label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qProject">Project Type</label>
 <select id="qProject" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit">
 <option>Garage Floor</option>
@@ -940,9 +946,10 @@ async function submitQuoteForm(){
   const phone=document.getElementById('qPhone').value.trim();
   const email=document.getElementById('qEmail').value.trim();
   const zip=document.getElementById('qZip').value.trim();
+  const address=document.getElementById('qAddress').value.trim();
   const project=document.getElementById('qProject').value;
   const message=document.getElementById('qMessage').value.trim();
-  if(!name||!phone||!email||!zip){ alert('Please fill in all required fields.'); return; }
+  if(!name||!phone||!email||!zip||!address){ alert('Please fill in all required fields.'); return; }
   const btn=document.getElementById('qSubmitBtn');
   btn.disabled=true; btn.textContent='Sending...';
   const parts=name.split(/\s+/);
@@ -950,7 +957,7 @@ async function submitQuoteForm(){
   const lastName=parts.join(' ');
   const fd=new FormData();
   fd.append('name',name); fd.append('first_name',firstName); fd.append('last_name',lastName);
-  fd.append('phone',phone.replace(/[^\d+]/g,'')); fd.append('email',email); fd.append('zip',zip);
+  fd.append('phone',phone.replace(/[^\d+]/g,'')); fd.append('email',email); fd.append('zip',zip);fd.append('address',address);
   fd.append('project_type',project); fd.append('message',message);
   fd.append('lead_source','Show Me Epoxy Website'); fd.append('page_url',window.location.href);
   try{

@@ -559,6 +559,10 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 </div>
 </div>
 <div style="margin-bottom:12px">
+<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px">Property Address *</label>
+<input id="qAddress" placeholder="123 Main St, Jefferson City, MO" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" type="text"/>
+</div>
+<div style="margin-bottom:12px">
 <label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qProject">Project Type</label>
 <select id="qProject" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit">
 <option>Garage Floor</option>
@@ -602,9 +606,10 @@ async function submitQuoteForm(){
   const phone=document.getElementById('qPhone').value.trim();
   const email=document.getElementById('qEmail').value.trim();
   const zip=document.getElementById('qZip').value.trim();
+  const address=document.getElementById('qAddress').value.trim();
   const project=document.getElementById('qProject').value;
   const message=document.getElementById('qMessage').value.trim();
-  if(!name||!phone||!email||!zip){ alert('Please fill in all required fields.'); return; }
+  if(!name||!phone||!email||!zip||!address){ alert('Please fill in all required fields.'); return; }
   const btn=document.getElementById('qSubmitBtn');
   btn.disabled=true; btn.textContent='Sending...';
   const parts=name.split(/\s+/);
@@ -612,7 +617,7 @@ async function submitQuoteForm(){
   const lastName=parts.join(' ');
   const fd=new FormData();
   fd.append('name',name); fd.append('first_name',firstName); fd.append('last_name',lastName);
-  fd.append('phone',phone.replace(/[^\d+]/g,'')); fd.append('email',email); fd.append('zip',zip);
+  fd.append('phone',phone.replace(/[^\d+]/g,'')); fd.append('email',email); fd.append('zip',zip);fd.append('address',address);
   fd.append('project_type',project); fd.append('message',message);
   fd.append('lead_source','Show Me Epoxy Website'); fd.append('page_url',window.location.href);
   try{

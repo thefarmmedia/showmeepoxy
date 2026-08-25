@@ -1025,36 +1025,43 @@ function fvComposite(room, color, callback){
     var bw = maxX - minX, bh = maxY - minY;
     if (bw <= 0 || bh <= 0) { callback(baseImg.src); return; }
 
-    // Real floor lighting, read straight from the photo.
-    var floorData = ctx.getImageData(minX, minY, bw, bh).data;
+    // Room LIGHTING, not the concrete's own dirt: downscale-then-upscale
+    // the floor region (a cheap, fast box blur with zero extra libraries)
+    // so individual stains, cracks, and discoloration in the raw concrete
+    // get smoothed away, while the broad light falloff (bright near the
+    // door, dimmer toward the back) survives. Epoxy fully seals and hides
+    // the slab underneath — a stain visible in the "before" photo has no
+    // business showing up as a blotch in the "after" floor.
+    var blurSmall = document.createElement('canvas');
+    var sw = Math.max(8, Math.round(bw / 22));
+    var sh = Math.max(8, Math.round(bh / 22));
+    blurSmall.width = sw; blurSmall.height = sh;
+    blurSmall.getContext('2d').drawImage(canvas, minX, minY, bw, bh, 0, 0, sw, sh);
+    var blurCanvas = document.createElement('canvas');
+    blurCanvas.width = bw; blurCanvas.height = bh;
+    var blurCtx = blurCanvas.getContext('2d');
+    blurCtx.imageSmoothingEnabled = true;
+    blurCtx.drawImage(blurSmall, 0, 0, sw, sh, 0, 0, bw, bh);
+    var floorData = blurCtx.getImageData(0, 0, bw, bh).data;
 
-    // Tile the selected color texture in horizontal bands with a growing
-    // scale from top to bottom of the floor region — flake nearest the
-    // camera reads larger, flake toward the back of the room reads
-    // smaller, approximating the perspective a flat single-scale tile
-    // can't produce with plain canvas (no true projective transform).
+    // Tile the selected color texture at one consistent scale across the
+    // whole floor region. An earlier version tried to grow the tile size
+    // in horizontal bands to fake perspective (smaller flake toward the
+    // back of the room); in testing that produced a visible moire
+    // interference pattern from the repeating tile crossing the band
+    // scale-steps, which reads far worse than not having a perspective
+    // cue at all. A single clean scale, no seams, no interference.
     var texCanvas = document.createElement('canvas');
     texCanvas.width = bw; texCanvas.height = bh;
     var texCtx = texCanvas.getContext('2d');
     var pattern = texCtx.createPattern(texImg, 'repeat');
-    var farTile = Math.max(16, Math.round(bw * 0.025));
-    var nearTile = Math.max(farTile + 16, Math.round(bw * 0.10));
-    var bands = 16;
-    for (var s = 0; s < bands; s++) {
-      var stripTop = Math.floor(bh * s / bands);
-      var stripBottom = Math.floor(bh * (s + 1) / bands);
-      var t = (s + 0.5) / bands;
-      var tileSize = farTile + (nearTile - farTile) * t;
-      var bScale = tileSize / texImg.naturalWidth;
-      texCtx.save();
-      texCtx.beginPath();
-      texCtx.rect(0, stripTop, bw, stripBottom - stripTop);
-      texCtx.clip();
-      texCtx.scale(bScale, bScale);
-      texCtx.fillStyle = pattern;
-      texCtx.fillRect(0, stripTop / bScale, bw / bScale, (stripBottom - stripTop) / bScale + 2);
-      texCtx.restore();
-    }
+    var tileSize = Math.max(110, Math.round(bw * 0.16));
+    var uScale = tileSize / texImg.naturalWidth;
+    texCtx.save();
+    texCtx.scale(uScale, uScale);
+    texCtx.fillStyle = pattern;
+    texCtx.fillRect(0, 0, bw / uScale, bh / uScale);
+    texCtx.restore();
     var texData = texCtx.getImageData(0, 0, bw, bh);
     var out = texData;
     for (var i = 0; i < floorData.length; i += 4) {

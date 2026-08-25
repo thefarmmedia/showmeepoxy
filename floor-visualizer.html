@@ -135,7 +135,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 .fv-tag-before{left:12px;background:rgba(0,0,0,.55)}
 .fv-tag-after{right:12px;background:rgba(19,77,180,.85)}
 
-.fv-toggle-row{display:flex;gap:8px;justify-content:center;margin-top:14px}
+.fv-toggle-row{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
 .fv-toggle-btn{border:1.5px solid rgba(255,255,255,.25);background:transparent;color:#fff;font-family:var(--font);font-weight:700;font-size:13px;padding:9px 20px;border-radius:24px;cursor:pointer;transition:all .15s}
 .fv-toggle-btn.fv-toggle-active{background:var(--gold);border-color:var(--gold);color:#0d2d6e}
 
@@ -336,15 +336,12 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 
             <!-- CALIBRATION OVERLAY: shown right after a customer uploads their own photo -->
             <div class="fv-calibrate" id="fvCalibrate" style="display:none">
-              <img class="fv-calibrate-img" id="fvCalibrateImg" src="" alt="Your uploaded photo — drag the corners onto your floor">
+              <img class="fv-calibrate-img" id="fvCalibrateImg" src="" alt="Your uploaded photo — drag the points onto the edge of your floor">
               <svg class="fv-calibrate-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
                 <polygon id="fvCalibratePoly" points="" fill="rgba(235,251,59,.28)" stroke="#ebfb3b" stroke-width="0.6" vector-effect="non-scaling-stroke"></polygon>
               </svg>
-              <div class="fv-calibrate-handle" id="fvHandle0" data-i="0"></div>
-              <div class="fv-calibrate-handle" id="fvHandle1" data-i="1"></div>
-              <div class="fv-calibrate-handle" id="fvHandle2" data-i="2"></div>
-              <div class="fv-calibrate-handle" id="fvHandle3" data-i="3"></div>
-              <div class="fv-calibrate-hint">Drag the 4 corners onto your floor</div>
+              <div id="fvHandles"></div>
+              <div class="fv-calibrate-hint" id="fvCalibrateHint">Drag the points onto your floor's edges</div>
             </div>
           </div>
           <div class="fv-toggle-row" id="fvToggleRow">
@@ -353,7 +350,9 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
             <button type="button" class="fv-toggle-btn" id="fvBtnAfter" onclick="fvSetReveal(100)">After</button>
           </div>
           <div class="fv-toggle-row" id="fvCalibrateRow" style="display:none">
-            <button type="button" class="fv-toggle-btn" onclick="fvResetCalibration()">↺ Reset Corners</button>
+            <button type="button" class="fv-toggle-btn" onclick="fvAddCalibrationPoint()">+ Add Point</button>
+            <button type="button" class="fv-toggle-btn" onclick="fvRemoveCalibrationPoint()">− Remove Point</button>
+            <button type="button" class="fv-toggle-btn" onclick="fvResetCalibration()">↺ Reset</button>
             <button type="button" class="fv-toggle-btn fv-toggle-active" onclick="fvConfirmCalibration()">✓ Looks Good — Show My Floor</button>
             <button type="button" class="fv-toggle-btn" onclick="fvCancelCalibration()">Cancel</button>
           </div>
@@ -718,12 +717,18 @@ function fvSelectRoom(key){
 // locally, a canvas downscales it, and the result is only ever held in
 // memory / localStorage on this device — nothing is uploaded anywhere,
 // there's no server to receive it, and no paid service is involved.
+// Starts at 5 points so an L-shaped room, an angled wall, or a step in the
+// floor can be traced without first having to add one — corners can still
+// be added or removed to match any floor shape exactly.
 var FV_CALIBRATE_DEFAULT = [
   { x: 8,  y: 55 },
+  { x: 50, y: 50 },
   { x: 92, y: 55 },
   { x: 100, y: 100 },
   { x: 0,  y: 100 }
 ];
+var FV_MIN_POINTS = 3;
+var FV_MAX_POINTS = 12;
 var fvCalibratePoints = null;
 var fvCalibrateImageUrl = null;
 
@@ -799,12 +804,19 @@ function fvCalibrateFrameRect(){
   };
 }
 
+// Handles are rebuilt each render since the point count can change (add /
+// remove corner) — cheap for the handful of points a floor outline needs.
 function fvRenderCalibrationPoints(){
   var frame = fvCalibrateFrameRect();
+  var handlesWrap = document.getElementById('fvHandles');
+  handlesWrap.innerHTML = '';
   fvCalibratePoints.forEach(function(p, i){
-    var h = document.getElementById('fvHandle' + i);
+    var h = document.createElement('div');
+    h.className = 'fv-calibrate-handle';
+    h.dataset.i = i;
     h.style.left = (frame.left + p.x / 100 * frame.width) + 'px';
     h.style.top = (frame.top + p.y / 100 * frame.height) + 'px';
+    handlesWrap.appendChild(h);
   });
   var svg = document.querySelector('.fv-calibrate-svg');
   svg.style.left = frame.left + 'px';
@@ -815,6 +827,8 @@ function fvRenderCalibrationPoints(){
     'points',
     fvCalibratePoints.map(function(p){ return p.x + ',' + p.y; }).join(' ')
   );
+  document.getElementById('fvCalibrateHint').textContent =
+    'Drag the ' + fvCalibratePoints.length + ' points onto your floor’s edges';
 }
 
 (function initCalibrationDrag(){
@@ -830,12 +844,11 @@ function fvRenderCalibrationPoints(){
     return { x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) };
   }
 
-  [0, 1, 2, 3].forEach(function(i){
-    var handle = document.getElementById('fvHandle' + i);
-    handle.addEventListener('pointerdown', function(e){
-      dragIndex = i;
-      e.preventDefault();
-    });
+  document.getElementById('fvHandles').addEventListener('pointerdown', function(e){
+    var target = e.target.closest('.fv-calibrate-handle');
+    if (!target) return;
+    dragIndex = parseInt(target.dataset.i, 10);
+    e.preventDefault();
   });
   window.addEventListener('pointermove', function(e){
     if (dragIndex === null) return;
@@ -850,6 +863,36 @@ function fvRenderCalibrationPoints(){
 
 function fvResetCalibration(){
   fvCalibratePoints = FV_CALIBRATE_DEFAULT.map(function(p){ return { x: p.x, y: p.y }; });
+  fvRenderCalibrationPoints();
+}
+
+// Inserts a new point at the midpoint of the longest edge, so it lands
+// somewhere useful to drag into a notch or jog rather than stacked on an
+// existing corner.
+function fvAddCalibrationPoint(){
+  if (fvCalibratePoints.length >= FV_MAX_POINTS) {
+    fvShowToast('That’s plenty of points for any floor shape.');
+    return;
+  }
+  var n = fvCalibratePoints.length;
+  var bestI = 0, bestDist = -1;
+  for (var i = 0; i < n; i++) {
+    var a = fvCalibratePoints[i], b = fvCalibratePoints[(i + 1) % n];
+    var d = Math.hypot(b.x - a.x, b.y - a.y);
+    if (d > bestDist) { bestDist = d; bestI = i; }
+  }
+  var a = fvCalibratePoints[bestI], b = fvCalibratePoints[(bestI + 1) % n];
+  var mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+  fvCalibratePoints.splice(bestI + 1, 0, mid);
+  fvRenderCalibrationPoints();
+}
+
+function fvRemoveCalibrationPoint(){
+  if (fvCalibratePoints.length <= FV_MIN_POINTS) {
+    fvShowToast('A floor outline needs at least ' + FV_MIN_POINTS + ' points.');
+    return;
+  }
+  fvCalibratePoints.pop();
   fvRenderCalibrationPoints();
 }
 

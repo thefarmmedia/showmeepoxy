@@ -563,6 +563,11 @@ var ROOMS = {
     image: '/bare-concrete-garage-floor-before-epoxy-coating-missouri.webp',
     alt: 'Garage floor room for the Show Me Epoxy Floor Visualizer',
     floorClipPath: 'polygon(0% 27%, 100% 23%, 100% 100%, 0% 100%)',
+    // Eye-level vanishing line as a % of image height. Controls how fast
+    // the flake shrinks toward the back of the room: closer to the floor's
+    // far edge = stronger foreshortening. Omit it and it's estimated from
+    // the floor outline, which is what uploaded photos rely on.
+    horizonY: 20,
     available: true
   },
   basement: {
@@ -1044,115 +1049,189 @@ function fvComposite(room, color, callback){
     blurCtx.drawImage(blurSmall, 0, 0, sw, sh, 0, 0, bw, bh);
     var floorData = blurCtx.getImageData(0, 0, bw, bh).data;
 
-    // Tile the selected color texture across the whole floor region.
-    // Three earlier attempts all failed on actual inspection: a plain
-    // repeated tile made an obvious grid (every copy pixel-identical);
-    // mirror-flipping alternate tiles removed the grid but created an
-    // even more obvious kaleidoscope/symmetry pattern; randomly rotated
-    // hard-edged patches removed the grid AND the symmetry but the hard
-    // edge of every patch was still a visible seam line once actually
-    // looked at, not just in a cherry-picked crop.
-    //
-    // This instead stamps many overlapping, softly-feathered patches
-    // (random crop + random rotation, like before, but faded to
-    // transparent at the edges with a radial gradient) densely enough
-    // that every point on the floor is covered by several overlapping
-    // stamps. There is no hard edge anywhere for the eye to catch,
-    // because nothing is ever drawn with a hard edge — the blend
-    // between neighboring patches is a real gradient, not a boundary.
-    // A single unrotated base fill goes down first purely so there is
-    // no gap in coverage between stamps; the dense stamping on top is
-    // what actually determines how the floor looks.
+    // Average brightness of the slab. Relighting is applied RELATIVE to
+    // this rather than as an absolute multiply, so a heavily oil-stained
+    // or dirty floor doesn't drag the coated result down into dark
+    // patches — only genuine light falloff across the room survives, and
+    // it's clamped so nothing can blow out or go black. This is what
+    // keeps arbitrary customer photos usable, not just clean sample ones.
+    var lumSum = 0, lumCount = 0;
+    for (var li = 0; li < floorData.length; li += 4) {
+      lumSum += (0.299 * floorData[li] + 0.587 * floorData[li + 1] + 0.114 * floorData[li + 2]) / 255;
+      lumCount++;
+    }
+    var lumMean = lumCount ? (lumSum / lumCount) : 0.5;
+    if (lumMean < 0.05) lumMean = 0.05;
+
+    // ---- STEP 1: build a SEAMLESS, repeat-free flake texture ----------
+    // Earlier versions tiled the flake photo directly in screen space and
+    // every one of them failed on inspection: a plain repeat made an
+    // obvious grid; mirroring alternate tiles made a kaleidoscope; hard-
+    // edged rotated patches still showed a seam line at every patch edge.
+    // Here the texture is instead built ONCE into a square tile that is
+    // genuinely seamless, by stamping soft-edged random crops with
+    // toroidal wrap-around (a stamp that runs off the right edge is also
+    // drawn coming back in on the left, same top/bottom). Because every
+    // stamp fades out through a radial gradient, no hard edge exists
+    // anywhere, and because the stamps wrap, the tile's own borders match
+    // perfectly — so it can repeat forever with nothing to see.
+    var TILE = 512;
+    var tileCanvas = document.createElement('canvas');
+    tileCanvas.width = TILE; tileCanvas.height = TILE;
+    var tileCtx = tileCanvas.getContext('2d');
+    var srcW = texImg.naturalWidth, srcH = texImg.naturalHeight;
+    tileCtx.drawImage(texImg, 0, 0, TILE, TILE); // base coverage, fully hidden by the stamps below
+
+    var rndSeed = 0x9e3779b9;
+    function rnd(){ // deterministic PRNG so a given color always renders identically (cacheable)
+      rndSeed ^= rndSeed << 13; rndSeed ^= rndSeed >>> 17; rndSeed ^= rndSeed << 5;
+      return ((rndSeed >>> 0) % 100000) / 100000;
+    }
+    var stampSize = Math.round(TILE * 0.44);
+    var stampR = stampSize / 2;
+    var cropW = srcW * 0.52, cropH = srcH * 0.52;
+    var maxOffX = Math.max(1, srcW - cropW), maxOffY = Math.max(1, srcH - cropH);
+    var stampCanvas = document.createElement('canvas');
+    stampCanvas.width = stampSize; stampCanvas.height = stampSize;
+    var stampCtx = stampCanvas.getContext('2d');
+    var featherGrad = stampCtx.createRadialGradient(stampR, stampR, stampR * 0.30, stampR, stampR, stampR);
+    featherGrad.addColorStop(0, 'rgba(0,0,0,1)');
+    featherGrad.addColorStop(1, 'rgba(0,0,0,0)');
+
+    var STAMPS = 120;
+    for (var si = 0; si < STAMPS; si++) {
+      stampCtx.setTransform(1, 0, 0, 1, 0, 0);
+      stampCtx.globalCompositeOperation = 'source-over';
+      stampCtx.clearRect(0, 0, stampSize, stampSize);
+      stampCtx.save();
+      stampCtx.translate(stampR, stampR);
+      stampCtx.rotate(rnd() * Math.PI * 2);
+      var ds = stampSize * 1.5; // overdraw so rotated corners still fill the stamp
+      stampCtx.drawImage(texImg, rnd() * maxOffX, rnd() * maxOffY, cropW, cropH, -ds / 2, -ds / 2, ds, ds);
+      stampCtx.restore();
+      stampCtx.globalCompositeOperation = 'destination-in';
+      stampCtx.fillStyle = featherGrad;
+      stampCtx.fillRect(0, 0, stampSize, stampSize);
+
+      var px = rnd() * TILE, py = rnd() * TILE;
+      for (var wx = -1; wx <= 1; wx++) {
+        for (var wy = -1; wy <= 1; wy++) {
+          var dx = px + wx * TILE, dy = py + wy * TILE;
+          if (dx + stampR < 0 || dx - stampR > TILE || dy + stampR < 0 || dy - stampR > TILE) continue;
+          tileCtx.drawImage(stampCanvas, dx - stampR, dy - stampR);
+        }
+      }
+    }
+
+    // ---- STEP 2: mip pyramid ------------------------------------------
+    // Toward the back of the room the texture is compressed into very few
+    // pixels. Sampling the full-res tile there produces harsh sparkle/
+    // aliasing (which is what made an earlier attempt look like TV static).
+    // Pre-filtered smaller copies get sampled instead as the floor recedes.
+    var mips = [];
+    var mipSize = TILE;
+    var mipSrc = tileCanvas;
+    while (mipSize >= 8) {
+      var mc = document.createElement('canvas');
+      mc.width = mipSize; mc.height = mipSize;
+      var mctx = mc.getContext('2d');
+      mctx.imageSmoothingEnabled = true;
+      mctx.drawImage(mipSrc, 0, 0, mipSize, mipSize);
+      mips.push({ size: mipSize, data: mctx.getImageData(0, 0, mipSize, mipSize).data });
+      mipSrc = mc;
+      mipSize = Math.floor(mipSize / 2);
+    }
+
+    // ---- STEP 3: project the texture in TRUE PERSPECTIVE ---------------
+    // This is what every previous attempt was missing. A real floor
+    // recedes: flake near the camera is large, flake at the back wall is
+    // tiny, and that gradient is what makes a photo read as a floor rather
+    // than as wallpaper. For a flat plane under a camera, ground distance
+    // Z is proportional to 1 / (screenY - horizonY). Feeding that straight
+    // into the texture lookup reproduces real foreshortening exactly,
+    // per-pixel — no bands, so none of the moire the banded attempt had.
+    var polyTopY = Math.min.apply(null, ys);
+    var polyBotY = Math.max.apply(null, ys);
+    var horizonY = (room.horizonY != null)
+      ? (room.horizonY / 100) * h
+      : polyTopY - 0.16 * Math.max(1, polyBotY - polyTopY);
+    if (horizonY > polyTopY - 4) horizonY = polyTopY - 4; // keep the floor strictly below the horizon
+
+    var nearSpan = Math.max(120, bw * 0.62); // px one texture repeat covers at the very front
+    var dNear = polyBotY - horizonY;
+    var Acoef = (dNear * dNear) / nearSpan;
+    var Bcoef = dNear / nearSpan;
+    var cxImg = (minX + maxX) / 2;
+
     var texCanvas = document.createElement('canvas');
     texCanvas.width = bw; texCanvas.height = bh;
     var texCtx = texCanvas.getContext('2d');
-    var srcW = texImg.naturalWidth, srcH = texImg.naturalHeight;
+    var out = texCtx.createImageData(bw, bh);
+    var outData = out.data;
 
-    var baseTile = Math.max(110, Math.round(bw * 0.16));
-    var basePattern = texCtx.createPattern(texImg, 'repeat');
-    texCtx.save();
-    var baseScale = baseTile / srcW;
-    texCtx.scale(baseScale, baseScale);
-    texCtx.fillStyle = basePattern;
-    texCtx.fillRect(0, 0, bw / baseScale, bh / baseScale);
-    texCtx.restore();
+    for (var py2 = 0; py2 < bh; py2++) {
+      var imgY = minY + py2;
+      var depth = imgY - horizonY;
+      if (depth < 1) depth = 1;
+      var invD = 1 / depth;
+      var vTex = Acoef * invD;
+      // Texel footprint per screen pixel decides which mip is sharp enough.
+      // The footprint is anisotropic — receding into the distance squashes
+      // the texture much harder vertically (1/depth^2) than horizontally
+      // (1/depth). Picking the mip off the larger (vertical) footprint
+      // kills aliasing but over-blurs, washing the back of the room into
+      // featureless haze; the geometric mean of the two, biased slightly
+      // sharp, keeps real flake detail visible all the way back while
+      // still suppressing sparkle.
+      var fpV = Acoef * invD * invD * TILE;
+      var fpU = Bcoef * invD * TILE;
+      var footprint = Math.sqrt(fpV * fpU);
+      var lvl = Math.log(Math.max(footprint, 0.0001)) / Math.LN2 - 0.5;
+      if (lvl < 0) lvl = 0;
+      if (lvl > mips.length - 1) lvl = mips.length - 1;
+      var mip = mips[lvl | 0];
+      var mSize = mip.size, mData = mip.data;
+      var vPix = vTex * mSize;
 
-    var stampSize = Math.max(160, Math.round(bw * 0.24));
-    var stampR = stampSize / 2;
-    var spacing = stampR * 0.7; // dense: spacing well under the stamp radius so coverage overlaps heavily
-    var cropFrac = 0.5;
-    var cropW = srcW * cropFrac, cropH = srcH * cropFrac;
-    var maxOffX = Math.max(1, srcW - cropW), maxOffY = Math.max(1, srcH - cropH);
-    var scols = Math.ceil(bw / spacing) + 2;
-    var srows = Math.ceil(bh / spacing) + 2;
+      for (var px2 = 0; px2 < bw; px2++) {
+        var imgX = minX + px2;
+        var uTex = (imgX - cxImg) * Bcoef * invD;
+        var uPix = uTex * mSize;
 
-    var stampMask = document.createElement('canvas');
-    stampMask.width = stampSize; stampMask.height = stampSize;
-    var maskCtx = stampMask.getContext('2d');
-    var grad = maskCtx.createRadialGradient(stampR, stampR, stampR * 0.42, stampR, stampR, stampR);
-    grad.addColorStop(0, 'rgba(0,0,0,1)');
-    grad.addColorStop(1, 'rgba(0,0,0,0)');
+        // bilinear sample, wrapping (the tile is seamless so wrap is safe)
+        var fx = uPix - Math.floor(uPix), fy = vPix - Math.floor(vPix);
+        var x0 = ((Math.floor(uPix) % mSize) + mSize) % mSize;
+        var y0 = ((Math.floor(vPix) % mSize) + mSize) % mSize;
+        var x1 = (x0 + 1) % mSize, y1 = (y0 + 1) % mSize;
+        var i00 = (y0 * mSize + x0) * 4, i10 = (y0 * mSize + x1) * 4;
+        var i01 = (y1 * mSize + x0) * 4, i11 = (y1 * mSize + x1) * 4;
+        var w00 = (1 - fx) * (1 - fy), w10 = fx * (1 - fy), w01 = (1 - fx) * fy, w11 = fx * fy;
+        var tr = mData[i00] * w00 + mData[i10] * w10 + mData[i01] * w01 + mData[i11] * w11;
+        var tg = mData[i00 + 1] * w00 + mData[i10 + 1] * w10 + mData[i01 + 1] * w01 + mData[i11 + 1] * w11;
+        var tb = mData[i00 + 2] * w00 + mData[i10 + 2] * w10 + mData[i01 + 2] * w01 + mData[i11 + 2] * w11;
 
-    for (var sy = -1; sy < srows; sy++) {
-      for (var sx = -1; sx < scols; sx++) {
-        var h1 = ((sx * 928371) ^ (sy * 689287)) >>> 0;
-        var h2 = (((sx + 5) * 374761393) ^ ((sy + 11) * 668265263)) >>> 0;
-        var h3 = (((sx + 17) * 2246822519) ^ ((sy + 23) * 3266489917)) >>> 0;
-        var h4 = (((sx + 31) * 3812015801) ^ ((sy + 37) * 2654435761)) >>> 0;
-        var jitterX = ((h4 % 10007) / 10007 - 0.5) * spacing;
-        var jitterY = (((h4 >> 8) % 10007) / 10007 - 0.5) * spacing;
-        var cx = sx * spacing + jitterX;
-        var cy = sy * spacing + jitterY;
-        if (cx < -stampR || cx > bw + stampR || cy < -stampR || cy > bh + stampR) continue;
+        // ---- STEP 4: relight + glossy topcoat -------------------------
+        var fi = (py2 * bw + px2) * 4;
+        var lum = (0.299 * floorData[fi] + 0.587 * floorData[fi + 1] + 0.114 * floorData[fi + 2]) / 255;
+        // Relative, clamped relighting (see lumMean above).
+        var shade = 1 + (lum - lumMean) * 0.85;
+        if (shade < 0.62) shade = 0.62;
+        if (shade > 1.25) shade = 1.25;
+        tr *= shade; tg *= shade; tb *= shade;
+        if (tr > 255) tr = 255; if (tg > 255) tg = 255; if (tb > 255) tb = 255;
+        // gentle all-over sheen so the floor reads sealed/wet, not matte
+        tr += (255 - tr) * 0.12; tg += (255 - tg) * 0.12; tb += (255 - tb) * 0.12;
+        // strong reflection where the real photo itself was brightest, so
+        // highlights land where the room's actual light is
+        var spec = (lum - (lumMean + 0.14)) / 0.34;
+        if (spec > 1) spec = 1;
+        if (spec > 0) {
+          spec = Math.pow(spec, 1.3) * 0.85;
+          tr += (255 - tr) * spec; tg += (255 - tg) * spec; tb += (255 - tb) * spec;
+        }
 
-        var offX = (h1 % 10007) / 10007 * maxOffX;
-        var offY = (h2 % 10007) / 10007 * maxOffY;
-        var angle = ((h3 % 10007) / 10007 * 2 - 1) * Math.PI;
-
-        // Build this one stamp: a rotated crop, faded to transparent at
-        // the edge, then composited onto the floor at (cx, cy).
-        var stampCanvas = document.createElement('canvas');
-        stampCanvas.width = stampSize; stampCanvas.height = stampSize;
-        var stampCtx = stampCanvas.getContext('2d');
-        stampCtx.save();
-        stampCtx.translate(stampR, stampR);
-        stampCtx.rotate(angle);
-        var drawSize = stampSize * 1.5;
-        stampCtx.drawImage(texImg, offX, offY, cropW, cropH, -drawSize / 2, -drawSize / 2, drawSize, drawSize);
-        stampCtx.restore();
-        stampCtx.globalCompositeOperation = 'destination-in';
-        stampCtx.fillStyle = grad;
-        stampCtx.fillRect(0, 0, stampSize, stampSize);
-
-        texCtx.drawImage(stampCanvas, cx - stampR, cy - stampR);
+        outData[fi] = tr; outData[fi + 1] = tg; outData[fi + 2] = tb; outData[fi + 3] = 255;
       }
-    }
-    var texData = texCtx.getImageData(0, 0, bw, bh);
-    var out = texData;
-    for (var i = 0; i < floorData.length; i += 4) {
-      var lum = (0.299 * floorData[i] + 0.587 * floorData[i + 1] + 0.114 * floorData[i + 2]) / 255;
-      var shade = Math.min(1, lum * 1.2 + 0.04); // keep coated floor from reading too dark/muddy
-      var tr = out.data[i] * shade, tg = out.data[i + 1] * shade, tb = out.data[i + 2] * shade;
-      // Glossy topcoat sheen, in two parts:
-      // 1) a gentle overall sheen so the whole floor reads as sealed/wet,
-      //    not a matte mat — real epoxy has some shine everywhere, not
-      //    just under a direct light.
-      var baseSheen = 0.12;
-      tr = tr + (255 - tr) * baseSheen;
-      tg = tg + (255 - tg) * baseSheen;
-      tb = tb + (255 - tb) * baseSheen;
-      // 2) a strong mirror-like highlight screen-blended in exactly where
-      //    the real photo itself was brightest (its own light source /
-      //    reflections), so bright reflections sit where real light
-      //    actually is instead of a generic fake gradient.
-      var spec = Math.max(0, lum - 0.55) / 0.45;
-      spec = Math.pow(spec, 1.3) * 0.85;
-      tr = tr + (255 - tr) * spec;
-      tg = tg + (255 - tg) * spec;
-      tb = tb + (255 - tb) * spec;
-      out.data[i]     = tr;
-      out.data[i + 1] = tg;
-      out.data[i + 2] = tb;
     }
     texCtx.putImageData(out, 0, 0);
 

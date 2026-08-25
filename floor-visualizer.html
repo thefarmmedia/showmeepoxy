@@ -1044,24 +1044,44 @@ function fvComposite(room, color, callback){
     blurCtx.drawImage(blurSmall, 0, 0, sw, sh, 0, 0, bw, bh);
     var floorData = blurCtx.getImageData(0, 0, bw, bh).data;
 
-    // Tile the selected color texture at one consistent scale across the
-    // whole floor region. An earlier version tried to grow the tile size
-    // in horizontal bands to fake perspective (smaller flake toward the
-    // back of the room); in testing that produced a visible moire
-    // interference pattern from the repeating tile crossing the band
-    // scale-steps, which reads far worse than not having a perspective
-    // cue at all. A single clean scale, no seams, no interference.
+    // Tile the selected color texture across the whole floor region.
+    // Two earlier attempts both failed on inspection: a plain repeated
+    // tile (ctx.createPattern) makes an obvious grid since every copy is
+    // pixel-identical; mirror-flipping alternate tiles removed the grid
+    // but created an even more obvious kaleidoscope/symmetry pattern,
+    // since mirrored copies share a visible reflection axis at every
+    // seam. Neither is close to acceptable, so this instead draws a
+    // random crop from a different spot in the source texture at a
+    // small random rotation for every tile — no two tiles are identical
+    // AND none of them are mirror images of each other, so there's no
+    // grid and no symmetry axis for the eye to lock onto.
     var texCanvas = document.createElement('canvas');
     texCanvas.width = bw; texCanvas.height = bh;
     var texCtx = texCanvas.getContext('2d');
-    var pattern = texCtx.createPattern(texImg, 'repeat');
     var tileSize = Math.max(110, Math.round(bw * 0.16));
-    var uScale = tileSize / texImg.naturalWidth;
-    texCtx.save();
-    texCtx.scale(uScale, uScale);
-    texCtx.fillStyle = pattern;
-    texCtx.fillRect(0, 0, bw / uScale, bh / uScale);
-    texCtx.restore();
+    var cols = Math.ceil(bw / tileSize) + 1;
+    var rows = Math.ceil(bh / tileSize) + 1;
+    var srcW = texImg.naturalWidth, srcH = texImg.naturalHeight;
+    var cropW = srcW * 0.55, cropH = srcH * 0.55;
+    var maxOffX = Math.max(1, srcW - cropW), maxOffY = Math.max(1, srcH - cropH);
+    var drawSize = tileSize * 1.6; // overdraw so rotated corners still cover the cell
+    for (var ry = 0; ry < rows; ry++) {
+      for (var rx = 0; rx < cols; rx++) {
+        var h1 = ((rx * 928371) ^ (ry * 689287)) >>> 0;
+        var h2 = (((rx + 5) * 374761393) ^ ((ry + 11) * 668265263)) >>> 0;
+        var h3 = (((rx + 17) * 2246822519) ^ ((ry + 23) * 3266489917)) >>> 0;
+        var offX = (h1 % 10007) / 10007 * maxOffX;
+        var offY = (h2 % 10007) / 10007 * maxOffY;
+        var angle = ((h3 % 10007) / 10007 * 2 - 1) * 0.30; // roughly -17deg..17deg
+        var cx = rx * tileSize + tileSize / 2;
+        var cy = ry * tileSize + tileSize / 2;
+        texCtx.save();
+        texCtx.translate(cx, cy);
+        texCtx.rotate(angle);
+        texCtx.drawImage(texImg, offX, offY, cropW, cropH, -drawSize / 2, -drawSize / 2, drawSize, drawSize);
+        texCtx.restore();
+      }
+    }
     var texData = texCtx.getImageData(0, 0, bw, bh);
     var out = texData;
     for (var i = 0; i < floorData.length; i += 4) {

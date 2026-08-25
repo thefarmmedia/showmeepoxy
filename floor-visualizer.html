@@ -119,6 +119,16 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 .fv-after-wrap .fv-img{transition:opacity .15s ease}
 .fv-rendering-indicator{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(13,45,110,.85);color:#fff;font-size:12px;font-weight:700;padding:7px 16px;border-radius:20px;z-index:6;opacity:0;pointer-events:none;transition:opacity .15s ease}
 .fv-rendering-indicator.fv-rendering-show{opacity:1}
+
+/* ---- upload + corner calibration ---- */
+.fv-pill-upload{display:inline-flex;align-items:center;gap:6px}
+.fv-calibrate{position:absolute;inset:0;z-index:20;touch-action:none;display:flex;align-items:center;justify-content:center;background:#000;overflow:hidden}
+.fv-calibrate-img{max-width:100%;max-height:100%;width:auto;height:auto;display:block;pointer-events:none}
+.fv-calibrate-svg{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none}
+.fv-calibrate-handle{position:absolute;left:0;top:0;width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:50%;background:var(--gold);border:3px solid #0d2d6e;box-shadow:0 2px 8px rgba(0,0,0,.4);cursor:grab;touch-action:none;z-index:21}
+.fv-calibrate-handle:active{cursor:grabbing}
+.fv-calibrate-hint{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(13,45,110,.85);color:#fff;font-size:12px;font-weight:700;padding:7px 16px;border-radius:20px;white-space:nowrap}
+.fv-privacy-note{text-align:center;font-size:12px;color:var(--gray-500);margin-top:10px}
 .fv-divider{position:absolute;top:0;bottom:0;width:0;border-left:3px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.25);cursor:ew-resize;z-index:5;touch-action:none}
 .fv-divider::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:#fff;box-shadow:var(--shm);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23134db4' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 7l-5 5 5 5M16 7l5 5-5 5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center}
 .fv-tag{position:absolute;top:12px;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:#fff;z-index:3;pointer-events:none}
@@ -284,6 +294,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 </div>
 
 <main>
+<input type="file" id="fvUploadInput" accept="image/*" capture="environment" style="display:none">
 <div class="breadcrumb"><div class="wrap"><a href="/">Home</a><span>›</span><strong>Floor Visualizer</strong></div></div>
 
 <!-- HERO -->
@@ -322,12 +333,31 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
             <div class="fv-tag fv-tag-after">After</div>
             <div class="fv-divider" id="fvDivider"></div>
             <div class="fv-rendering-indicator" id="fvRenderingIndicator">Rendering your floor…</div>
+
+            <!-- CALIBRATION OVERLAY: shown right after a customer uploads their own photo -->
+            <div class="fv-calibrate" id="fvCalibrate" style="display:none">
+              <img class="fv-calibrate-img" id="fvCalibrateImg" src="" alt="Your uploaded photo — drag the corners onto your floor">
+              <svg class="fv-calibrate-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <polygon id="fvCalibratePoly" points="" fill="rgba(235,251,59,.28)" stroke="#ebfb3b" stroke-width="0.6" vector-effect="non-scaling-stroke"></polygon>
+              </svg>
+              <div class="fv-calibrate-handle" id="fvHandle0" data-i="0"></div>
+              <div class="fv-calibrate-handle" id="fvHandle1" data-i="1"></div>
+              <div class="fv-calibrate-handle" id="fvHandle2" data-i="2"></div>
+              <div class="fv-calibrate-handle" id="fvHandle3" data-i="3"></div>
+              <div class="fv-calibrate-hint">Drag the 4 corners onto your floor</div>
+            </div>
           </div>
-          <div class="fv-toggle-row">
+          <div class="fv-toggle-row" id="fvToggleRow">
             <button type="button" class="fv-toggle-btn" id="fvBtnBefore" onclick="fvSetReveal(0)">Before</button>
             <button type="button" class="fv-toggle-btn" id="fvBtnSplit" onclick="fvSetReveal(50)">Split</button>
             <button type="button" class="fv-toggle-btn" id="fvBtnAfter" onclick="fvSetReveal(100)">After</button>
           </div>
+          <div class="fv-toggle-row" id="fvCalibrateRow" style="display:none">
+            <button type="button" class="fv-toggle-btn" onclick="fvResetCalibration()">↺ Reset Corners</button>
+            <button type="button" class="fv-toggle-btn fv-toggle-active" onclick="fvConfirmCalibration()">✓ Looks Good — Show My Floor</button>
+            <button type="button" class="fv-toggle-btn" onclick="fvCancelCalibration()">Cancel</button>
+          </div>
+          <p class="fv-privacy-note" id="fvPrivacyNote" style="display:none">🔒 Your photo stays on your device — nothing is uploaded or stored anywhere.</p>
         </div>
 
         <div class="fv-current-color">
@@ -632,6 +662,32 @@ function fvRenderPickers(){
     roomWrap.appendChild(btn);
   });
 
+  // "Upload Your Own Photo" — not a preset room, so it lives outside ROOM_ORDER.
+  // Before upload: one pill that opens the file picker. After upload+calibration:
+  // a normal selectable "My Photo" pill, plus a small pill to swap in a new photo.
+  if (ROOMS.custom) {
+    var myBtn = document.createElement('button');
+    myBtn.type = 'button';
+    myBtn.className = 'fv-pill fv-pill-upload' + (fvState.room === 'custom' ? ' fv-pill-active' : '');
+    myBtn.innerHTML = '📸 My Photo';
+    myBtn.onclick = function(){ fvSelectRoom('custom'); };
+    roomWrap.appendChild(myBtn);
+
+    var newBtn = document.createElement('button');
+    newBtn.type = 'button';
+    newBtn.className = 'fv-pill fv-pill-upload';
+    newBtn.innerHTML = '↻ New Photo';
+    newBtn.onclick = fvOpenUpload;
+    roomWrap.appendChild(newBtn);
+  } else {
+    var upBtn = document.createElement('button');
+    upBtn.type = 'button';
+    upBtn.className = 'fv-pill fv-pill-upload';
+    upBtn.innerHTML = '📸 Upload Your Photo';
+    upBtn.onclick = fvOpenUpload;
+    roomWrap.appendChild(upBtn);
+  }
+
   var sysWrap = document.getElementById('fvSystemPicker');
   sysWrap.innerHTML = '';
   SYSTEM_ORDER.forEach(function(key){
@@ -657,6 +713,168 @@ function fvSelectRoom(key){
   fvApplyColor(true);
 }
 
+// ---------- upload your own photo + corner calibration ----------
+// Everything here stays in the browser: FileReader reads the chosen file
+// locally, a canvas downscales it, and the result is only ever held in
+// memory / localStorage on this device — nothing is uploaded anywhere,
+// there's no server to receive it, and no paid service is involved.
+var FV_CALIBRATE_DEFAULT = [
+  { x: 8,  y: 55 },
+  { x: 92, y: 55 },
+  { x: 100, y: 100 },
+  { x: 0,  y: 100 }
+];
+var fvCalibratePoints = null;
+var fvCalibrateImageUrl = null;
+
+function fvOpenUpload(){
+  document.getElementById('fvUploadInput').click();
+}
+
+document.getElementById('fvUploadInput').addEventListener('change', function(e){
+  var file = e.target.files && e.target.files[0];
+  e.target.value = ''; // allow re-selecting the same file later
+  if (!file) return;
+  if (!/^image\//.test(file.type)) {
+    fvShowToast('Please choose an image file.');
+    return;
+  }
+  if (file.size > 15 * 1024 * 1024) {
+    fvShowToast('That photo is a bit large — try one under 15MB.');
+    return;
+  }
+  fvTrack('floor_visualizer_photo_uploaded', {});
+  fvDownscaleImage(file, 1400, function(dataUrl){
+    fvStartCalibration(dataUrl);
+  });
+});
+
+function fvDownscaleImage(file, maxDim, callback){
+  var reader = new FileReader();
+  reader.onload = function(){
+    var img = new Image();
+    img.onload = function(){
+      var scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
+      var w = Math.round(img.naturalWidth * scale);
+      var h = Math.round(img.naturalHeight * scale);
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/jpeg', 0.9));
+    };
+    img.onerror = function(){ fvShowToast('That image could not be read — try a different photo.'); };
+    img.src = reader.result;
+  };
+  reader.onerror = function(){ fvShowToast('That image could not be read — try a different photo.'); };
+  reader.readAsDataURL(file);
+}
+
+function fvStartCalibration(dataUrl){
+  fvCalibrateImageUrl = dataUrl;
+  fvCalibratePoints = FV_CALIBRATE_DEFAULT.map(function(p){ return { x: p.x, y: p.y }; });
+  var img = document.getElementById('fvCalibrateImg');
+  document.getElementById('fvCalibrate').style.display = 'flex';
+  document.getElementById('fvToggleRow').style.display = 'none';
+  document.getElementById('fvCalibrateRow').style.display = 'flex';
+  img.onload = function(){
+    fvRenderCalibrationPoints();
+    document.getElementById('fvStage').scrollIntoView({behavior: 'smooth', block: 'center'});
+  };
+  img.src = dataUrl;
+}
+
+// Percent-based points (0-100) are relative to the IMAGE's own rendered box,
+// not the surrounding stage — this keeps calibration correct even though the
+// stage is a fixed 4:3 box while an uploaded photo can be any aspect ratio.
+function fvCalibrateFrameRect(){
+  var container = document.getElementById('fvCalibrate');
+  var img = document.getElementById('fvCalibrateImg');
+  var cRect = container.getBoundingClientRect();
+  var iRect = img.getBoundingClientRect();
+  return {
+    left: iRect.left - cRect.left,
+    top: iRect.top - cRect.top,
+    width: iRect.width,
+    height: iRect.height
+  };
+}
+
+function fvRenderCalibrationPoints(){
+  var frame = fvCalibrateFrameRect();
+  fvCalibratePoints.forEach(function(p, i){
+    var h = document.getElementById('fvHandle' + i);
+    h.style.left = (frame.left + p.x / 100 * frame.width) + 'px';
+    h.style.top = (frame.top + p.y / 100 * frame.height) + 'px';
+  });
+  var svg = document.querySelector('.fv-calibrate-svg');
+  svg.style.left = frame.left + 'px';
+  svg.style.top = frame.top + 'px';
+  svg.style.width = frame.width + 'px';
+  svg.style.height = frame.height + 'px';
+  document.getElementById('fvCalibratePoly').setAttribute(
+    'points',
+    fvCalibratePoints.map(function(p){ return p.x + ',' + p.y; }).join(' ')
+  );
+}
+
+(function initCalibrationDrag(){
+  var dragIndex = null;
+
+  function pctFromEvent(e){
+    var frame = fvCalibrateFrameRect();
+    var container = document.getElementById('fvCalibrate').getBoundingClientRect();
+    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    var x = (clientX - container.left - frame.left) / frame.width * 100;
+    var y = (clientY - container.top - frame.top) / frame.height * 100;
+    return { x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) };
+  }
+
+  [0, 1, 2, 3].forEach(function(i){
+    var handle = document.getElementById('fvHandle' + i);
+    handle.addEventListener('pointerdown', function(e){
+      dragIndex = i;
+      e.preventDefault();
+    });
+  });
+  window.addEventListener('pointermove', function(e){
+    if (dragIndex === null) return;
+    fvCalibratePoints[dragIndex] = pctFromEvent(e);
+    fvRenderCalibrationPoints();
+  });
+  window.addEventListener('pointerup', function(){ dragIndex = null; });
+  window.addEventListener('resize', function(){
+    if (document.getElementById('fvCalibrate').style.display !== 'none') fvRenderCalibrationPoints();
+  });
+})();
+
+function fvResetCalibration(){
+  fvCalibratePoints = FV_CALIBRATE_DEFAULT.map(function(p){ return { x: p.x, y: p.y }; });
+  fvRenderCalibrationPoints();
+}
+
+function fvCancelCalibration(){
+  document.getElementById('fvCalibrate').style.display = 'none';
+  document.getElementById('fvCalibrateRow').style.display = 'none';
+  document.getElementById('fvToggleRow').style.display = 'flex';
+}
+
+function fvConfirmCalibration(){
+  var poly = 'polygon(' + fvCalibratePoints.map(function(p){ return p.x + '% ' + p.y + '%'; }).join(', ') + ')';
+  ROOMS.custom = {
+    label: 'My Photo',
+    image: fvCalibrateImageUrl,
+    alt: 'Your uploaded room photo',
+    floorClipPath: poly,
+    available: true
+  };
+  document.getElementById('fvCalibrate').style.display = 'none';
+  document.getElementById('fvCalibrateRow').style.display = 'none';
+  document.getElementById('fvToggleRow').style.display = 'flex';
+  document.getElementById('fvPrivacyNote').style.display = 'block';
+  fvSelectRoom('custom');
+}
+
 function fvSelectSystem(key){
   if (!FLOOR_SYSTEMS[key] || !FLOOR_SYSTEMS[key].available) return;
   fvState.system = key;
@@ -668,10 +886,22 @@ function fvSelectSystem(key){
 }
 
 // ---------- stage rendering ----------
+// Matches the stage box to the current photo's own aspect ratio (clamped to a
+// sane range) so object-fit:cover never has to crop away the calibrated floor
+// area — important once photos aren't all the same shape as our sample room.
+function fvSetStageAspect(w, h){
+  if (!w || !h) return;
+  var ratio = Math.max(0.62, Math.min(1.6, w / h));
+  document.getElementById('fvStage').style.aspectRatio = ratio;
+}
+
 function fvApplyRoom(){
   var room = ROOMS[fvState.room];
-  document.getElementById('fvImgBefore').src = room.image;
-  document.getElementById('fvImgBefore').alt = room.alt;
+  var beforeImg = document.getElementById('fvImgBefore');
+  beforeImg.onload = function(){ fvSetStageAspect(beforeImg.naturalWidth, beforeImg.naturalHeight); };
+  beforeImg.src = room.image;
+  beforeImg.alt = room.alt;
+  if (beforeImg.complete && beforeImg.naturalWidth) fvSetStageAspect(beforeImg.naturalWidth, beforeImg.naturalHeight);
 }
 
 function fvApplyColor(skipTrack){
@@ -812,7 +1042,7 @@ function fvUpdateQuoteLink(){
 function fvSetReveal(pct){
   pct = Math.max(0, Math.min(100, pct));
   fvState.reveal = pct;
-  document.getElementById('fvAfterWrap').style.clipPath = 'inset(0 0 0 ' + pct + '%)';
+  document.getElementById('fvAfterWrap').style.clipPath = 'inset(0 0 0 ' + (100 - pct) + '%)';
   document.getElementById('fvDivider').style.left = pct + '%';
   document.getElementById('fvBtnBefore').classList.toggle('fv-toggle-active', pct === 0);
   document.getElementById('fvBtnSplit').classList.toggle('fv-toggle-active', pct > 0 && pct < 100);

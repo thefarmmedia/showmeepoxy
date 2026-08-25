@@ -985,27 +985,59 @@ function fvComposite(room, color, callback){
     // Real floor lighting, read straight from the photo.
     var floorData = ctx.getImageData(minX, minY, bw, bh).data;
 
-    // Tile the selected color texture at a believable flake scale, then
-    // multiply it by the real floor's luminance map computed above.
+    // Tile the selected color texture in horizontal bands with a growing
+    // scale from top to bottom of the floor region — flake nearest the
+    // camera reads larger, flake toward the back of the room reads
+    // smaller, approximating the perspective a flat single-scale tile
+    // can't produce with plain canvas (no true projective transform).
     var texCanvas = document.createElement('canvas');
     texCanvas.width = bw; texCanvas.height = bh;
     var texCtx = texCanvas.getContext('2d');
-    var tileSize = Math.max(140, Math.round(bw * 0.32));
     var pattern = texCtx.createPattern(texImg, 'repeat');
-    var scale = tileSize / texImg.naturalWidth;
-    texCtx.save();
-    texCtx.scale(scale, scale);
-    texCtx.fillStyle = pattern;
-    texCtx.fillRect(0, 0, bw / scale, bh / scale);
-    texCtx.restore();
+    var farTile = Math.max(16, Math.round(bw * 0.025));
+    var nearTile = Math.max(farTile + 16, Math.round(bw * 0.10));
+    var bands = 16;
+    for (var s = 0; s < bands; s++) {
+      var stripTop = Math.floor(bh * s / bands);
+      var stripBottom = Math.floor(bh * (s + 1) / bands);
+      var t = (s + 0.5) / bands;
+      var tileSize = farTile + (nearTile - farTile) * t;
+      var bScale = tileSize / texImg.naturalWidth;
+      texCtx.save();
+      texCtx.beginPath();
+      texCtx.rect(0, stripTop, bw, stripBottom - stripTop);
+      texCtx.clip();
+      texCtx.scale(bScale, bScale);
+      texCtx.fillStyle = pattern;
+      texCtx.fillRect(0, stripTop / bScale, bw / bScale, (stripBottom - stripTop) / bScale + 2);
+      texCtx.restore();
+    }
     var texData = texCtx.getImageData(0, 0, bw, bh);
     var out = texData;
     for (var i = 0; i < floorData.length; i += 4) {
       var lum = (0.299 * floorData[i] + 0.587 * floorData[i + 1] + 0.114 * floorData[i + 2]) / 255;
-      lum = Math.min(1, lum * 1.2 + 0.04); // keep coated floor from reading too dark/muddy
-      out.data[i]     = out.data[i]     * lum;
-      out.data[i + 1] = out.data[i + 1] * lum;
-      out.data[i + 2] = out.data[i + 2] * lum;
+      var shade = Math.min(1, lum * 1.2 + 0.04); // keep coated floor from reading too dark/muddy
+      var tr = out.data[i] * shade, tg = out.data[i + 1] * shade, tb = out.data[i + 2] * shade;
+      // Glossy topcoat sheen, in two parts:
+      // 1) a gentle overall sheen so the whole floor reads as sealed/wet,
+      //    not a matte mat — real epoxy has some shine everywhere, not
+      //    just under a direct light.
+      var baseSheen = 0.12;
+      tr = tr + (255 - tr) * baseSheen;
+      tg = tg + (255 - tg) * baseSheen;
+      tb = tb + (255 - tb) * baseSheen;
+      // 2) a strong mirror-like highlight screen-blended in exactly where
+      //    the real photo itself was brightest (its own light source /
+      //    reflections), so bright reflections sit where real light
+      //    actually is instead of a generic fake gradient.
+      var spec = Math.max(0, lum - 0.55) / 0.45;
+      spec = Math.pow(spec, 1.3) * 0.85;
+      tr = tr + (255 - tr) * spec;
+      tg = tg + (255 - tg) * spec;
+      tb = tb + (255 - tb) * spec;
+      out.data[i]     = tr;
+      out.data[i + 1] = tg;
+      out.data[i + 2] = tb;
     }
     texCtx.putImageData(out, 0, 0);
 

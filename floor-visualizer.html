@@ -116,7 +116,9 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 .fv-stage{position:relative;width:100%;aspect-ratio:4/3;border-radius:10px;overflow:hidden;touch-action:none;user-select:none;background:#08204f}
 .fv-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
 .fv-after-wrap{position:absolute;inset:0;overflow:hidden;will-change:clip-path}
-.fv-floor-tex{position:absolute;inset:0;background-size:cover;background-position:center;mix-blend-mode:multiply;filter:saturate(1.12) contrast(1.02);transition:opacity .18s ease;transform-origin:center top}
+.fv-after-wrap .fv-img{transition:opacity .15s ease}
+.fv-rendering-indicator{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(13,45,110,.85);color:#fff;font-size:12px;font-weight:700;padding:7px 16px;border-radius:20px;z-index:6;opacity:0;pointer-events:none;transition:opacity .15s ease}
+.fv-rendering-indicator.fv-rendering-show{opacity:1}
 .fv-divider{position:absolute;top:0;bottom:0;width:0;border-left:3px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.25);cursor:ew-resize;z-index:5;touch-action:none}
 .fv-divider::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:#fff;box-shadow:var(--shm);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23134db4' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 7l-5 5 5 5M16 7l5 5-5 5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center}
 .fv-tag{position:absolute;top:12px;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:#fff;z-index:3;pointer-events:none}
@@ -316,10 +318,10 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
             <div class="fv-tag fv-tag-before">Before</div>
             <div class="fv-after-wrap" id="fvAfterWrap">
               <img class="fv-img" id="fvImgAfter" src="" alt="" loading="eager">
-              <div class="fv-floor-tex" id="fvFloorTex"></div>
             </div>
             <div class="fv-tag fv-tag-after">After</div>
             <div class="fv-divider" id="fvDivider"></div>
+            <div class="fv-rendering-indicator" id="fvRenderingIndicator">Rendering your floor…</div>
           </div>
           <div class="fv-toggle-row">
             <button type="button" class="fv-toggle-btn" id="fvBtnBefore" onclick="fvSetReveal(0)">Before</button>
@@ -520,17 +522,18 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
      ============================================================ -->
 <script>
 // ---------- ROOMS ----------
-// floorClipPath: CSS polygon() points (percent of stage width/height) outlining
-// the visible concrete floor area in `image`. Recalibrate whenever `image` changes:
-// temporarily set #fvFloorTex background to solid red in devtools, adjust the
-// polygon points until it hugs the floor edges, then remove the debug color.
+// floorClipPath: polygon() points (percent of the photo's width/height) outlining
+// the visible concrete floor area in `image`. This is used both as a canvas clip
+// region (to composite a recolored floor from the real photo) and as a fallback
+// CSS clip-path. Recalibrate whenever `image` changes: temporarily draw the
+// polygon in fvComposite with a solid red fillStyle instead of the texture,
+// reload, adjust the points until it hugs the floor edges, then revert.
 var ROOMS = {
   garage: {
     label: 'Garage',
     image: '/bare-concrete-garage-floor-before-epoxy-coating-missouri.webp',
     alt: 'Garage floor room for the Show Me Epoxy Floor Visualizer',
     floorClipPath: 'polygon(0% 27%, 100% 23%, 100% 100%, 0% 100%)',
-    floorTransform: 'perspective(900px) rotateX(2deg) scale(1.03)',
     available: true
   },
   basement: {
@@ -539,7 +542,6 @@ var ROOMS = {
     image: '/visualizer-room-basement.webp',
     alt: 'Basement floor room for the Show Me Epoxy Floor Visualizer',
     floorClipPath: 'polygon(0% 30%, 100% 30%, 100% 100%, 0% 100%)',
-    floorTransform: 'perspective(900px) rotateX(2deg) scale(1.03)',
     available: false
   },
   shop: {
@@ -548,7 +550,6 @@ var ROOMS = {
     image: '/visualizer-room-shop.webp',
     alt: 'Shop floor room for the Show Me Epoxy Floor Visualizer',
     floorClipPath: 'polygon(0% 28%, 100% 24%, 100% 100%, 0% 100%)',
-    floorTransform: 'perspective(900px) rotateX(2deg) scale(1.03)',
     available: false
   }
   // Add Patio / Commercial / Man Cave / Pool Deck here later — same shape as above.
@@ -671,29 +672,131 @@ function fvApplyRoom(){
   var room = ROOMS[fvState.room];
   document.getElementById('fvImgBefore').src = room.image;
   document.getElementById('fvImgBefore').alt = room.alt;
-  document.getElementById('fvImgAfter').src = room.image;
-  document.getElementById('fvImgAfter').alt = room.alt;
-  var tex = document.getElementById('fvFloorTex');
-  tex.style.clipPath = room.floorClipPath;
-  tex.style.transform = room.floorTransform || 'none';
 }
 
 function fvApplyColor(skipTrack){
-  var tex = document.getElementById('fvFloorTex');
   var color = fvState.color;
   document.getElementById('fvCurrentName').textContent = color ? color.name.toUpperCase() : '—';
-  if (color) {
-    tex.style.opacity = '0';
-    setTimeout(function(){
-      tex.style.backgroundImage = "url('" + color.texture + "')";
-      tex.style.opacity = '1';
-    }, 120);
-  }
   fvRenderColorGrid();
   fvUpdateFavButton();
   fvUpdateQuoteLink();
   fvSyncUrl();
+  if (color) {
+    var room = ROOMS[fvState.room];
+    var indicator = document.getElementById('fvRenderingIndicator');
+    var afterImg = document.getElementById('fvImgAfter');
+    indicator.classList.add('fv-rendering-show');
+    fvComposite(room, color, function(url){
+      afterImg.style.opacity = '0';
+      setTimeout(function(){
+        afterImg.src = url;
+        afterImg.alt = room.alt + ' coated in ' + color.name;
+        afterImg.style.opacity = '1';
+        indicator.classList.remove('fv-rendering-show');
+      }, 100);
+    });
+  }
   if (!skipTrack && color) fvTrack('floor_color_selected', {color: color.slug});
+}
+
+// ---------- photorealistic floor recolor (canvas) ----------
+// Composites the SAME base room photo with its actual floor region recolored,
+// rather than pasting a separate texture photo on top: the selected color
+// texture is multiplied by the real photo's own floor luminance (its exact
+// shadows / highlights / unevenness), so the result reads as "this floor,
+// coated" instead of a texture swatch stuck over the picture. Same-origin
+// images only, so canvas pixel reads are never CORS-tainted.
+var fvCanvasCache = {};
+var fvImageCache = {};
+
+function fvLoadImage(src){
+  if (fvImageCache[src]) return fvImageCache[src];
+  var p = new Promise(function(resolve, reject){
+    var img = new Image();
+    img.onload = function(){ resolve(img); };
+    img.onerror = reject;
+    img.src = src;
+  });
+  fvImageCache[src] = p;
+  return p;
+}
+
+function fvParsePolygon(clipPathStr, w, h){
+  var inner = clipPathStr.replace('polygon(', '').replace(')', '');
+  return inner.split(',').map(function(pair){
+    var parts = pair.trim().split(/\s+/);
+    return { x: parseFloat(parts[0]) / 100 * w, y: parseFloat(parts[1]) / 100 * h };
+  });
+}
+
+function fvComposite(room, color, callback){
+  var cacheKey = room.image + '|' + color.texture;
+  if (fvCanvasCache[cacheKey]) { callback(fvCanvasCache[cacheKey]); return; }
+
+  Promise.all([fvLoadImage(room.image), fvLoadImage(color.texture)]).then(function(imgs){
+    var baseImg = imgs[0], texImg = imgs[1];
+    var w = baseImg.naturalWidth, h = baseImg.naturalHeight;
+
+    var canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(baseImg, 0, 0, w, h);
+
+    var poly = fvParsePolygon(room.floorClipPath, w, h);
+    var xs = poly.map(function(p){ return p.x; });
+    var ys = poly.map(function(p){ return p.y; });
+    var minX = Math.max(0, Math.floor(Math.min.apply(null, xs)));
+    var maxX = Math.min(w, Math.ceil(Math.max.apply(null, xs)));
+    var minY = Math.max(0, Math.floor(Math.min.apply(null, ys)));
+    var maxY = Math.min(h, Math.ceil(Math.max.apply(null, ys)));
+    var bw = maxX - minX, bh = maxY - minY;
+    if (bw <= 0 || bh <= 0) { callback(baseImg.src); return; }
+
+    // Real floor lighting, read straight from the photo.
+    var floorData = ctx.getImageData(minX, minY, bw, bh).data;
+
+    // Tile the selected color texture at a believable flake scale, then
+    // multiply it by the real floor's luminance map computed above.
+    var texCanvas = document.createElement('canvas');
+    texCanvas.width = bw; texCanvas.height = bh;
+    var texCtx = texCanvas.getContext('2d');
+    var tileSize = Math.max(140, Math.round(bw * 0.32));
+    var pattern = texCtx.createPattern(texImg, 'repeat');
+    var scale = tileSize / texImg.naturalWidth;
+    texCtx.save();
+    texCtx.scale(scale, scale);
+    texCtx.fillStyle = pattern;
+    texCtx.fillRect(0, 0, bw / scale, bh / scale);
+    texCtx.restore();
+    var texData = texCtx.getImageData(0, 0, bw, bh);
+    var out = texData;
+    for (var i = 0; i < floorData.length; i += 4) {
+      var lum = (0.299 * floorData[i] + 0.587 * floorData[i + 1] + 0.114 * floorData[i + 2]) / 255;
+      lum = Math.min(1, lum * 1.2 + 0.04); // keep coated floor from reading too dark/muddy
+      out.data[i]     = out.data[i]     * lum;
+      out.data[i + 1] = out.data[i + 1] * lum;
+      out.data[i + 2] = out.data[i + 2] * lum;
+    }
+    texCtx.putImageData(out, 0, 0);
+
+    // Stamp the recolored floor back onto the real photo, clipped to the
+    // actual floor outline so walls, cabinets, doors, and vehicles are
+    // completely untouched.
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(poly[0].x, poly[0].y);
+    for (var j = 1; j < poly.length; j++) ctx.lineTo(poly[j].x, poly[j].y);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(texCanvas, minX, minY);
+    ctx.restore();
+
+    var url = canvas.toDataURL('image/jpeg', 0.86);
+    fvCanvasCache[cacheKey] = url;
+    callback(url);
+  }).catch(function(){
+    callback(room.image); // graceful fallback: show the unmodified room photo
+  });
 }
 
 function fvUpdateQuoteLink(){

@@ -1045,41 +1045,86 @@ function fvComposite(room, color, callback){
     var floorData = blurCtx.getImageData(0, 0, bw, bh).data;
 
     // Tile the selected color texture across the whole floor region.
-    // Two earlier attempts both failed on inspection: a plain repeated
-    // tile (ctx.createPattern) makes an obvious grid since every copy is
-    // pixel-identical; mirror-flipping alternate tiles removed the grid
-    // but created an even more obvious kaleidoscope/symmetry pattern,
-    // since mirrored copies share a visible reflection axis at every
-    // seam. Neither is close to acceptable, so this instead draws a
-    // random crop from a different spot in the source texture at a
-    // small random rotation for every tile — no two tiles are identical
-    // AND none of them are mirror images of each other, so there's no
-    // grid and no symmetry axis for the eye to lock onto.
+    // Three earlier attempts all failed on actual inspection: a plain
+    // repeated tile made an obvious grid (every copy pixel-identical);
+    // mirror-flipping alternate tiles removed the grid but created an
+    // even more obvious kaleidoscope/symmetry pattern; randomly rotated
+    // hard-edged patches removed the grid AND the symmetry but the hard
+    // edge of every patch was still a visible seam line once actually
+    // looked at, not just in a cherry-picked crop.
+    //
+    // This instead stamps many overlapping, softly-feathered patches
+    // (random crop + random rotation, like before, but faded to
+    // transparent at the edges with a radial gradient) densely enough
+    // that every point on the floor is covered by several overlapping
+    // stamps. There is no hard edge anywhere for the eye to catch,
+    // because nothing is ever drawn with a hard edge — the blend
+    // between neighboring patches is a real gradient, not a boundary.
+    // A single unrotated base fill goes down first purely so there is
+    // no gap in coverage between stamps; the dense stamping on top is
+    // what actually determines how the floor looks.
     var texCanvas = document.createElement('canvas');
     texCanvas.width = bw; texCanvas.height = bh;
     var texCtx = texCanvas.getContext('2d');
-    var tileSize = Math.max(110, Math.round(bw * 0.16));
-    var cols = Math.ceil(bw / tileSize) + 1;
-    var rows = Math.ceil(bh / tileSize) + 1;
     var srcW = texImg.naturalWidth, srcH = texImg.naturalHeight;
-    var cropW = srcW * 0.55, cropH = srcH * 0.55;
+
+    var baseTile = Math.max(110, Math.round(bw * 0.16));
+    var basePattern = texCtx.createPattern(texImg, 'repeat');
+    texCtx.save();
+    var baseScale = baseTile / srcW;
+    texCtx.scale(baseScale, baseScale);
+    texCtx.fillStyle = basePattern;
+    texCtx.fillRect(0, 0, bw / baseScale, bh / baseScale);
+    texCtx.restore();
+
+    var stampSize = Math.max(160, Math.round(bw * 0.24));
+    var stampR = stampSize / 2;
+    var spacing = stampR * 0.7; // dense: spacing well under the stamp radius so coverage overlaps heavily
+    var cropFrac = 0.5;
+    var cropW = srcW * cropFrac, cropH = srcH * cropFrac;
     var maxOffX = Math.max(1, srcW - cropW), maxOffY = Math.max(1, srcH - cropH);
-    var drawSize = tileSize * 1.6; // overdraw so rotated corners still cover the cell
-    for (var ry = 0; ry < rows; ry++) {
-      for (var rx = 0; rx < cols; rx++) {
-        var h1 = ((rx * 928371) ^ (ry * 689287)) >>> 0;
-        var h2 = (((rx + 5) * 374761393) ^ ((ry + 11) * 668265263)) >>> 0;
-        var h3 = (((rx + 17) * 2246822519) ^ ((ry + 23) * 3266489917)) >>> 0;
+    var scols = Math.ceil(bw / spacing) + 2;
+    var srows = Math.ceil(bh / spacing) + 2;
+
+    var stampMask = document.createElement('canvas');
+    stampMask.width = stampSize; stampMask.height = stampSize;
+    var maskCtx = stampMask.getContext('2d');
+    var grad = maskCtx.createRadialGradient(stampR, stampR, stampR * 0.42, stampR, stampR, stampR);
+    grad.addColorStop(0, 'rgba(0,0,0,1)');
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+    for (var sy = -1; sy < srows; sy++) {
+      for (var sx = -1; sx < scols; sx++) {
+        var h1 = ((sx * 928371) ^ (sy * 689287)) >>> 0;
+        var h2 = (((sx + 5) * 374761393) ^ ((sy + 11) * 668265263)) >>> 0;
+        var h3 = (((sx + 17) * 2246822519) ^ ((sy + 23) * 3266489917)) >>> 0;
+        var h4 = (((sx + 31) * 3812015801) ^ ((sy + 37) * 2654435761)) >>> 0;
+        var jitterX = ((h4 % 10007) / 10007 - 0.5) * spacing;
+        var jitterY = (((h4 >> 8) % 10007) / 10007 - 0.5) * spacing;
+        var cx = sx * spacing + jitterX;
+        var cy = sy * spacing + jitterY;
+        if (cx < -stampR || cx > bw + stampR || cy < -stampR || cy > bh + stampR) continue;
+
         var offX = (h1 % 10007) / 10007 * maxOffX;
         var offY = (h2 % 10007) / 10007 * maxOffY;
-        var angle = ((h3 % 10007) / 10007 * 2 - 1) * 0.30; // roughly -17deg..17deg
-        var cx = rx * tileSize + tileSize / 2;
-        var cy = ry * tileSize + tileSize / 2;
-        texCtx.save();
-        texCtx.translate(cx, cy);
-        texCtx.rotate(angle);
-        texCtx.drawImage(texImg, offX, offY, cropW, cropH, -drawSize / 2, -drawSize / 2, drawSize, drawSize);
-        texCtx.restore();
+        var angle = ((h3 % 10007) / 10007 * 2 - 1) * Math.PI;
+
+        // Build this one stamp: a rotated crop, faded to transparent at
+        // the edge, then composited onto the floor at (cx, cy).
+        var stampCanvas = document.createElement('canvas');
+        stampCanvas.width = stampSize; stampCanvas.height = stampSize;
+        var stampCtx = stampCanvas.getContext('2d');
+        stampCtx.save();
+        stampCtx.translate(stampR, stampR);
+        stampCtx.rotate(angle);
+        var drawSize = stampSize * 1.5;
+        stampCtx.drawImage(texImg, offX, offY, cropW, cropH, -drawSize / 2, -drawSize / 2, drawSize, drawSize);
+        stampCtx.restore();
+        stampCtx.globalCompositeOperation = 'destination-in';
+        stampCtx.fillStyle = grad;
+        stampCtx.fillRect(0, 0, stampSize, stampSize);
+
+        texCtx.drawImage(stampCanvas, cx - stampR, cy - stampR);
       }
     }
     var texData = texCtx.getImageData(0, 0, bw, bh);

@@ -563,11 +563,12 @@ var ROOMS = {
     image: '/bare-concrete-garage-floor-before-epoxy-coating-missouri.webp',
     alt: 'Garage floor room for the Show Me Epoxy Floor Visualizer',
     floorClipPath: 'polygon(0% 27%, 100% 23%, 100% 100%, 0% 100%)',
-    // Eye-level vanishing line as a % of image height. Controls how fast
-    // the flake shrinks toward the back of the room: closer to the floor's
-    // far edge = stronger foreshortening. Omit it and it's estimated from
-    // the floor outline, which is what uploaded photos rely on.
-    horizonY: 20,
+    // horizonY (eye-level vanishing line, % of image height) may be set
+    // per room, but is normally left off: the estimate derived from the
+    // floor outline is tuned to keep flake detail readable all the way to
+    // the back wall while still foreshortening clearly. Setting it too
+    // close to the floor's far edge crushes the back of the room to flat
+    // grey, which is what an earlier hardcoded value did here.
     available: true
   },
   basement: {
@@ -1037,27 +1038,52 @@ function fvComposite(room, color, callback){
     // door, dimmer toward the back) survives. Epoxy fully seals and hides
     // the slab underneath — a stain visible in the "before" photo has no
     // business showing up as a blotch in the "after" floor.
-    var blurSmall = document.createElement('canvas');
-    var sw = Math.max(8, Math.round(bw / 22));
-    var sh = Math.max(8, Math.round(bh / 22));
-    blurSmall.width = sw; blurSmall.height = sh;
-    blurSmall.getContext('2d').drawImage(canvas, minX, minY, bw, bh, 0, 0, sw, sh);
-    var blurCanvas = document.createElement('canvas');
-    blurCanvas.width = bw; blurCanvas.height = bh;
-    var blurCtx = blurCanvas.getContext('2d');
-    blurCtx.imageSmoothingEnabled = true;
-    blurCtx.drawImage(blurSmall, 0, 0, sw, sh, 0, 0, bw, bh);
-    var floorData = blurCtx.getImageData(0, 0, bw, bh).data;
+    // The slab is separated into TWO frequency bands, because they have to
+    // be treated differently. Previously a single heavy blur was used for
+    // relighting, which threw away every expansion joint, crack and floor
+    // contour and is a big part of why the result read as a flat sticker
+    // pasted over the photo.
+    //   LOW  band (very blurred) = environmental lighting / light falloff.
+    //   DETAIL band (lightly blurred) = expansion joints, saw cuts, slab
+    //        contours, surface relief. Real epoxy is a thin film: it seals
+    //        and recolors the slab but the joints and contours underneath
+    //        still read through, which is exactly what the reference
+    //        installation photos show.
+    function fvBandData(divisor, minPx){
+      var dw = Math.max(minPx, Math.round(bw / divisor));
+      var dh = Math.max(minPx, Math.round(bh / divisor));
+      var small = document.createElement('canvas');
+      small.width = dw; small.height = dh;
+      small.getContext('2d').drawImage(canvas, minX, minY, bw, bh, 0, 0, dw, dh);
+      var full = document.createElement('canvas');
+      full.width = bw; full.height = bh;
+      var fctx = full.getContext('2d');
+      fctx.imageSmoothingEnabled = true;
+      fctx.drawImage(small, 0, 0, dw, dh, 0, 0, bw, bh);
+      return fctx.getImageData(0, 0, bw, bh).data;
+    }
+    // THREE bands, because "keep the shadows and joints but lose the
+    // stains" needs a band-pass, not a single blur. A two-band split
+    // carried oil stains straight through into the coating as dirty
+    // patches, which a real coating would cover.
+    //   LOW (very coarse) - broad environmental light falloff only. Too
+    //        coarse to contain a stain, so relighting can't reproduce one.
+    //   MID - contains stains AND broad blotches.
+    //   DET - contains joints, saw cuts, cracks, fine relief.
+    // DET/MID cancels anything coarser than the mid scale (stains,
+    // blotches) while preserving the fine structure, which is exactly the
+    // detail that keeps the surface from looking like a flat sticker.
+    var lowData = fvBandData(140, 5);  // lighting only
+    var midData = fvBandData(18, 10);  // local average (stain scale)
+    var detData = fvBandData(2.5, 24); // joints / cracks / relief
 
-    // Average brightness of the slab. Relighting is applied RELATIVE to
-    // this rather than as an absolute multiply, so a heavily oil-stained
-    // or dirty floor doesn't drag the coated result down into dark
-    // patches — only genuine light falloff across the room survives, and
-    // it's clamped so nothing can blow out or go black. This is what
-    // keeps arbitrary customer photos usable, not just clean sample ones.
+    // Relighting is applied RELATIVE to the slab's mean brightness rather
+    // than as an absolute multiply, so a heavily oil-stained or dirty
+    // floor doesn't drag the coated result into dark patches — only
+    // genuine light falloff survives, clamped so nothing blows out.
     var lumSum = 0, lumCount = 0;
-    for (var li = 0; li < floorData.length; li += 4) {
-      lumSum += (0.299 * floorData[li] + 0.587 * floorData[li + 1] + 0.114 * floorData[li + 2]) / 255;
+    for (var li = 0; li < lowData.length; li += 4) {
+      lumSum += (0.299 * lowData[li] + 0.587 * lowData[li + 1] + 0.114 * lowData[li + 2]) / 255;
       lumCount++;
     }
     var lumMean = lumCount ? (lumSum / lumCount) : 0.5;
@@ -1075,21 +1101,43 @@ function fvComposite(room, color, callback){
     // stamp fades out through a radial gradient, no hard edge exists
     // anywhere, and because the stamps wrap, the tile's own borders match
     // perfectly — so it can repeat forever with nothing to see.
+    // CHIP SCALE — this is the bug that made the flakes look enormous.
+    // The previous version cropped 270px of the source photo and drew it
+    // into 337px, i.e. it MAGNIFIED the product photo 1.25x. Source chips
+    // (~30px) became ~37px, so a 512px tile held only ~14 chips, and that
+    // tile was then stretched across ~794px of the near floor — roughly
+    // 58px per chip. Real 1/4" full-broadcast flake reads at ~12-15px at
+    // that distance. Chips are now DOWNSCALED so the tile carries ~37 of
+    // them, cutting rendered chip size by about 75%.
     var TILE = 512;
+    var CHIPS_ACROSS_TILE = 37;
+    var SRC_CHIP_PX = 30;               // approx chip size in the product photos
+    var chipInTile = TILE / CHIPS_ACROSS_TILE;
+    var chipScale = chipInTile / SRC_CHIP_PX; // ~0.46 => a real reduction, not a magnification
+
     var tileCanvas = document.createElement('canvas');
     tileCanvas.width = TILE; tileCanvas.height = TILE;
     var tileCtx = tileCanvas.getContext('2d');
     var srcW = texImg.naturalWidth, srcH = texImg.naturalHeight;
-    tileCtx.drawImage(texImg, 0, 0, TILE, TILE); // base coverage, fully hidden by the stamps below
+
+    // Base coverage at the SAME reduced chip scale (a magnified base fill
+    // would show through the stamp gaps as oversized flake).
+    var baseDraw = Math.max(8, Math.round(srcW * chipScale));
+    for (var byy = 0; byy < TILE; byy += baseDraw) {
+      for (var bxx = 0; bxx < TILE; bxx += baseDraw) {
+        tileCtx.drawImage(texImg, bxx, byy, baseDraw, baseDraw);
+      }
+    }
 
     var rndSeed = 0x9e3779b9;
     function rnd(){ // deterministic PRNG so a given color always renders identically (cacheable)
       rndSeed ^= rndSeed << 13; rndSeed ^= rndSeed >>> 17; rndSeed ^= rndSeed << 5;
       return ((rndSeed >>> 0) % 100000) / 100000;
     }
-    var stampSize = Math.round(TILE * 0.44);
+    var cropW = srcW * 0.5, cropH = srcH * 0.5;
+    var ds = Math.max(6, cropW * chipScale);        // reduced, never magnified
+    var stampSize = Math.max(8, Math.round(ds / 1.5));
     var stampR = stampSize / 2;
-    var cropW = srcW * 0.52, cropH = srcH * 0.52;
     var maxOffX = Math.max(1, srcW - cropW), maxOffY = Math.max(1, srcH - cropH);
     var stampCanvas = document.createElement('canvas');
     stampCanvas.width = stampSize; stampCanvas.height = stampSize;
@@ -1098,7 +1146,9 @@ function fvComposite(room, color, callback){
     featherGrad.addColorStop(0, 'rgba(0,0,0,1)');
     featherGrad.addColorStop(1, 'rgba(0,0,0,0)');
 
-    var STAMPS = 120;
+    // Enough overlapping stamps to cover the tile several times over, so
+    // the result is a dense randomized broadcast rather than one photo.
+    var STAMPS = Math.min(900, Math.max(150, Math.round((TILE / stampSize) * (TILE / stampSize) * 3)));
     for (var si = 0; si < STAMPS; si++) {
       stampCtx.setTransform(1, 0, 0, 1, 0, 0);
       stampCtx.globalCompositeOperation = 'source-over';
@@ -1106,7 +1156,6 @@ function fvComposite(room, color, callback){
       stampCtx.save();
       stampCtx.translate(stampR, stampR);
       stampCtx.rotate(rnd() * Math.PI * 2);
-      var ds = stampSize * 1.5; // overdraw so rotated corners still fill the stamp
       stampCtx.drawImage(texImg, rnd() * maxOffX, rnd() * maxOffY, cropW, cropH, -ds / 2, -ds / 2, ds, ds);
       stampCtx.restore();
       stampCtx.globalCompositeOperation = 'destination-in';
@@ -1122,6 +1171,30 @@ function fvComposite(room, color, callback){
         }
       }
     }
+
+    // Mean tile colour, used to tame the product photo's studio-lit
+    // contrast. Under a clear coat the extremes soften; raw photo contrast
+    // is what made the coating read "harsh" versus real installs.
+    var tileProbe = tileCtx.getImageData(0, 0, TILE, TILE).data;
+    var tmR = 0, tmG = 0, tmB = 0, tmN = 0, lSum = 0, lSum2 = 0;
+    for (var ti = 0; ti < tileProbe.length; ti += 16) { // sample every 4th px, plenty
+      tmR += tileProbe[ti]; tmG += tileProbe[ti + 1]; tmB += tileProbe[ti + 2];
+      var lp = 0.299 * tileProbe[ti] + 0.587 * tileProbe[ti + 1] + 0.114 * tileProbe[ti + 2];
+      lSum += lp; lSum2 += lp * lp; tmN++;
+    }
+    tmR /= tmN; tmG /= tmN; tmB /= tmN;
+    // Match the CONTRAST of a real installed floor instead of guessing a
+    // fixed number. Measured against reference installs, a finished floor
+    // sits near a luminance stdev of ~62; the product photos (shot loose
+    // under studio light, then softened by mip filtering) come out much
+    // flatter, which is why the coating looked hazy and washed out. Each
+    // colour's tile is normalised to that target, so every blend lands
+    // with believable depth rather than one blanket multiplier that
+    // over-punches some colours and under-punches others.
+    var tileStd = Math.sqrt(Math.max(1, lSum2 / tmN - (lSum / tmN) * (lSum / tmN)));
+    var FLAKE_CONTRAST = 62 / tileStd;
+    if (FLAKE_CONTRAST < 0.85) FLAKE_CONTRAST = 0.85;
+    if (FLAKE_CONTRAST > 2.2) FLAKE_CONTRAST = 2.2;
 
     // ---- STEP 2: mip pyramid ------------------------------------------
     // Toward the back of the room the texture is compressed into very few
@@ -1157,7 +1230,12 @@ function fvComposite(room, color, callback){
       : polyTopY - 0.16 * Math.max(1, polyBotY - polyTopY);
     if (horizonY > polyTopY - 4) horizonY = polyTopY - 4; // keep the floor strictly below the horizon
 
-    var nearSpan = Math.max(120, bw * 0.62); // px one texture repeat covers at the very front
+    // NEAR SCALE. One tile carries CHIPS_ACROSS_TILE chips, so the span a
+    // tile covers at the very front sets the rendered chip size there.
+    // 0.40 * floorWidth over ~37 chips lands near-camera flake at roughly
+    // 13-14px in a 1280px photo, matching the reference installs (the old
+    // 0.62 over ~14 chips gave ~58px, the "giant flake" problem).
+    var nearSpan = Math.max(90, bw * 0.40);
     var dNear = polyBotY - horizonY;
     var Acoef = (dNear * dNear) / nearSpan;
     var Bcoef = dNear / nearSpan;
@@ -1168,6 +1246,7 @@ function fvComposite(room, color, callback){
     var texCtx = texCanvas.getContext('2d');
     var out = texCtx.createImageData(bw, bh);
     var outData = out.data;
+    var MAX_ANISO = 8;
 
     for (var py2 = 0; py2 < bh; py2++) {
       var imgY = minY + py2;
@@ -1175,77 +1254,127 @@ function fvComposite(room, color, callback){
       if (depth < 1) depth = 1;
       var invD = 1 / depth;
       var vTex = Acoef * invD;
-      // Texel footprint per screen pixel decides which mip is sharp enough.
-      // The footprint is anisotropic — receding into the distance squashes
-      // the texture much harder vertically (1/depth^2) than horizontally
-      // (1/depth). Picking the mip off the larger (vertical) footprint
-      // kills aliasing but over-blurs, washing the back of the room into
-      // featureless haze; the geometric mean of the two, biased slightly
-      // sharp, keeps real flake detail visible all the way back while
-      // still suppressing sparkle.
-      var fpV = Acoef * invD * invD * TILE;
+
+      // ANISOTROPIC FILTERING. Receding into the room squashes the texture
+      // far harder vertically (1/depth^2) than horizontally (1/depth) — up
+      // to ~27:1 at the back wall. Choosing one isotropic mip for such a
+      // lopsided footprint is what smeared the far field and made the
+      // pattern look stretched. Instead the mip is chosen from the SHARP
+      // (horizontal) axis and several samples are integrated along the
+      // squashed axis, which is how real texture filtering handles this.
       var fpU = Bcoef * invD * TILE;
-      var footprint = Math.sqrt(fpV * fpU);
-      var lvl = Math.log(Math.max(footprint, 0.0001)) / Math.LN2 - 0.5;
+      var fpV = Acoef * invD * invD * TILE;
+      var aniso = fpV / fpU;
+      if (!(aniso > 1)) aniso = 1;
+      if (aniso > MAX_ANISO) aniso = MAX_ANISO;
+
+      var lvl = Math.log(Math.max(fpU, 0.0001)) / Math.LN2;
       if (lvl < 0) lvl = 0;
       if (lvl > mips.length - 1) lvl = mips.length - 1;
       var mip = mips[lvl | 0];
       var mSize = mip.size, mData = mip.data;
-      var vPix = vTex * mSize;
+
+      var nSamp = Math.max(1, Math.round(aniso));
+      // vertical span of this pixel's footprint, expressed in mip texels
+      var vSpan = (Acoef * invD * invD) * mSize;
+      var vPixBase = vTex * mSize;
+
+      // u advances linearly across the row, so step it instead of
+      // recomputing the projection per pixel
+      var uPix = (minX - cxImg) * Bcoef * invD * mSize;
+      var uStep = Bcoef * invD * mSize;
+      var invN = 1 / nSamp;
 
       for (var px2 = 0; px2 < bw; px2++) {
-        var imgX = minX + px2;
-        var uTex = (imgX - cxImg) * Bcoef * invD;
-        var uPix = uTex * mSize;
-
-        // bilinear sample, wrapping (the tile is seamless so wrap is safe)
-        var fx = uPix - Math.floor(uPix), fy = vPix - Math.floor(vPix);
+        var tr = 0, tg = 0, tb = 0;
+        var fx = uPix - Math.floor(uPix);
         var x0 = ((Math.floor(uPix) % mSize) + mSize) % mSize;
-        var y0 = ((Math.floor(vPix) % mSize) + mSize) % mSize;
-        var x1 = (x0 + 1) % mSize, y1 = (y0 + 1) % mSize;
-        var i00 = (y0 * mSize + x0) * 4, i10 = (y0 * mSize + x1) * 4;
-        var i01 = (y1 * mSize + x0) * 4, i11 = (y1 * mSize + x1) * 4;
-        var w00 = (1 - fx) * (1 - fy), w10 = fx * (1 - fy), w01 = (1 - fx) * fy, w11 = fx * fy;
-        var tr = mData[i00] * w00 + mData[i10] * w10 + mData[i01] * w01 + mData[i11] * w11;
-        var tg = mData[i00 + 1] * w00 + mData[i10 + 1] * w10 + mData[i01 + 1] * w01 + mData[i11 + 1] * w11;
-        var tb = mData[i00 + 2] * w00 + mData[i10 + 2] * w10 + mData[i01 + 2] * w01 + mData[i11 + 2] * w11;
+        var x1 = (x0 + 1) % mSize;
 
-        // ---- STEP 4: relight + glossy topcoat -------------------------
+        for (var k = 0; k < nSamp; k++) {
+          var vPix = vPixBase + ((k + 0.5) * invN - 0.5) * vSpan;
+          var fy = vPix - Math.floor(vPix);
+          var y0 = ((Math.floor(vPix) % mSize) + mSize) % mSize;
+          var y1 = (y0 + 1) % mSize;
+          var r0 = y0 * mSize, r1 = y1 * mSize;
+          var i00 = (r0 + x0) * 4, i10 = (r0 + x1) * 4;
+          var i01 = (r1 + x0) * 4, i11 = (r1 + x1) * 4;
+          var w00 = (1 - fx) * (1 - fy), w10 = fx * (1 - fy), w01 = (1 - fx) * fy, w11 = fx * fy;
+          tr += mData[i00] * w00 + mData[i10] * w10 + mData[i01] * w01 + mData[i11] * w11;
+          tg += mData[i00 + 1] * w00 + mData[i10 + 1] * w10 + mData[i01 + 1] * w01 + mData[i11 + 1] * w11;
+          tb += mData[i00 + 2] * w00 + mData[i10 + 2] * w10 + mData[i01 + 2] * w01 + mData[i11 + 2] * w11;
+        }
+        tr *= invN; tg *= invN; tb *= invN;
+        uPix += uStep;
+
+        // Soften the product photo's studio contrast — a clear coat mutes
+        // the extremes, and raw contrast is what read as "harsh".
+        tr = tmR + (tr - tmR) * FLAKE_CONTRAST;
+        tg = tmG + (tg - tmG) * FLAKE_CONTRAST;
+        tb = tmB + (tb - tmB) * FLAKE_CONTRAST;
+
+        // ---- STEP 4: composite over the ORIGINAL luminance -------------
+        // The colour/flake layer and the photo's own light and structure
+        // are kept separate and combined with a restrained multiply, so
+        // room shadows, expansion joints and slab contours stay visible
+        // through the coating instead of being painted over.
         var fi = (py2 * bw + px2) * 4;
-        var lum = (0.299 * floorData[fi] + 0.587 * floorData[fi + 1] + 0.114 * floorData[fi + 2]) / 255;
-        // Relative, clamped relighting (see lumMean above).
-        var shade = 1 + (lum - lumMean) * 0.85;
-        if (shade < 0.62) shade = 0.62;
-        if (shade > 1.25) shade = 1.25;
+        var lumLow = (0.299 * lowData[fi] + 0.587 * lowData[fi + 1] + 0.114 * lowData[fi + 2]) / 255;
+        var lumDet = (0.299 * detData[fi] + 0.587 * detData[fi + 1] + 0.114 * detData[fi + 2]) / 255;
+
+        // environmental lighting, relative to the slab mean and clamped
+        var shade = 1 + (lumLow - lumMean) * 0.90;
+        if (shade < 0.58) shade = 0.58;
+        if (shade > 1.28) shade = 1.28;
+
+        // Structural relief only: DET/MID is a band-pass, so joints, saw
+        // cuts and cracks ride through while stains and broad blotches
+        // cancel out. Reduced strength so it reads without dominating.
+        var lumMid = (0.299 * midData[fi] + 0.587 * midData[fi + 1] + 0.114 * midData[fi + 2]) / 255;
+        var ratio = lumDet / (lumMid > 0.04 ? lumMid : 0.04);
+        if (ratio < 0.45) ratio = 0.45;
+        if (ratio > 1.55) ratio = 1.55;
+        shade *= 1 + (ratio - 1) * 0.55;
+
         tr *= shade; tg *= shade; tb *= shade;
-        if (tr > 255) tr = 255; if (tg > 255) tg = 255; if (tb > 255) tb = 255;
-        // gentle all-over sheen so the floor reads sealed/wet, not matte
-        tr += (255 - tr) * 0.12; tg += (255 - tg) * 0.12; tb += (255 - tb) * 0.12;
-        // strong reflection where the real photo itself was brightest, so
-        // highlights land where the room's actual light is
-        var spec = (lum - (lumMean + 0.14)) / 0.34;
+
+        // Satin-to-gloss clear coat: a whisper of all-over sheen plus a
+        // restrained highlight where the room's own light already is.
+        // Deliberately far weaker than before, which was mirror-like.
+        tr += (255 - tr) * 0.03; tg += (255 - tg) * 0.03; tb += (255 - tb) * 0.03;
+        var spec = (lumLow - (lumMean + 0.16)) / 0.32;
         if (spec > 1) spec = 1;
         if (spec > 0) {
-          spec = Math.pow(spec, 1.3) * 0.85;
+          spec = spec * spec * 0.22;
           tr += (255 - tr) * spec; tg += (255 - tg) * spec; tb += (255 - tb) * spec;
         }
 
+        if (tr < 0) tr = 0; else if (tr > 255) tr = 255;
+        if (tg < 0) tg = 0; else if (tg > 255) tg = 255;
+        if (tb < 0) tb = 0; else if (tb > 255) tb = 255;
         outData[fi] = tr; outData[fi + 1] = tg; outData[fi + 2] = tb; outData[fi + 3] = 255;
       }
     }
     texCtx.putImageData(out, 0, 0);
 
-    // Stamp the recolored floor back onto the real photo, clipped to the
-    // actual floor outline so walls, cabinets, doors, and vehicles are
-    // completely untouched.
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(poly[0].x, poly[0].y);
-    for (var j = 1; j < poly.length; j++) ctx.lineTo(poly[j].x, poly[j].y);
-    ctx.closePath();
-    ctx.clip();
+    // Mask to the floor outline with an anti-aliased path rather than a
+    // hard clip, giving the ~1px feathered edge that keeps the coating
+    // from cutting a jagged line against walls, trim, stairs and doors.
+    // Everything outside the mask is left completely untouched.
+    var maskCanvas = document.createElement('canvas');
+    maskCanvas.width = bw; maskCanvas.height = bh;
+    var maskCtx = maskCanvas.getContext('2d');
+    maskCtx.fillStyle = '#000';
+    maskCtx.beginPath();
+    maskCtx.moveTo(poly[0].x - minX, poly[0].y - minY);
+    for (var j = 1; j < poly.length; j++) maskCtx.lineTo(poly[j].x - minX, poly[j].y - minY);
+    maskCtx.closePath();
+    maskCtx.fill();
+    texCtx.globalCompositeOperation = 'destination-in';
+    texCtx.drawImage(maskCanvas, 0, 0);
+    texCtx.globalCompositeOperation = 'source-over';
+
     ctx.drawImage(texCanvas, minX, minY);
-    ctx.restore();
 
     var url = canvas.toDataURL('image/jpeg', 0.86);
     fvCanvasCache[cacheKey] = url;

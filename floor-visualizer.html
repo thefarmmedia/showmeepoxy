@@ -726,15 +726,24 @@ function fvSelectRoom(key){
 // Starts at 5 points so an L-shaped room, an angled wall, or a step in the
 // floor can be traced without first having to add one — corners can still
 // be added or removed to match any floor shape exactly.
+// Seven draggable points by default, walking the floor perimeter
+// clockwise: back-left, back-middle, back-right, right-middle,
+// front-right, front-left, left-middle. Five was not enough for real
+// garages — the extra mid-edge points on the left and right sides are
+// what let an angled side wall, a bump-out, a step down or a doorway
+// return be traced without having to add points first. More can still
+// be inserted with "+ Add Point", or by tapping directly on an edge.
 var FV_CALIBRATE_DEFAULT = [
-  { x: 8,  y: 55 },
-  { x: 50, y: 50 },
-  { x: 92, y: 55 },
+  { x: 8,   y: 55 },
+  { x: 50,  y: 50 },
+  { x: 92,  y: 55 },
+  { x: 100, y: 76 },
   { x: 100, y: 100 },
-  { x: 0,  y: 100 }
+  { x: 0,   y: 100 },
+  { x: 0,   y: 76 }
 ];
 var FV_MIN_POINTS = 3;
-var FV_MAX_POINTS = 12;
+var FV_MAX_POINTS = 16;
 var fvCalibratePoints = null;
 var fvCalibrateImageUrl = null;
 
@@ -834,7 +843,7 @@ function fvRenderCalibrationPoints(){
     fvCalibratePoints.map(function(p){ return p.x + ',' + p.y; }).join(' ')
   );
   document.getElementById('fvCalibrateHint').textContent =
-    'Drag the ' + fvCalibratePoints.length + ' points onto your floor’s edges';
+    'Drag the ' + fvCalibratePoints.length + ' points onto your floor’s edges · tap an edge to add another';
 }
 
 (function initCalibrationDrag(){
@@ -854,6 +863,39 @@ function fvRenderCalibrationPoints(){
     var target = e.target.closest('.fv-calibrate-handle');
     if (!target) return;
     dragIndex = parseInt(target.dataset.i, 10);
+    e.preventDefault();
+  });
+
+  // Second way to add a point: press directly ON an edge of the outline
+  // and a new point is inserted at that spot, already being dragged. For
+  // an irregular floor this is far quicker than pressing "+ Add Point"
+  // and hunting for where the new point landed.
+  function fvDistToSegment(p, a, b){
+    var vx = b.x - a.x, vy = b.y - a.y;
+    var wx = p.x - a.x, wy = p.y - a.y;
+    var L2 = vx * vx + vy * vy;
+    var t = L2 > 0 ? (wx * vx + wy * vy) / L2 : 0;
+    if (t < 0) t = 0; else if (t > 1) t = 1;
+    var qx = a.x + t * vx, qy = a.y + t * vy;
+    var dx = p.x - qx, dy = p.y - qy;
+    return { d: Math.sqrt(dx * dx + dy * dy), x: qx, y: qy };
+  }
+
+  document.getElementById('fvCalibrate').addEventListener('pointerdown', function(e){
+    if (e.target.closest('.fv-calibrate-handle')) return; // dragging an existing point
+    if (!fvCalibratePoints) return;
+    if (fvCalibratePoints.length >= FV_MAX_POINTS) return;
+    var p = pctFromEvent(e);
+    var n = fvCalibratePoints.length;
+    var bestI = -1, bestD = 1e9, bestPt = null;
+    for (var i = 0; i < n; i++) {
+      var hit = fvDistToSegment(p, fvCalibratePoints[i], fvCalibratePoints[(i + 1) % n]);
+      if (hit.d < bestD) { bestD = hit.d; bestI = i; bestPt = hit; }
+    }
+    if (bestI < 0 || bestD > 4.5) return; // only when pressing near the outline
+    fvCalibratePoints.splice(bestI + 1, 0, { x: bestPt.x, y: bestPt.y });
+    dragIndex = bestI + 1;   // grab it straight away so it can be dragged
+    fvRenderCalibrationPoints();
     e.preventDefault();
   });
   window.addEventListener('pointermove', function(e){

@@ -1152,7 +1152,7 @@ function fvComposite(room, color, callback){
     // that distance. Chips are now DOWNSCALED so the tile carries ~37 of
     // them, cutting rendered chip size by about 75%.
     var TILE = 768;
-    var CHIPS_ACROSS_TILE = 62;
+    var CHIPS_ACROSS_TILE = 72;
     var SRC_CHIP_PX = 30;               // approx chip size in the product photos
     var chipInTile = TILE / CHIPS_ACROSS_TILE;
     var chipScale = chipInTile / SRC_CHIP_PX; // ~0.46 => a real reduction, not a magnification
@@ -1198,7 +1198,17 @@ function fvComposite(room, color, callback){
       stampCtx.save();
       stampCtx.translate(stampR, stampR);
       stampCtx.rotate(rnd() * Math.PI * 2);
-      stampCtx.drawImage(texImg, rnd() * maxOffX, rnd() * maxOffY, cropW, cropH, -ds / 2, -ds / 2, ds, ds);
+      // Per-stamp variation so the broadcast doesn't read as one photo
+      // repeated: each patch gets its own slight scale, and its own
+      // slight brightness/saturation shift. Real flake is hand-broadcast,
+      // so chip size and colour drift across a floor; without this the
+      // eye eventually picks up machine-like uniformity.
+      var sJit = 0.88 + rnd() * 0.24;          // +/- ~12% chip size
+      var dsj = ds * sJit;
+      stampCtx.filter = 'brightness(' + (0.95 + rnd() * 0.10).toFixed(3) +
+                        ') saturate(' + (0.92 + rnd() * 0.16).toFixed(3) + ')';
+      stampCtx.drawImage(texImg, rnd() * maxOffX, rnd() * maxOffY, cropW, cropH, -dsj / 2, -dsj / 2, dsj, dsj);
+      stampCtx.filter = 'none';
       stampCtx.restore();
       stampCtx.globalCompositeOperation = 'destination-in';
       stampCtx.fillStyle = featherGrad;
@@ -1430,9 +1440,9 @@ function fvComposite(room, color, callback){
         // range widened so the coating genuinely darkens in shadow and
         // lifts where the original floor catches light, instead of
         // flattening the room's tonal variation.
-        var shade = 1 + (lumLow - lumMean) * 1.30;
-        if (shade < 0.48) shade = 0.48;
-        if (shade > 1.42) shade = 1.42;
+        var shade = 1 + (lumLow - lumMean) * 1.42;
+        if (shade < 0.44) shade = 0.44;
+        if (shade > 1.48) shade = 1.48;
 
         // Structural relief only: DET/MID is a band-pass, so joints, saw
         // cuts and cracks ride through while stains and broad blotches
@@ -1441,18 +1451,18 @@ function fvComposite(room, color, callback){
         var ratio = lumDet / (lumMid > 0.04 ? lumMid : 0.04);
         if (ratio < 0.45) ratio = 0.45;
         if (ratio > 1.55) ratio = 1.55;
-        shade *= 1 + (ratio - 1) * 0.62;
+        shade *= 1 + (ratio - 1) * 0.72;
 
         tr *= shade; tg *= shade; tb *= shade;
 
         // Satin-to-gloss clear coat: a whisper of all-over sheen plus a
         // restrained highlight where the room's own light already is.
         // Deliberately far weaker than before, which was mirror-like.
-        tr += (255 - tr) * 0.03; tg += (255 - tg) * 0.03; tb += (255 - tb) * 0.03;
+        tr += (255 - tr) * 0.025; tg += (255 - tg) * 0.025; tb += (255 - tb) * 0.025;
         var spec = (lumLow - (lumMean + 0.18)) / 0.34;
         if (spec > 1) spec = 1;
         if (spec > 0) {
-          spec = spec * spec * 0.15;
+          spec = spec * spec * 0.12;
           tr += (255 - tr) * spec; tg += (255 - tg) * spec; tb += (255 - tb) * spec;
         }
 
@@ -1477,6 +1487,17 @@ function fvComposite(room, color, callback){
     for (var j = 1; j < poly.length; j++) maskCtx.lineTo(poly[j].x - minX, poly[j].y - minY);
     maskCtx.closePath();
     maskCtx.fill();
+    // Erode the mask slightly. An anti-aliased fill alone leaves partial
+    // coverage right on the boundary, which can tint the first pixel of a
+    // wall, a garage-door track or a piece of trim. Stroking the same path
+    // with destination-out pulls the coating back under the edge, so it
+    // stops just short of every vertical surface while keeping the soft
+    // ~1px transition instead of a hard cut.
+    maskCtx.globalCompositeOperation = 'destination-out';
+    maskCtx.lineWidth = 1.6;
+    maskCtx.strokeStyle = '#000';
+    maskCtx.stroke();
+    maskCtx.globalCompositeOperation = 'source-over';
     texCtx.globalCompositeOperation = 'destination-in';
     texCtx.drawImage(maskCanvas, 0, 0);
     texCtx.globalCompositeOperation = 'source-over';

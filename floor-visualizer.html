@@ -1109,8 +1109,8 @@ function fvComposite(room, color, callback){
     // 58px per chip. Real 1/4" full-broadcast flake reads at ~12-15px at
     // that distance. Chips are now DOWNSCALED so the tile carries ~37 of
     // them, cutting rendered chip size by about 75%.
-    var TILE = 512;
-    var CHIPS_ACROSS_TILE = 37;
+    var TILE = 768;
+    var CHIPS_ACROSS_TILE = 62;
     var SRC_CHIP_PX = 30;               // approx chip size in the product photos
     var chipInTile = TILE / CHIPS_ACROSS_TILE;
     var chipScale = chipInTile / SRC_CHIP_PX; // ~0.46 => a real reduction, not a magnification
@@ -1193,8 +1193,20 @@ function fvComposite(room, color, callback){
     // over-punches some colours and under-punches others.
     var tileStd = Math.sqrt(Math.max(1, lSum2 / tmN - (lSum / tmN) * (lSum / tmN)));
     var FLAKE_CONTRAST = 62 / tileStd;
-    if (FLAKE_CONTRAST < 0.85) FLAKE_CONTRAST = 0.85;
-    if (FLAKE_CONTRAST > 2.2) FLAKE_CONTRAST = 2.2;
+    if (FLAKE_CONTRAST < 0.75) FLAKE_CONTRAST = 0.75;
+    if (FLAKE_CONTRAST > 2.0) FLAKE_CONTRAST = 2.0;
+    var FLAKE_SAT = 0.88; // pull slightly toward neutral: a coating, not confetti
+
+    // Visible BASE COAT between the chips. Product photos are loose flake
+    // packed edge to edge with no binder showing, which renders as a
+    // crowded confetti field. A real broadcast floor always shows some
+    // coloured base between and under the chips, so a base tone derived
+    // from the blend (slightly darker and desaturated) is mixed in.
+    var bcLum = 0.299 * tmR + 0.587 * tmG + 0.114 * tmB;
+    var bcR = (tmR * 0.55 + bcLum * 0.45) * 0.86;
+    var bcG = (tmG * 0.55 + bcLum * 0.45) * 0.86;
+    var bcB = (tmB * 0.55 + bcLum * 0.45) * 0.86;
+    var BASE_MIX = 0.17;
 
     // ---- STEP 2: mip pyramid ------------------------------------------
     // Toward the back of the room the texture is compressed into very few
@@ -1240,13 +1252,13 @@ function fvComposite(room, color, callback){
     var Acoef = (dNear * dNear) / nearSpan;
     var Bcoef = dNear / nearSpan;
     var cxImg = (minX + maxX) / 2;
+    var invDnear = 1 / dNear; // anchor for shear damping (near edge stays exact)
 
     var texCanvas = document.createElement('canvas');
     texCanvas.width = bw; texCanvas.height = bh;
     var texCtx = texCanvas.getContext('2d');
     var out = texCtx.createImageData(bw, bh);
     var outData = out.data;
-    var MAX_ANISO = 8;
 
     for (var py2 = 0; py2 < bh; py2++) {
       var imgY = minY + py2;
@@ -1255,63 +1267,113 @@ function fvComposite(room, color, callback){
       var invD = 1 / depth;
       var vTex = Acoef * invD;
 
-      // ANISOTROPIC FILTERING. Receding into the room squashes the texture
-      // far harder vertically (1/depth^2) than horizontally (1/depth) — up
-      // to ~27:1 at the back wall. Choosing one isotropic mip for such a
-      // lopsided footprint is what smeared the far field and made the
-      // pattern look stretched. Instead the mip is chosen from the SHARP
-      // (horizontal) axis and several samples are integrated along the
-      // squashed axis, which is how real texture filtering handles this.
-      var fpU = Bcoef * invD * TILE;
-      var fpV = Acoef * invD * invD * TILE;
-      var aniso = fpV / fpU;
-      if (!(aniso > 1)) aniso = 1;
-      if (aniso > MAX_ANISO) aniso = MAX_ANISO;
+      // FOOTPRINT — full Jacobian, including the shear term.
+      //   du/dx = B/d          dv/dx = 0
+      //   du/dy = -(x-cx)B/d^2 dv/dy = -A/d^2
+      // The du/dy shear is zero at the image centre and grows toward the
+      // edges (~1.9x the scale at the frame edge). A previous version
+      // integrated several samples along texture-v only; with a sheared
+      // footprint that averaging direction maps to a screen direction
+      // radiating from the vanishing point, which is exactly what turned
+      // flakes into long streaks fanning out from the back wall. Sampling
+      // is now a single isotropic lookup whose mip comes from the LARGEST
+      // footprint axis, so perspective changes flake SCALE without
+      // distorting flake SHAPE. No directional averaging anywhere.
+      // SHEAR DAMPING. A strict pinhole mapping shears the horizontal
+      // texture coordinate as depth changes down a column, by an amount
+      // proportional to distance from the image centre. Measured at the
+      // bottom edge of the sample photo that slants every flake by ~29
+      // degrees, which reads as diagonal streaks fanning out from the
+      // vanishing point even though anisotropy there is only ~1.1 (a
+      // single sample, no filter blur involved). It is geometrically
+      // faithful but it distorts the SHAPE of every chip, and real flake
+      // is randomly oriented, so the eye reads the systematic slant as
+      // smearing. Horizontal convergence is damped to a fraction of the
+      // strict value, anchored so the near edge is untouched: perspective
+      // still drives flake SCALE, without shearing flake SHAPE.
+      var SHEAR_DAMP = 0.40;
+      var uScale = Bcoef * (invDnear + (invD - invDnear) * SHEAR_DAMP);
+      var duX = uScale;
+      var dvY = Acoef * invD * invD;
+      var duYcoef = Bcoef * SHEAR_DAMP * invD * invD;
+      var duYbase = (minX - cxImg) * duYcoef;
+      var duYstep = duYcoef;
 
-      var lvl = Math.log(Math.max(fpU, 0.0001)) / Math.LN2;
-      if (lvl < 0) lvl = 0;
-      if (lvl > mips.length - 1) lvl = mips.length - 1;
-      var mip = mips[lvl | 0];
-      var mSize = mip.size, mData = mip.data;
+      // Extremely light distance softening: the foreground stays defined
+      // and only the far floor picks up a touch of natural camera falloff.
+      var kDepth = dNear * invD;
+      if (kDepth < 1) kDepth = 1;
+      var distBias = 0.16 * (Math.log(kDepth) / Math.LN2);
+      if (distBias > 0.55) distBias = 0.55;
 
-      var nSamp = Math.max(1, Math.round(aniso));
-      // vertical span of this pixel's footprint, expressed in mip texels
-      var vSpan = (Acoef * invD * invD) * mSize;
-      var vPixBase = vTex * mSize;
-
-      // u advances linearly across the row, so step it instead of
-      // recomputing the projection per pixel
-      var uPix = (minX - cxImg) * Bcoef * invD * mSize;
-      var uStep = Bcoef * invD * mSize;
-      var invN = 1 / nSamp;
+      var uTexBase = (minX - cxImg) * uScale;
+      var uTexStep = uScale;
+      var maxLvl = mips.length - 1;
 
       for (var px2 = 0; px2 < bw; px2++) {
+        var uTex = uTexBase + px2 * uTexStep;
+        var duY = duYbase + px2 * duYstep;
+
+        // The pixel footprint is a parallelogram spanned by
+        //   (duX, 0)      along screen x   <- the SHORT axis
+        //   (duY, dvY)    along screen y   <- the LONG axis, INCLUDING the
+        //                                    shear term that was ignored
+        // Integrating along the TRUE long axis is correct filtering and
+        // leaves flake shapes intact. The earlier bug integrated along
+        // (0, dvY) instead — dropping duY — which smeared flakes into
+        // streaks fanning out from the vanishing point. Taking the mip
+        // from the short axis keeps the foreground crisp; without this
+        // the whole floor blurs and the far field turns to mush.
+        var L = Math.sqrt(duY * duY + dvY * dvY);
+        var aniso = L / duX;
+        if (!(aniso > 1)) aniso = 1;
+        var N = Math.round(aniso);
+        if (N < 1) N = 1; else if (N > 4) N = 4;
+
+        // If more anisotropy remains than samples can cover, blur just
+        // enough to make up the difference rather than alias.
+        var lvl = Math.log(Math.max(duX * TILE * (aniso / N), 0.0001)) / Math.LN2 + distBias;
+        if (lvl < 0) lvl = 0; else if (lvl > maxLvl) lvl = maxLvl;
+        var l0 = lvl | 0;
+        var l1 = l0 < maxLvl ? l0 + 1 : l0;
+        var lf = lvl - l0;
+
         var tr = 0, tg = 0, tb = 0;
-        var fx = uPix - Math.floor(uPix);
-        var x0 = ((Math.floor(uPix) % mSize) + mSize) % mSize;
-        var x1 = (x0 + 1) % mSize;
-
-        for (var k = 0; k < nSamp; k++) {
-          var vPix = vPixBase + ((k + 0.5) * invN - 0.5) * vSpan;
-          var fy = vPix - Math.floor(vPix);
-          var y0 = ((Math.floor(vPix) % mSize) + mSize) % mSize;
-          var y1 = (y0 + 1) % mSize;
-          var r0 = y0 * mSize, r1 = y1 * mSize;
-          var i00 = (r0 + x0) * 4, i10 = (r0 + x1) * 4;
-          var i01 = (r1 + x0) * 4, i11 = (r1 + x1) * 4;
-          var w00 = (1 - fx) * (1 - fy), w10 = fx * (1 - fy), w01 = (1 - fx) * fy, w11 = fx * fy;
-          tr += mData[i00] * w00 + mData[i10] * w10 + mData[i01] * w01 + mData[i11] * w11;
-          tg += mData[i00 + 1] * w00 + mData[i10 + 1] * w10 + mData[i01 + 1] * w01 + mData[i11 + 1] * w11;
-          tb += mData[i00 + 2] * w00 + mData[i10 + 2] * w10 + mData[i01 + 2] * w01 + mData[i11 + 2] * w11;
+        var invN = 1 / N;
+        for (var lv = 0; lv < 2; lv++) {
+          var wgt = (lv === 0 ? (1 - lf) : lf) * invN;
+          if (wgt <= 0) continue;
+          var mp = mips[lv === 0 ? l0 : l1];
+          var mS = mp.size, mD = mp.data;
+          for (var k = 0; k < N; k++) {
+            var tt = (k + 0.5) * invN - 0.5;      // walk the long axis
+            var up = (uTex + tt * duY) * mS;
+            var vp = (vTex + tt * dvY) * mS;
+            var fxx = up - Math.floor(up), fyy = vp - Math.floor(vp);
+            var xa = ((Math.floor(up) % mS) + mS) % mS, xb = (xa + 1) % mS;
+            var ya = ((Math.floor(vp) % mS) + mS) % mS, yb = (ya + 1) % mS;
+            var ra = ya * mS, rb = yb * mS;
+            var j00 = (ra + xa) * 4, j10 = (ra + xb) * 4, j01 = (rb + xa) * 4, j11 = (rb + xb) * 4;
+            var q00 = (1 - fxx) * (1 - fyy) * wgt, q10 = fxx * (1 - fyy) * wgt;
+            var q01 = (1 - fxx) * fyy * wgt, q11 = fxx * fyy * wgt;
+            tr += mD[j00] * q00 + mD[j10] * q10 + mD[j01] * q01 + mD[j11] * q11;
+            tg += mD[j00 + 1] * q00 + mD[j10 + 1] * q10 + mD[j01 + 1] * q01 + mD[j11 + 1] * q11;
+            tb += mD[j00 + 2] * q00 + mD[j10 + 2] * q10 + mD[j01 + 2] * q01 + mD[j11 + 2] * q11;
+          }
         }
-        tr *= invN; tg *= invN; tb *= invN;
-        uPix += uStep;
 
-        // Soften the product photo's studio contrast — a clear coat mutes
-        // the extremes, and raw contrast is what read as "harsh".
+        // Soften the product photo's studio contrast, desaturate slightly,
+        // then let base-coat colour show between the chips.
         tr = tmR + (tr - tmR) * FLAKE_CONTRAST;
         tg = tmG + (tg - tmG) * FLAKE_CONTRAST;
         tb = tmB + (tb - tmB) * FLAKE_CONTRAST;
+        var tl = 0.299 * tr + 0.587 * tg + 0.114 * tb;
+        tr = tl + (tr - tl) * FLAKE_SAT;
+        tg = tl + (tg - tl) * FLAKE_SAT;
+        tb = tl + (tb - tl) * FLAKE_SAT;
+        tr = tr + (bcR - tr) * BASE_MIX;
+        tg = tg + (bcG - tg) * BASE_MIX;
+        tb = tb + (bcB - tb) * BASE_MIX;
 
         // ---- STEP 4: composite over the ORIGINAL luminance -------------
         // The colour/flake layer and the photo's own light and structure
@@ -1322,10 +1384,13 @@ function fvComposite(room, color, callback){
         var lumLow = (0.299 * lowData[fi] + 0.587 * lowData[fi + 1] + 0.114 * lowData[fi + 2]) / 255;
         var lumDet = (0.299 * detData[fi] + 0.587 * detData[fi + 1] + 0.114 * detData[fi + 2]) / 255;
 
-        // environmental lighting, relative to the slab mean and clamped
-        var shade = 1 + (lumLow - lumMean) * 0.90;
-        if (shade < 0.58) shade = 0.58;
-        if (shade > 1.28) shade = 1.28;
+        // Environmental lighting, relative to the slab mean. Strength and
+        // range widened so the coating genuinely darkens in shadow and
+        // lifts where the original floor catches light, instead of
+        // flattening the room's tonal variation.
+        var shade = 1 + (lumLow - lumMean) * 1.30;
+        if (shade < 0.48) shade = 0.48;
+        if (shade > 1.42) shade = 1.42;
 
         // Structural relief only: DET/MID is a band-pass, so joints, saw
         // cuts and cracks ride through while stains and broad blotches
@@ -1334,7 +1399,7 @@ function fvComposite(room, color, callback){
         var ratio = lumDet / (lumMid > 0.04 ? lumMid : 0.04);
         if (ratio < 0.45) ratio = 0.45;
         if (ratio > 1.55) ratio = 1.55;
-        shade *= 1 + (ratio - 1) * 0.55;
+        shade *= 1 + (ratio - 1) * 0.62;
 
         tr *= shade; tg *= shade; tb *= shade;
 
@@ -1342,10 +1407,10 @@ function fvComposite(room, color, callback){
         // restrained highlight where the room's own light already is.
         // Deliberately far weaker than before, which was mirror-like.
         tr += (255 - tr) * 0.03; tg += (255 - tg) * 0.03; tb += (255 - tb) * 0.03;
-        var spec = (lumLow - (lumMean + 0.16)) / 0.32;
+        var spec = (lumLow - (lumMean + 0.18)) / 0.34;
         if (spec > 1) spec = 1;
         if (spec > 0) {
-          spec = spec * spec * 0.22;
+          spec = spec * spec * 0.15;
           tr += (255 - tr) * spec; tg += (255 - tg) * spec; tb += (255 - tb) * spec;
         }
 

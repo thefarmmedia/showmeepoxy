@@ -562,7 +562,7 @@ var ROOMS = {
     label: 'Garage',
     image: '/bare-concrete-garage-floor-before-epoxy-coating-missouri.webp',
     alt: 'Garage floor room for the Show Me Epoxy Floor Visualizer',
-    floorClipPath: 'polygon(0% 27%, 100% 23%, 100% 100%, 0% 100%)',
+    floorClipPath: 'polygon(0% 21.3%, 100% 21.1%, 100% 100%, 0% 100%)',
     // horizonY (eye-level vanishing line, % of image height) may be set
     // per room, but is normally left off: the estimate derived from the
     // floor outline is tuned to keep flake detail readable all the way to
@@ -1073,77 +1073,88 @@ function fvComposite(room, color, callback){
     var bw = maxX - minX, bh = maxY - minY;
     if (bw <= 0 || bh <= 0) { callback(baseImg.src); return; }
 
-    // Room LIGHTING, not the concrete's own dirt: downscale-then-upscale
-    // the floor region (a cheap, fast box blur with zero extra libraries)
-    // so individual stains, cracks, and discoloration in the raw concrete
-    // get smoothed away, while the broad light falloff (bright near the
-    // door, dimmer toward the back) survives. Epoxy fully seals and hides
-    // the slab underneath — a stain visible in the "before" photo has no
-    // business showing up as a blotch in the "after" floor.
-    // The slab is separated into TWO frequency bands, because they have to
-    // be treated differently. Previously a single heavy blur was used for
-    // relighting, which threw away every expansion joint, crack and floor
-    // contour and is a big part of why the result read as a flat sticker
-    // pasted over the photo.
-    //   LOW  band (very blurred) = environmental lighting / light falloff.
-    //   DETAIL band (lightly blurred) = expansion joints, saw cuts, slab
-    //        contours, surface relief. Real epoxy is a thin film: it seals
-    //        and recolors the slab but the joints and contours underneath
-    //        still read through, which is exactly what the reference
-    //        installation photos show.
-    function fvBandData(divisor, minPx){
-      var dw = Math.max(minPx, Math.round(bw / divisor));
-      var dh = Math.max(minPx, Math.round(bh / divisor));
-      // PROGRESSIVE HALVING, not one big drawImage. A single large-ratio
-      // downscale does not box-filter in Chrome, it effectively point
-      // samples, so the "blurred" band comes back ALIASED — noise, not a
-      // smooth average. Stretched back up to full size that noise turns
-      // into big soft light and dark patches, which is a direct cause of
-      // the cloudy, blotchy look. Measured on the flake photo: reducing
-      // 520px to 4px in one step left a luminance stdev of 28.0, where
-      // successive halving gives the correct 17.5. Halving repeatedly is a
-      // true box filter at every step, so the low band is genuinely smooth
-      // and only carries real room lighting.
+    // ---- LIGHTING ONLY, NOTHING ELSE ------------------------------------
+    // The coating is opaque, so the slab underneath may contribute LIGHTING
+    // and perspective and nothing more — no stains, no oil spots, no
+    // discolouration, no cracks, no saw cuts, no patches, no old damage.
+    // A previous version deliberately multiplied a DET/MID band-pass back
+    // in so joints and surface relief would read through the coating. That
+    // is precisely the "original concrete showing through" problem, so it
+    // is gone; a real full-broadcast system buries all of it.
+    //
+    // What remains is ONE light field, built to be immune to dark marks
+    // rather than merely blurred. Blurring does not remove a stain, it
+    // AVERAGES it in: a big oil patch just becomes a soft dark cloud that
+    // still tracks the stain. Instead the floor is reduced to a coarse
+    // grid and a 3x3 MAXIMUM is taken across it. Room lighting is what the
+    // floor looks like where it is CLEAN, so following the local bright
+    // envelope tracks the light falloff while dark contamination drops out
+    // entirely. Two mean passes then take the blockiness back off.
+    function fvLightField(){
+      var gw = Math.max(4, Math.min(10, Math.round(bw / 140)));
+      var gh = Math.max(3, Math.min(10, Math.round(gw * bh / Math.max(1, bw))));
       var cur = document.createElement('canvas');
       cur.width = bw; cur.height = bh;
       cur.getContext('2d').drawImage(canvas, minX, minY, bw, bh, 0, 0, bw, bh);
       var cw = bw, ch = bh;
-      while (cw > dw * 2 || ch > dh * 2) {
-        var nw = Math.max(dw, Math.round(cw / 2));
-        var nh = Math.max(dh, Math.round(ch / 2));
-        var half = document.createElement('canvas');
-        half.width = nw; half.height = nh;
-        var hx = half.getContext('2d');
+      while (cw > gw * 2 || ch > gh * 2) {           // progressive halving = true averaging
+        var nw = Math.max(gw, Math.round(cw / 2)), nh = Math.max(gh, Math.round(ch / 2));
+        var hc = document.createElement('canvas');
+        hc.width = nw; hc.height = nh;
+        var hx = hc.getContext('2d');
         hx.imageSmoothingEnabled = true; hx.imageSmoothingQuality = 'high';
         hx.drawImage(cur, 0, 0, cw, ch, 0, 0, nw, nh);
-        cur = half; cw = nw; ch = nh;
+        cur = hc; cw = nw; ch = nh;
       }
-      var small = document.createElement('canvas');
-      small.width = dw; small.height = dh;
-      var sctx = small.getContext('2d');
-      sctx.imageSmoothingEnabled = true; sctx.imageSmoothingQuality = 'high';
-      sctx.drawImage(cur, 0, 0, cw, ch, 0, 0, dw, dh);
-      var full = document.createElement('canvas');
-      full.width = bw; full.height = bh;
-      var fctx = full.getContext('2d');
-      fctx.imageSmoothingEnabled = true;
-      fctx.drawImage(small, 0, 0, dw, dh, 0, 0, bw, bh);
-      return fctx.getImageData(0, 0, bw, bh).data;
+      var gc = document.createElement('canvas');
+      gc.width = gw; gc.height = gh;
+      var gx = gc.getContext('2d');
+      gx.imageSmoothingEnabled = true; gx.imageSmoothingQuality = 'high';
+      gx.drawImage(cur, 0, 0, cw, ch, 0, 0, gw, gh);
+      var g = gx.getImageData(0, 0, gw, gh);
+      var gd = g.data;
+
+      function neigh(src, pick){
+        var dst = new Float64Array(gw * gh * 3);
+        for (var yy = 0; yy < gh; yy++) {
+          for (var xx = 0; xx < gw; xx++) {
+            for (var ch3 = 0; ch3 < 3; ch3++) {
+              var acc = pick === 'max' ? -1 : 0, n = 0;
+              for (var dy = -1; dy <= 1; dy++) {
+                var sy = yy + dy; if (sy < 0 || sy >= gh) continue;
+                for (var dx = -1; dx <= 1; dx++) {
+                  var sx = xx + dx; if (sx < 0 || sx >= gw) continue;
+                  var v = src[(sy * gw + sx) * 3 + ch3];
+                  if (pick === 'max') { if (v > acc) acc = v; }
+                  else { acc += v; n++; }
+                }
+              }
+              dst[(yy * gw + xx) * 3 + ch3] = pick === 'max' ? acc : acc / n;
+            }
+          }
+        }
+        return dst;
+      }
+      var lin = new Float64Array(gw * gh * 3);
+      for (var gi = 0; gi < gw * gh; gi++) {
+        lin[gi * 3] = gd[gi * 4]; lin[gi * 3 + 1] = gd[gi * 4 + 1]; lin[gi * 3 + 2] = gd[gi * 4 + 2];
+      }
+      lin = neigh(lin, 'max');     // bright envelope: dark contamination drops out
+      lin = neigh(lin, 'mean');    // de-blockify
+      lin = neigh(lin, 'mean');
+      for (var gj = 0; gj < gw * gh; gj++) {
+        gd[gj * 4] = lin[gj * 3]; gd[gj * 4 + 1] = lin[gj * 3 + 1];
+        gd[gj * 4 + 2] = lin[gj * 3 + 2]; gd[gj * 4 + 3] = 255;
+      }
+      gx.putImageData(g, 0, 0);
+      var up = document.createElement('canvas');
+      up.width = bw; up.height = bh;
+      var ux = up.getContext('2d');
+      ux.imageSmoothingEnabled = true; ux.imageSmoothingQuality = 'high';
+      ux.drawImage(gc, 0, 0, gw, gh, 0, 0, bw, bh);
+      return ux.getImageData(0, 0, bw, bh).data;
     }
-    // THREE bands, because "keep the shadows and joints but lose the
-    // stains" needs a band-pass, not a single blur. A two-band split
-    // carried oil stains straight through into the coating as dirty
-    // patches, which a real coating would cover.
-    //   LOW (very coarse) - broad environmental light falloff only. Too
-    //        coarse to contain a stain, so relighting can't reproduce one.
-    //   MID - contains stains AND broad blotches.
-    //   DET - contains joints, saw cuts, cracks, fine relief.
-    // DET/MID cancels anything coarser than the mid scale (stains,
-    // blotches) while preserving the fine structure, which is exactly the
-    // detail that keeps the surface from looking like a flat sticker.
-    var lowData = fvBandData(140, 5);  // lighting only
-    var midData = fvBandData(18, 10);  // local average (stain scale)
-    var detData = fvBandData(2.5, 24); // joints / cracks / relief
+    var lowData = fvLightField();
 
     // Relighting is applied RELATIVE to the slab's mean brightness rather
     // than as an absolute multiply, so a heavily oil-stained or dirty
@@ -1156,6 +1167,192 @@ function fvComposite(room, color, callback){
     }
     var lumMean = lumCount ? (lumSum / lumCount) : 0.5;
     if (lumMean < 0.05) lumMean = 0.05;
+
+    // The untouched photograph, grabbed before any coating goes into ctx.
+    // Used both for the object mask below and for the topcoat reflections.
+    var srcFull = ctx.getImageData(0, 0, w, h).data;
+
+    // ---- OBJECT-AWARE FOREGROUND MASK -----------------------------------
+    // Things physically SITTING on the floor — a toolbox, a tyre, a bike, a
+    // bench, a cord, a mat, a car — must stay on top of the new coating,
+    // while marks that are IN the floor — stains, oil, chalk lines, tyre
+    // scuffs, patches — must be buried by it. Both deviate from clean
+    // concrete, so deviation alone cannot separate them. Three properties
+    // do, and an object has to satisfy all three:
+    //   1. It differs from the clean-floor colour, in CHROMA as much as in
+    //      brightness. Concrete and its stains are near-neutral; objects
+    //      usually are not.
+    //   2. It has a crisp boundary. A real object occludes the floor and
+    //      cuts a hard edge; a stain fades into the slab.
+    //   3. It survives an erosion. This is what separates a bench from a
+    //      chalk line or a hairline crack: thin marks disappear under a
+    //      morphological opening no matter how long or how contrasty they
+    //      are, while anything with genuine bulk survives and can then be
+    //      grown back.
+    // Anything failing any test is treated as floor and gets coated, which
+    // is the safe default: the complaint being fixed is stains showing
+    // through, so the bias is toward covering.
+    var FV_OBJ_DEV = 30;      // colour distance from the clean-floor field
+    var FV_OBJ_EDGE = 0;      // local gradient energy (0 = gate disabled)
+    var FV_OBJ_ERODE = 2;     // opening radius, low-res px
+    var FV_OBJ_MINAREA = 0.0009; // fraction of the floor a blob must cover
+    function fvObjectMask(){
+      var ow = Math.min(320, bw);
+      var oh = Math.max(8, Math.round(bh * ow / bw));
+      function shrink(srcCanvas, sw, sh){
+        var cur = srcCanvas, cw = sw, chh = sh;
+        while (cw > ow * 2 || chh > oh * 2) {
+          var nw = Math.max(ow, Math.round(cw / 2)), nh = Math.max(oh, Math.round(chh / 2));
+          var hc = document.createElement('canvas');
+          hc.width = nw; hc.height = nh;
+          var hx = hc.getContext('2d');
+          hx.imageSmoothingEnabled = true; hx.imageSmoothingQuality = 'high';
+          hx.drawImage(cur, 0, 0, cw, chh, 0, 0, nw, nh);
+          cur = hc; cw = nw; chh = nh;
+        }
+        var fc = document.createElement('canvas');
+        fc.width = ow; fc.height = oh;
+        var fx = fc.getContext('2d');
+        fx.imageSmoothingEnabled = true; fx.imageSmoothingQuality = 'high';
+        fx.drawImage(cur, 0, 0, cw, chh, 0, 0, ow, oh);
+        return fx.getImageData(0, 0, ow, oh).data;
+      }
+      var photoC = document.createElement('canvas');
+      photoC.width = bw; photoC.height = bh;
+      photoC.getContext('2d').drawImage(canvas, minX, minY, bw, bh, 0, 0, bw, bh);
+      var P = shrink(photoC, bw, bh);
+
+      var N = ow * oh;
+      // REFERENCE = a LOCAL MEAN of the photo, not the light field. The
+      // light field is a bright envelope built specifically to ignore dark
+      // marks, so measuring against it makes every stain look like a huge
+      // deviation — which is exactly backwards for telling stains from
+      // objects. A local mean instead TRACKS a stain (broad, soft, so the
+      // mean follows it and the deviation stays small) while an object,
+      // which is compact with hard edges, still stands out against its own
+      // surroundings.
+      var F = new Float64Array(N * 3);
+      var rad = Math.max(3, Math.round(ow / 14));
+      for (var by = 0; by < oh; by++) {
+        for (var bx = 0; bx < ow; bx++) {
+          var ar = 0, ag = 0, ab = 0, an = 0;
+          for (var wy = -rad; wy <= rad; wy += 2) {
+            var syy = by + wy; if (syy < 0 || syy >= oh) continue;
+            for (var wx = -rad; wx <= rad; wx += 2) {
+              var sxx = bx + wx; if (sxx < 0 || sxx >= ow) continue;
+              var q4 = (syy * ow + sxx) * 4;
+              ar += P[q4]; ag += P[q4 + 1]; ab += P[q4 + 2]; an++;
+            }
+          }
+          var o3 = (by * ow + bx) * 3;
+          F[o3] = ar / an; F[o3 + 1] = ag / an; F[o3 + 2] = ab / an;
+        }
+      }
+      var lum = new Float64Array(N);
+      var dev = new Float64Array(N);
+      for (var i = 0; i < N; i++) {
+        var pr = P[i * 4], pg = P[i * 4 + 1], pb = P[i * 4 + 2];
+        var fr = F[i * 3], fg = F[i * 3 + 1], fb = F[i * 3 + 2];
+        lum[i] = 0.299 * pr + 0.587 * pg + 0.114 * pb;
+        var dL = lum[i] - (0.299 * fr + 0.587 * fg + 0.114 * fb);
+        var ca = (pr - pg) - (fr - fg);
+        var cb = (pb - pg) - (fb - fg);
+        dev[i] = 0.6 * (dL < 0 ? -dL : dL) + Math.sqrt(ca * ca + cb * cb);
+      }
+      // local gradient energy
+      var edge = new Float64Array(N);
+      for (var y = 1; y < oh - 1; y++) {
+        for (var x = 1; x < ow - 1; x++) {
+          var k = y * ow + x;
+          var gxv = lum[k + 1] - lum[k - 1], gyv = lum[k + ow] - lum[k - ow];
+          edge[k] = Math.sqrt(gxv * gxv + gyv * gyv);
+        }
+      }
+      var edgeS = new Float64Array(N);
+      for (var y2 = 0; y2 < oh; y2++) {
+        for (var x2 = 0; x2 < ow; x2++) {
+          var acc = 0, cnt = 0;
+          for (var dy = -2; dy <= 2; dy++) {
+            var sy = y2 + dy; if (sy < 0 || sy >= oh) continue;
+            for (var dx = -2; dx <= 2; dx++) {
+              var sx = x2 + dx; if (sx < 0 || sx >= ow) continue;
+              acc += edge[sy * ow + sx]; cnt++;
+            }
+          }
+          edgeS[y2 * ow + x2] = acc / cnt;
+        }
+      }
+      var seed = new Uint8Array(N);
+      for (var s = 0; s < N; s++) seed[s] = (dev[s] > FV_OBJ_DEV && (FV_OBJ_EDGE <= 0 || edgeS[s] > FV_OBJ_EDGE)) ? 1 : 0;
+
+      function morph(src, r, grow){
+        var dst = new Uint8Array(N);
+        for (var y3 = 0; y3 < oh; y3++) {
+          for (var x3 = 0; x3 < ow; x3++) {
+            var hit = grow ? 0 : 1;
+            for (var dy3 = -r; dy3 <= r && (grow ? !hit : hit); dy3++) {
+              var sy3 = y3 + dy3;
+              for (var dx3 = -r; dx3 <= r; dx3++) {
+                var sx3 = x3 + dx3;
+                var v = (sy3 < 0 || sy3 >= oh || sx3 < 0 || sx3 >= ow) ? 0 : src[sy3 * ow + sx3];
+                if (grow) { if (v) { hit = 1; break; } }
+                else if (!v) { hit = 0; break; }
+              }
+            }
+            dst[y3 * ow + x3] = hit;
+          }
+        }
+        return dst;
+      }
+      var opened = morph(seed, FV_OBJ_ERODE, false);   // erode: thin marks die here
+
+      // Keep only blobs with real bulk.
+      var label = new Int32Array(N).fill(-1);
+      var stack = new Int32Array(N);
+      var keep = new Uint8Array(N);
+      var minArea = Math.max(12, Math.round(FV_OBJ_MINAREA * N));
+      for (var q = 0; q < N; q++) {
+        if (!opened[q] || label[q] !== -1) continue;
+        var sp = 0, area = 0;
+        stack[sp++] = q; label[q] = q;
+        var members = [];
+        while (sp > 0) {
+          var cur2 = stack[--sp];
+          members.push(cur2); area++;
+          var cy = (cur2 / ow) | 0, cx = cur2 - cy * ow;
+          for (var nb = 0; nb < 4; nb++) {
+            var nx = cx + (nb === 0 ? 1 : nb === 1 ? -1 : 0);
+            var ny = cy + (nb === 2 ? 1 : nb === 3 ? -1 : 0);
+            if (nx < 0 || nx >= ow || ny < 0 || ny >= oh) continue;
+            var ni = ny * ow + nx;
+            if (opened[ni] && label[ni] === -1) { label[ni] = q; stack[sp++] = ni; }
+          }
+        }
+        if (area >= minArea) for (var mi = 0; mi < members.length; mi++) keep[members[mi]] = 1;
+      }
+      var grown = morph(keep, FV_OBJ_ERODE + 1, true);  // dilate back past the erosion
+
+      var mc = document.createElement('canvas');
+      mc.width = ow; mc.height = oh;
+      var mx = mc.getContext('2d');
+      var mImg = mx.createImageData(ow, oh);
+      var any = 0;
+      for (var mj = 0; mj < N; mj++) {
+        var v2 = grown[mj] ? 255 : 0;
+        if (v2) any++;
+        mImg.data[mj * 4] = v2; mImg.data[mj * 4 + 1] = v2;
+        mImg.data[mj * 4 + 2] = v2; mImg.data[mj * 4 + 3] = 255;
+      }
+      mx.putImageData(mImg, 0, 0);
+      if (!any) return null;                            // nothing on this floor
+      var upc = document.createElement('canvas');
+      upc.width = bw; upc.height = bh;
+      var ux2 = upc.getContext('2d');
+      ux2.imageSmoothingEnabled = true; ux2.imageSmoothingQuality = 'high';
+      ux2.drawImage(mc, 0, 0, ow, oh, 0, 0, bw, bh); // upscale feathers the edge
+      return ux2.getImageData(0, 0, bw, bh).data;
+    }
+    var objData = fvObjectMask();
 
     // ---- STEP 1: build a SEAMLESS, repeat-free flake texture ----------
     // Earlier versions tiled the flake photo directly in screen space and
@@ -1469,7 +1666,8 @@ function fvComposite(room, color, callback){
     // reflection is therefore a plain vertical flip about the contact line
     // — no compression factor, no fudge — so each column is mirrored about
     // the point where the floor meets whatever is standing on it.
-    var srcFull = ctx.getImageData(0, 0, w, h).data;
+    // srcFull is captured up with the light field, before any coating is
+    // drawn into ctx.
 
     // Contact line per column: the top edge of the floor polygon there.
     var contactY = new Float64Array(bw);
@@ -1739,31 +1937,19 @@ function fvComposite(room, color, callback){
         tg = tg + (bcG - tg) * bMix;
         tb = tb + (bcB - tb) * bMix;
 
-        // ---- STEP 4: composite over the ORIGINAL luminance -------------
-        // The colour/flake layer and the photo's own light and structure
-        // are kept separate and combined with a restrained multiply, so
-        // room shadows, expansion joints and slab contours stay visible
-        // through the coating instead of being painted over.
+        // ---- STEP 4: apply the room's LIGHT, and only its light --------
+        // The flake and basecoat layers above are entirely synthetic — not
+        // one original pixel is mixed into them. All the photograph does
+        // here is set how brightly this patch of floor is lit, from the
+        // stain-immune light field. No slab colour, no slab texture, no
+        // stains, no cracks: only where the room is bright and where it is
+        // in shadow.
         var fi = (py2 * bw + px2) * 4;
         var lumLow = (0.299 * lowData[fi] + 0.587 * lowData[fi + 1] + 0.114 * lowData[fi + 2]) / 255;
-        var lumDet = (0.299 * detData[fi] + 0.587 * detData[fi + 1] + 0.114 * detData[fi + 2]) / 255;
 
-        // Environmental lighting, relative to the slab mean. Strength and
-        // range widened so the coating genuinely darkens in shadow and
-        // lifts where the original floor catches light, instead of
-        // flattening the room's tonal variation.
         var shade = 1 + (lumLow - lumMean) * 1.42;
         if (shade < 0.44) shade = 0.44;
         if (shade > 1.48) shade = 1.48;
-
-        // Structural relief only: DET/MID is a band-pass, so joints, saw
-        // cuts and cracks ride through while stains and broad blotches
-        // cancel out. Reduced strength so it reads without dominating.
-        var lumMid = (0.299 * midData[fi] + 0.587 * midData[fi + 1] + 0.114 * midData[fi + 2]) / 255;
-        var ratio = lumDet / (lumMid > 0.04 ? lumMid : 0.04);
-        if (ratio < 0.45) ratio = 0.45;
-        if (ratio > 1.55) ratio = 1.55;
-        shade *= 1 + (ratio - 1) * 0.72;
 
         tr *= shade; tg *= shade; tb *= shade;
 
@@ -1807,6 +1993,29 @@ function fvComposite(room, color, callback){
           tr += (255 - tr) * glint; tg += (255 - tg) * glint; tb += (255 - tb) * glint;
         }
 
+        // CONTACT SHADOW. Where an object sits on the floor the photograph
+        // has a real shadow pooled against its base. The coating is opaque,
+        // so that shadow would otherwise be painted out and the object
+        // would look pasted on rather than standing on the floor. Just
+        // outside the object mask, the photo's own darkness relative to the
+        // clean-floor light field is carried across as a multiply — a
+        // shadow is a lighting fact, not slab colour, so this stays within
+        // "lighting only". Clamped so a dark object can never punch a hole
+        // in the coating.
+        if (objData) {
+          var oNear = objData[fi] / 255;
+          if (oNear > 0.02 && oNear < 0.98) {
+            var pl = (0.299 * srcFull[((minY + py2) * w + (minX + px2)) * 4]
+                    + 0.587 * srcFull[((minY + py2) * w + (minX + px2)) * 4 + 1]
+                    + 0.114 * srcFull[((minY + py2) * w + (minX + px2)) * 4 + 2]) / 255;
+            var sh2 = pl / (lumLow > 0.04 ? lumLow : 0.04);
+            if (sh2 > 1) sh2 = 1; else if (sh2 < 0.55) sh2 = 0.55;
+            var sMix = 1 - Math.abs(oNear - 0.5) * 2; // strongest just at the rim
+            var sf = 1 + (sh2 - 1) * sMix;
+            tr *= sf; tg *= sf; tb *= sf;
+          }
+        }
+
         if (tr < 0) tr = 0; else if (tr > 255) tr = 255;
         if (tg < 0) tg = 0; else if (tg > 255) tg = 255;
         if (tb < 0) tb = 0; else if (tb > 255) tb = 255;
@@ -1844,6 +2053,37 @@ function fvComposite(room, color, callback){
     texCtx.globalCompositeOperation = 'source-over';
 
     ctx.drawImage(texCanvas, minX, minY);
+
+    // ---- LAYER 5: objects that physically sit ON the floor --------------
+    // The coating went down opaque, so anything standing on the floor was
+    // painted over. Those pixels are now restored from the untouched
+    // photograph through the object mask, which puts them back ON TOP of
+    // the new coating at full opacity — no ghosting, no transparency. The
+    // coating stays rebuilt underneath and around them.
+    if (objData) {
+      var objCanvas = document.createElement('canvas');
+      objCanvas.width = bw; objCanvas.height = bh;
+      var objCtx = objCanvas.getContext('2d');
+      var objImg = objCtx.createImageData(bw, bh);
+      var objPix = objImg.data;
+      for (var oy = 0; oy < bh; oy++) {
+        for (var ox = 0; ox < bw; ox++) {
+          var oi = (oy * bw + ox) * 4;
+          var sidx = ((minY + oy) * w + (minX + ox)) * 4;
+          objPix[oi] = srcFull[sidx];
+          objPix[oi + 1] = srcFull[sidx + 1];
+          objPix[oi + 2] = srcFull[sidx + 2];
+          objPix[oi + 3] = objData[oi];
+        }
+      }
+      objCtx.putImageData(objImg, 0, 0);
+      // Clip the restored objects to the floor outline too, so a feathered
+      // mask edge can never paint photo pixels outside the coated area.
+      objCtx.globalCompositeOperation = 'destination-in';
+      objCtx.drawImage(maskCanvas, 0, 0);
+      objCtx.globalCompositeOperation = 'source-over';
+      ctx.drawImage(objCanvas, minX, minY);
+    }
 
     var url = canvas.toDataURL('image/jpeg', 0.86);
     fvCanvasCache[cacheKey] = url;

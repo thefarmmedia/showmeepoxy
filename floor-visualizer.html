@@ -1527,6 +1527,26 @@ function fvComposite(room, color, callback){
     var lpN = lpData.length / 4;
     lpMeanR /= lpN; lpMeanG /= lpN; lpMeanB /= lpN;
 
+    // IN-SITU EXPOSURE. The product photos are shots of LOOSE flake, and
+    // they are not exposed alike: Domino's averages luminance 150 while
+    // Carbon's averages 39, because a tray of black flake photographs very
+    // dark. Using that number as the floor's brightness is wrong — a black
+    // epoxy floor in a lit garage is not a black hole, it is a dark floor
+    // under room light, and the darkest real install in this repo still
+    // measures mean 99.6. Carbon was rendering at mean 39, far below any
+    // real photo, which is most of why it read as flat black vinyl rather
+    // than coated concrete.
+    // Very dark tiles are therefore lifted toward a plausible in-situ
+    // exposure. It is a straight multiply, so hue is untouched and the
+    // relative contrast between chips is preserved (and scaled up with it)
+    // rather than being invented. Blends already at or above the threshold
+    // are multiplied by exactly 1 and cannot be affected.
+    var FV_MIN_TILE_L = 62;
+    var FV_MAX_LIFT = 2.2;
+    var lpMeanL = 0.299 * lpMeanR + 0.587 * lpMeanG + 0.114 * lpMeanB;
+    var tileLift = lpMeanL > 1 ? (FV_MIN_TILE_L / lpMeanL) : 1;
+    if (tileLift < 1) tileLift = 1; else if (tileLift > FV_MAX_LIFT) tileLift = FV_MAX_LIFT;
+
     var flat = tileCtx.getImageData(0, 0, TILE, TILE);
     var flatData = flat.data;
     var lpScale = lpSize / TILE;
@@ -1548,6 +1568,7 @@ function fvComposite(room, color, callback){
         var nr = flatData[fi] - (lpData[i00] * w00 + lpData[i10] * w10 + lpData[i01] * w01 + lpData[i11] * w11) + lpMeanR;
         var ng = flatData[fi + 1] - (lpData[i00 + 1] * w00 + lpData[i10 + 1] * w10 + lpData[i01 + 1] * w01 + lpData[i11 + 1] * w11) + lpMeanG;
         var nb = flatData[fi + 2] - (lpData[i00 + 2] * w00 + lpData[i10 + 2] * w10 + lpData[i01 + 2] * w01 + lpData[i11 + 2] * w11) + lpMeanB;
+        nr *= tileLift; ng *= tileLift; nb *= tileLift;
         flatData[fi]     = nr < 0 ? 0 : (nr > 255 ? 255 : nr);
         flatData[fi + 1] = ng < 0 ? 0 : (ng > 255 ? 255 : ng);
         flatData[fi + 2] = nb < 0 ? 0 : (nb > 255 ? 255 : nb);
@@ -1574,10 +1595,26 @@ function fvComposite(room, color, callback){
     // colour's tile is normalised to that target, so every blend lands
     // with believable depth rather than one blanket multiplier that
     // over-punches some colours and under-punches others.
+    // The upper clamp of 2.0 quietly capped the dark blends short of the
+    // target: Carbon needed 10.3x and got 2.0, landing on stdev 12 of the
+    // 62 it was asked for, which is most of why it rendered flat.
+    // The extra headroom is tied to the exposure lift rather than raised
+    // for everyone. Only a blend whose product photo was genuinely
+    // under-exposed gets more latitude to be pulled back to a realistic
+    // in-situ appearance; every blend shot at a normal exposure has
+    // tileLift exactly 1 and keeps the old 2.0 ceiling unchanged. Raising
+    // the ceiling globally instead would have moved 20 of the 27 blends,
+    // which is far more than the dark ones needed.
     var tileStd = Math.sqrt(Math.max(1, lSum2 / tmN - (lSum / tmN) * (lSum / tmN)));
+    var FV_MAX_CONTRAST = 2.0 * tileLift;
     var FLAKE_CONTRAST = 62 / tileStd;
     if (FLAKE_CONTRAST < 0.75) FLAKE_CONTRAST = 0.75;
-    if (FLAKE_CONTRAST > 2.0) FLAKE_CONTRAST = 2.0;
+    if (FLAKE_CONTRAST > FV_MAX_CONTRAST) FLAKE_CONTRAST = FV_MAX_CONTRAST;
+    // What the tile ACTUALLY ends up with, which is the target only when
+    // the clamp did not bind. The glint term below keys off this rather
+    // than off the target, so a blend that genuinely cannot reach 62 still
+    // gets glints scaled to the range it does have.
+    var FV_ACHIEVED_SD = Math.max(6, tileStd * FLAKE_CONTRAST);
     var FLAKE_SAT = 0.88; // pull slightly toward neutral: a coating, not confetti
 
     // Visible BASE COAT between the chips. Product photos are loose flake
@@ -2035,7 +2072,16 @@ function fvComposite(room, color, callback){
         // own brightness AND to how bright the reflected surroundings
         // actually are, so highlights land where the photograph's light
         // really is and stay out of the shadows.
-        var facet = (tl - tmL) / 90;
+        // Normalised by the blend's OWN contrast, not a fixed 90. A chip
+        // face catches the light because of how it sits, not because of how
+        // pale it is, so the brightest chips in any blend should glint
+        // alike. With a fixed divisor a dark blend never reached it —
+        // Carbon's chips span about a third of Domino's range, so its
+        // glints came out near zero and the floor lost the sparkle that
+        // makes a real black flake floor read as flake at all. The mid and
+        // light blends land on 1.4 * 62 = 87, within 4% of the old 90, so
+        // they are effectively unchanged.
+        var facet = (tl - tmL) / (1.4 * FV_ACHIEVED_SD);
         if (facet > 0) {
           if (facet > 1) facet = 1;
           var envL = (0.299 * rr + 0.587 * rg + 0.114 * rb) / 255;

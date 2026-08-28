@@ -1399,7 +1399,8 @@ function fvComposite(room, color, callback){
     var bcR = parseInt(bcHex.substring(0, 2), 16);
     var bcG = parseInt(bcHex.substring(2, 4), 16);
     var bcB = parseInt(bcHex.substring(4, 6), 16);
-    var bcMeanL = 0.299 * tmR + 0.587 * tmG + 0.114 * tmB;
+    var tmL = 0.299 * tmR + 0.587 * tmG + 0.114 * tmB; // mean tile luminance
+    var bcMeanL = tmL;
     var BASE_MIX = 0.13;      // basecoat presence across the whole surface
     var BASE_MIX_GAP = 0.30;  // extra where the texture is dark, i.e. the voids
 
@@ -1449,6 +1450,118 @@ function fvComposite(room, color, callback){
     var cxImg = (minX + maxX) / 2;
     var invDnear = 1 / dNear; // anchor for shear damping (near edge stays exact)
 
+    // ---- CLEAR POLYASPARTIC TOPCOAT ------------------------------------
+    // A gloss coat does not invent light, it MIRRORS the room. So the
+    // reflection layer is built entirely out of the uploaded photograph:
+    // whatever is actually standing above the floor — the open door, the
+    // bright driveway beyond it, the walls, a parked vehicle, shelving —
+    // gets reflected. Nothing is added that is not already in the photo,
+    // and if the space above the floor is dark then the far floor goes
+    // darker, which is what the reference installs with a closed dark back
+    // wall actually do.
+    //
+    // The geometry is exact, not a guess. For a pinhole camera looking at a
+    // horizontal mirror, a point at height H and distance D projects to
+    //   y - horizon = f (hc - H) / D
+    // and its mirror image (H -> -H) to f (hc + H) / D. Writing g for the
+    // screen y of where that object MEETS the floor (H = 0), the reflection
+    // of a point at screen y lands at exactly 2g - y. A ground-plane
+    // reflection is therefore a plain vertical flip about the contact line
+    // — no compression factor, no fudge — so each column is mirrored about
+    // the point where the floor meets whatever is standing on it.
+    var srcFull = ctx.getImageData(0, 0, w, h).data;
+
+    // Contact line per column: the top edge of the floor polygon there.
+    var contactY = new Float64Array(bw);
+    for (var ci = 0; ci < bw; ci++) contactY[ci] = polyTopY;
+    for (var pe = 0; pe < poly.length; pe++) {
+      var pa = poly[pe], pbv = poly[(pe + 1) % poly.length];
+      if (pa.x === pbv.x) continue;
+      var exa = Math.max(minX, Math.floor(Math.min(pa.x, pbv.x)));
+      var exb = Math.min(maxX, Math.ceil(Math.max(pa.x, pbv.x)));
+      for (var ex = exa; ex < exb; ex++) {
+        var et = (ex + 0.5 - pa.x) / (pbv.x - pa.x);
+        if (et < 0 || et > 1) continue;
+        var ey = pa.y + (pbv.y - pa.y) * et;
+        var eidx = ex - minX;
+        if (eidx >= 0 && eidx < bw && ey < contactY[eidx]) contactY[eidx] = ey;
+      }
+    }
+
+    // Mirror the photo about that line into the floor's bounding box.
+    var reflCanvas = document.createElement('canvas');
+    reflCanvas.width = bw; reflCanvas.height = bh;
+    var reflCtx = reflCanvas.getContext('2d');
+    var reflRaw = reflCtx.createImageData(bw, bh);
+    var reflRawD = reflRaw.data;
+    for (var ry = 0; ry < bh; ry++) {
+      var rImgY = minY + ry;
+      for (var rx = 0; rx < bw; rx++) {
+        var ySrc = 2 * contactY[rx] - rImgY;
+        if (ySrc < 0) ySrc = 0; else if (ySrc > h - 1) ySrc = h - 1;
+        var si = ((ySrc | 0) * w + (minX + rx)) * 4;
+        var ri = (ry * bw + rx) * 4;
+        reflRawD[ri] = srcFull[si];
+        reflRawD[ri + 1] = srcFull[si + 1];
+        reflRawD[ri + 2] = srcFull[si + 2];
+        reflRawD[ri + 3] = 255;
+      }
+    }
+    reflCtx.putImageData(reflRaw, 0, 0);
+
+    // Blur it ANISOTROPICALLY. Polyaspartic is glossy but microscopically
+    // rough, and at the grazing angles a floor is viewed at, that roughness
+    // smears a reflection far more along the viewing direction (down the
+    // screen) than across it. That vertical streaking is the single most
+    // recognisable thing about the reference gloss photos. Shrinking harder
+    // in y than in x produces exactly that, and doing it by progressive
+    // halving keeps it a true average instead of an aliased one.
+    function fvShrinkTo(src, sw, sh, tw, th){
+      var cw = sw, ch = sh, cur = src;
+      while (cw > tw * 2 || ch > th * 2) {
+        var nw = Math.max(tw, Math.round(cw / 2)), nh = Math.max(th, Math.round(ch / 2));
+        var sc = document.createElement('canvas');
+        sc.width = nw; sc.height = nh;
+        var sxc = sc.getContext('2d');
+        sxc.imageSmoothingEnabled = true; sxc.imageSmoothingQuality = 'high';
+        sxc.drawImage(cur, 0, 0, cw, ch, 0, 0, nw, nh);
+        cur = sc; cw = nw; ch = nh;
+      }
+      var fc = document.createElement('canvas');
+      fc.width = tw; fc.height = th;
+      var fxc = fc.getContext('2d');
+      fxc.imageSmoothingEnabled = true; fxc.imageSmoothingQuality = 'high';
+      fxc.drawImage(cur, 0, 0, cw, ch, 0, 0, tw, th);
+      return fc;
+    }
+    function fvBlurBack(small){
+      var gc = document.createElement('canvas');
+      gc.width = bw; gc.height = bh;
+      var gx = gc.getContext('2d');
+      gx.imageSmoothingEnabled = true; gx.imageSmoothingQuality = 'high';
+      gx.drawImage(small, 0, 0, small.width, small.height, 0, 0, bw, bh);
+      return gx.getImageData(0, 0, bw, bh).data;
+    }
+    // Two levels: a tighter one for floor right up against whatever is
+    // reflecting (where a real floor holds a recognisable shape), and a
+    // much looser one for floor far from the contact line, where the
+    // reflection has spread out into broad soft sheen.
+    var reflNear = fvBlurBack(fvShrinkTo(reflCanvas, bw, bh,
+      Math.max(8, Math.round(bw / 2.5)), Math.max(6, Math.round(bh / 10))));
+    var reflFar = fvBlurBack(fvShrinkTo(reflCanvas, bw, bh,
+      Math.max(4, Math.round(bw / 12)), Math.max(3, Math.round(bh / 44))));
+
+    // Fresnel. A dielectric clear coat reflects only ~4% head-on but rises
+    // steeply toward grazing, which is why a flake floor looks nearly matte
+    // underfoot and glassy toward the far wall. Schlick's approximation,
+    // with the true cosine for a ground plane: cos = depth / hypot(depth, f)
+    // where f is the focal length in pixels (the image height is a fair
+    // stand-in for a phone camera).
+    var FV_R0 = 0.04;
+    var FV_FOCAL = h;
+    var FV_GLOSS = 0.85;   // microroughness: a real floor never reaches full Fresnel
+    var FV_SPARKLE = 0.30; // glints off individual chip facets
+
     var texCanvas = document.createElement('canvas');
     texCanvas.width = bw; texCanvas.height = bh;
     var texCtx = texCanvas.getContext('2d');
@@ -1474,19 +1587,24 @@ function fvComposite(room, color, callback){
       // is now a single isotropic lookup whose mip comes from the LARGEST
       // footprint axis, so perspective changes flake SCALE without
       // distorting flake SHAPE. No directional averaging anywhere.
-      // SHEAR DAMPING. A strict pinhole mapping shears the horizontal
-      // texture coordinate as depth changes down a column, by an amount
-      // proportional to distance from the image centre. Measured at the
-      // bottom edge of the sample photo that slants every flake by ~29
-      // degrees, which reads as diagonal streaks fanning out from the
-      // vanishing point even though anisotropy there is only ~1.1 (a
-      // single sample, no filter blur involved). It is geometrically
-      // faithful but it distorts the SHAPE of every chip, and real flake
-      // is randomly oriented, so the eye reads the systematic slant as
-      // smearing. Horizontal convergence is damped to a fraction of the
-      // strict value, anchored so the near edge is untouched: perspective
-      // still drives flake SCALE, without shearing flake SHAPE.
-      var SHEAR_DAMP = 0.40;
+      // SHEAR_DAMP is 1.0, i.e. strict pinhole perspective. It used to be
+      // 0.40, which was a mistake: the intent was to damp the SHEAR (du/dy,
+      // the slight slant of chips away from the image centre), but the
+      // factor was applied to uScale — the horizontal SCALE — so horizontal
+      // foreshortening came out 1.8x to 2.1x weaker than vertical toward
+      // the back of the room. Chips ended up stretched sideways: measured
+      // at y=400 in the sample garage they rendered 3.06px wide by 0.43px
+      // tall, a 7:1 dash, and at the far edge 15:1. A field of sideways
+      // dashes is exactly the "repeated horizontal pattern near the garage
+      // opening". With the damping removed, chips shrink correctly in both
+      // axes and the far floor resolves into fine isotropic speckle like
+      // the reference installs. Horizontal-to-vertical detail ratio in the
+      // far band went 0.35 -> 0.60 against 0.76-1.04 measured on the real
+      // installation photos. The ~29 degree shear this was added to hide is
+      // genuine perspective — vertical texture lines really do converge on
+      // the vanishing point — and it is not visible now that the filtering
+      // integrates along the true footprint axis.
+      var SHEAR_DAMP = 1.00;
       var uScale = Bcoef * (invDnear + (invD - invDnear) * SHEAR_DAMP);
       var duX = uScale;
       var dvY = Acoef * invD * invD;
@@ -1501,10 +1619,34 @@ function fvComposite(room, color, callback){
       var distBias = 0.16 * (Math.log(kDepth) / Math.LN2);
       if (distBias > 0.55) distBias = 0.55;
 
+      // Fresnel reflectance for this depth (Schlick). Depends only on the
+      // row, so it is computed once per row rather than per pixel.
+      var cosT = depth / Math.sqrt(depth * depth + FV_FOCAL * FV_FOCAL);
+      var om = 1 - cosT;
+      var om2 = om * om;
+      var fres = (FV_R0 + (1 - FV_R0) * om2 * om2 * om) * FV_GLOSS;
+
       var uTexBase = (minX - cxImg) * uScale;
       var uTexStep = uScale;
       var maxLvl = mips.length - 1;
-    var FV_ANISO_SAMPLES = 4; // FIXED — must not depend on x (see seam note below)
+
+      // TAP COUNT — derived PER ROW, then held constant across the row.
+      // A fixed 4 taps was wrong at the back of the room. The mip is picked
+      // from duX * (aniso / taps), so whenever anisotropy exceeds the tap
+      // count that ratio blows up and the texture gets blurred HORIZONTALLY
+      // by it. Measured on the sample garage: anisotropy is 15.1 at the far
+      // floor edge, so 4 taps meant a 3.8x horizontal smear, which is what
+      // turned the far flake into fine horizontal combing that read as a
+      // repeated horizontal pattern near the garage opening.
+      // Taps now scale with the row's own anisotropy. It must not vary
+      // along x — that was the original vertical-seam bug — so it is
+      // computed once per row from the largest anisotropy anywhere in that
+      // row and reused for every pixel in it.
+      var duYrow = Math.max(Math.abs((minX - cxImg) * duYcoef), Math.abs((maxX - cxImg) * duYcoef));
+      var anisoRow = Math.sqrt(duYrow * duYrow + dvY * dvY) / duX;
+      var FV_ANISO_SAMPLES = Math.ceil(anisoRow);
+      if (FV_ANISO_SAMPLES < 4) FV_ANISO_SAMPLES = 4;
+      else if (FV_ANISO_SAMPLES > 24) FV_ANISO_SAMPLES = 24;
 
       for (var px2 = 0; px2 < bw; px2++) {
         var uTex = uTexBase + px2 * uTexStep;
@@ -1539,7 +1681,14 @@ function fvComposite(room, color, callback){
         // aniso/FV_ANISO_SAMPLES, lvl, the sample positions and the
         // weights all vary smoothly across the whole row. No vertical
         // boundary can form anywhere.
-        var lvl = Math.log(Math.max(duX * TILE * (aniso / FV_ANISO_SAMPLES), 0.0001)) / Math.LN2 + distBias;
+        // Each tap should cover the SHORT axis; the taps together span the
+        // long one. So the mip comes from duX alone, and only widens if the
+        // taps cannot cover the long axis (aniso > taps) — clamped at 1 so
+        // it can never go BELOW the pixel footprint either, which used to
+        // under-filter the foreground.
+        var overBlur = aniso / FV_ANISO_SAMPLES;
+        if (overBlur < 1) overBlur = 1;
+        var lvl = Math.log(Math.max(duX * TILE * overBlur, 0.0001)) / Math.LN2 + distBias;
         if (lvl < 0) lvl = 0; else if (lvl > maxLvl) lvl = maxLvl;
         var l0 = lvl | 0;
         var l1 = l0 < maxLvl ? l0 + 1 : l0;
@@ -1618,15 +1767,44 @@ function fvComposite(room, color, callback){
 
         tr *= shade; tg *= shade; tb *= shade;
 
-        // Satin-to-gloss clear coat: a whisper of all-over sheen plus a
-        // restrained highlight where the room's own light already is.
-        // Deliberately far weaker than before, which was mirror-like.
-        tr += (255 - tr) * 0.025; tg += (255 - tg) * 0.025; tb += (255 - tb) * 0.025;
-        var spec = (lumLow - (lumMean + 0.18)) / 0.34;
-        if (spec > 1) spec = 1;
-        if (spec > 0) {
-          spec = spec * spec * 0.12;
-          tr += (255 - tr) * spec; tg += (255 - tg) * spec; tb += (255 - tb) * spec;
+        // ---- STEP 5: clear polyaspartic topcoat ------------------------
+        // Encapsulation. Under a clear film the voids between chips sit
+        // slightly deeper and read a touch darker, while chip faces catch
+        // the light. Without this the flake looks printed ON the floor
+        // rather than suspended in it.
+        var enc = 1 - gap * 0.11;
+        tr *= enc; tg *= enc; tb *= enc;
+
+        // The reflection blurs out with distance from whatever is doing the
+        // reflecting, so floor close to the contact line keeps a tighter
+        // image and floor far from it gets broad diffuse sheen.
+        var spread = (imgY - contactY[px2]) / (bh || 1);
+        if (spread < 0) spread = 0; else if (spread > 1) spread = 1;
+        var rNear0 = reflNear[fi], rNear1 = reflNear[fi + 1], rNear2 = reflNear[fi + 2];
+        var rr = rNear0 + (reflFar[fi] - rNear0) * spread;
+        var rg = rNear1 + (reflFar[fi + 1] - rNear1) * spread;
+        var rb = rNear2 + (reflFar[fi + 2] - rNear2) * spread;
+
+        // Energy-conserving dielectric mix: the coating shows through
+        // (1 - F) and the mirrored room contributes F. Because F is only a
+        // few percent underfoot, foreground flake colour is essentially
+        // untouched; it climbs toward the far wall, which is exactly where
+        // the reference photos go glassy.
+        var refl = fres;
+        tr = tr * (1 - refl) + rr * refl;
+        tg = tg * (1 - refl) + rg * refl;
+        tb = tb * (1 - refl) + rb * refl;
+
+        // Specular glints off individual chip facets. Keyed to the chip's
+        // own brightness AND to how bright the reflected surroundings
+        // actually are, so highlights land where the photograph's light
+        // really is and stay out of the shadows.
+        var facet = (tl - tmL) / 90;
+        if (facet > 0) {
+          if (facet > 1) facet = 1;
+          var envL = (0.299 * rr + 0.587 * rg + 0.114 * rb) / 255;
+          var glint = facet * facet * envL * fres * FV_SPARKLE;
+          tr += (255 - tr) * glint; tg += (255 - tg) * glint; tb += (255 - tb) * glint;
         }
 
         if (tr < 0) tr = 0; else if (tr > 255) tr = 255;

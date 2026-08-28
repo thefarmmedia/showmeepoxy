@@ -1741,13 +1741,19 @@ function fvComposite(room, color, callback){
       return gx.getImageData(0, 0, bw, bh).data;
     }
     // Two levels: a tighter one for floor right up against whatever is
-    // reflecting (where a real floor holds a recognisable shape), and a
-    // much looser one for floor far from the contact line, where the
-    // reflection has spread out into broad soft sheen.
+    // reflecting, and a much looser one for floor far from the contact
+    // line, where the reflection has spread out into broad soft sheen.
+    // HORIZONTAL blur is what tames the vertical banding. Door tracks,
+    // jambs and mullions are narrow and vertical, so at bw/2.5 they came
+    // back as hard vertical stripes down the floor — mirror-like rather
+    // than coated. Blurring across x widens each stripe and drops its
+    // amplitude, turning it into the broad faint highlight a real
+    // polyaspartic floor shows, without touching the vertical smear that
+    // gives the gloss its direction.
     var reflNear = fvBlurBack(fvShrinkTo(reflCanvas, bw, bh,
-      Math.max(8, Math.round(bw / 2.5)), Math.max(6, Math.round(bh / 10))));
+      Math.max(6, Math.round(bw / 9)), Math.max(5, Math.round(bh / 18))));
     var reflFar = fvBlurBack(fvShrinkTo(reflCanvas, bw, bh,
-      Math.max(4, Math.round(bw / 12)), Math.max(3, Math.round(bh / 44))));
+      Math.max(3, Math.round(bw / 22)), Math.max(3, Math.round(bh / 55))));
 
     // Fresnel. A dielectric clear coat reflects only ~4% head-on but rises
     // steeply toward grazing, which is why a flake floor looks nearly matte
@@ -1759,6 +1765,29 @@ function fvComposite(room, color, callback){
     var FV_FOCAL = h;
     var FV_GLOSS = 0.85;   // microroughness: a real floor never reaches full Fresnel
     var FV_SPARKLE = 0.30; // glints off individual chip facets
+
+    // BACK-OF-ROOM ROLL-OFF. Schlick alone keeps climbing all the way to
+    // the horizon, so the last stretch of floor by the garage opening was
+    // reaching a reflectance that reads as glass. Real coated concrete
+    // does not: the coating has enough microroughness that the grazing
+    // reflection scatters instead of mirroring. Two things therefore ease
+    // off toward the far edge and reach full strength by mid-floor, so the
+    // middle and foreground keep exactly the gloss they had:
+    //   FV_BACK_GLOSS   - reflectance at the far edge, 0.70 = 30% less.
+    //   FV_BACK_CLARITY - how much reflection CONTRAST survives there.
+    //         Cutting intensity alone would just dim the bands; cutting
+    //         contrast is what turns them into soft broad highlights and
+    //         lets the flake keep reading through.
+    // Both are driven by a smoothstep on the same depth cosine used for
+    // Fresnel, so the falloff is continuous — there is no depth at which
+    // anything switches, and therefore no transition line.
+    var FV_BACK_GLOSS = 0.70;
+    var FV_BACK_CLARITY = 0.55;
+    var fvDepthTop = Math.max(1, polyTopY - horizonY);
+    var fvDepthMid = Math.max(2, (polyTopY + polyBotY) / 2 - horizonY);
+    var fvCosTop = fvDepthTop / Math.sqrt(fvDepthTop * fvDepthTop + FV_FOCAL * FV_FOCAL);
+    var fvCosMid = fvDepthMid / Math.sqrt(fvDepthMid * fvDepthMid + FV_FOCAL * FV_FOCAL);
+    var fvCosSpan = Math.max(1e-6, fvCosMid - fvCosTop);
 
     var texCanvas = document.createElement('canvas');
     texCanvas.width = bw; texCanvas.height = bh;
@@ -1823,6 +1852,16 @@ function fvComposite(room, color, callback){
       var om = 1 - cosT;
       var om2 = om * om;
       var fres = (FV_R0 + (1 - FV_R0) * om2 * om2 * om) * FV_GLOSS;
+
+      // Ease the back edge off. bk runs 0 at the far edge to 1 by
+      // mid-floor; smoothstep makes both ends flat so the roll-off starts
+      // and finishes gradually and cannot show a seam. Past mid-floor bk
+      // stays 1, so the middle and foreground are untouched.
+      var bk = (cosT - fvCosTop) / fvCosSpan;
+      if (bk < 0) bk = 0; else if (bk > 1) bk = 1;
+      bk = bk * bk * (3 - 2 * bk);
+      fres *= FV_BACK_GLOSS + (1 - FV_BACK_GLOSS) * bk;
+      var clarity = FV_BACK_CLARITY + (1 - FV_BACK_CLARITY) * bk;
 
       var uTexBase = (minX - cxImg) * uScale;
       var uTexStep = uScale;
@@ -1967,9 +2006,20 @@ function fvComposite(room, color, callback){
         var spread = (imgY - contactY[px2]) / (bh || 1);
         if (spread < 0) spread = 0; else if (spread > 1) spread = 1;
         var rNear0 = reflNear[fi], rNear1 = reflNear[fi + 1], rNear2 = reflNear[fi + 2];
-        var rr = rNear0 + (reflFar[fi] - rNear0) * spread;
-        var rg = rNear1 + (reflFar[fi + 1] - rNear1) * spread;
-        var rb = rNear2 + (reflFar[fi + 2] - rNear2) * spread;
+        var rFar0 = reflFar[fi], rFar1 = reflFar[fi + 1], rFar2 = reflFar[fi + 2];
+        var rr = rNear0 + (rFar0 - rNear0) * spread;
+        var rg = rNear1 + (rFar1 - rNear1) * spread;
+        var rb = rNear2 + (rFar2 - rNear2) * spread;
+
+        // Reflection CLARITY falls off with distance. The soft copy stands
+        // in for the local average, so lerping toward it compresses the
+        // reflection's contrast without blurring the flake underneath —
+        // the coating layer is untouched, only the mirrored image is
+        // flattened. Hard structures like door tracks lose their edge and
+        // survive as faint broad sheen; nearer floor keeps full clarity.
+        rr = rFar0 + (rr - rFar0) * clarity;
+        rg = rFar1 + (rg - rFar1) * clarity;
+        rb = rFar2 + (rb - rFar2) * clarity;
 
         // Energy-conserving dielectric mix: the coating shows through
         // (1 - F) and the mirrored room contributes F. Because F is only a

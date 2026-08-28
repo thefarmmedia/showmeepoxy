@@ -1094,9 +1094,35 @@ function fvComposite(room, color, callback){
     function fvBandData(divisor, minPx){
       var dw = Math.max(minPx, Math.round(bw / divisor));
       var dh = Math.max(minPx, Math.round(bh / divisor));
+      // PROGRESSIVE HALVING, not one big drawImage. A single large-ratio
+      // downscale does not box-filter in Chrome, it effectively point
+      // samples, so the "blurred" band comes back ALIASED — noise, not a
+      // smooth average. Stretched back up to full size that noise turns
+      // into big soft light and dark patches, which is a direct cause of
+      // the cloudy, blotchy look. Measured on the flake photo: reducing
+      // 520px to 4px in one step left a luminance stdev of 28.0, where
+      // successive halving gives the correct 17.5. Halving repeatedly is a
+      // true box filter at every step, so the low band is genuinely smooth
+      // and only carries real room lighting.
+      var cur = document.createElement('canvas');
+      cur.width = bw; cur.height = bh;
+      cur.getContext('2d').drawImage(canvas, minX, minY, bw, bh, 0, 0, bw, bh);
+      var cw = bw, ch = bh;
+      while (cw > dw * 2 || ch > dh * 2) {
+        var nw = Math.max(dw, Math.round(cw / 2));
+        var nh = Math.max(dh, Math.round(ch / 2));
+        var half = document.createElement('canvas');
+        half.width = nw; half.height = nh;
+        var hx = half.getContext('2d');
+        hx.imageSmoothingEnabled = true; hx.imageSmoothingQuality = 'high';
+        hx.drawImage(cur, 0, 0, cw, ch, 0, 0, nw, nh);
+        cur = half; cw = nw; ch = nh;
+      }
       var small = document.createElement('canvas');
       small.width = dw; small.height = dh;
-      small.getContext('2d').drawImage(canvas, minX, minY, bw, bh, 0, 0, dw, dh);
+      var sctx = small.getContext('2d');
+      sctx.imageSmoothingEnabled = true; sctx.imageSmoothingQuality = 'high';
+      sctx.drawImage(cur, 0, 0, cw, ch, 0, 0, dw, dh);
       var full = document.createElement('canvas');
       full.width = bw; full.height = bh;
       var fctx = full.getContext('2d');
@@ -1239,10 +1265,14 @@ function fvComposite(room, color, callback){
       // slight brightness/saturation shift. Real flake is hand-broadcast,
       // so chip size and colour drift across a floor; without this the
       // eye eventually picks up machine-like uniformity.
-      var sJit = 0.88 + rnd() * 0.24;          // +/- ~12% chip size
+      var sJit = 0.90 + rnd() * 0.20;          // +/- ~10% chip size
       var dsj = ds * sJit;
-      stampCtx.filter = 'brightness(' + (0.95 + rnd() * 0.10).toFixed(3) +
-                        ') saturate(' + (0.92 + rnd() * 0.16).toFixed(3) + ')';
+      // Brightness/saturation drift is kept small. A whole stamp shifted 5%
+      // is a ~123px patch of the tile shifted 5%, i.e. another cloud. The
+      // high-pass below would flatten most of it anyway; keeping it tight
+      // means there is less for the high-pass to have to undo.
+      stampCtx.filter = 'brightness(' + (0.98 + rnd() * 0.04).toFixed(3) +
+                        ') saturate(' + (0.97 + rnd() * 0.06).toFixed(3) + ')';
       stampCtx.drawImage(texImg, rnd() * maxOffX, rnd() * maxOffY, cropW, cropH, -dsj / 2, -dsj / 2, dsj, dsj);
       stampCtx.filter = 'none';
       stampCtx.restore();
@@ -1259,6 +1289,74 @@ function fvComposite(room, color, callback){
         }
       }
     }
+
+    // ---- FLATTEN the tile: kill every cluster bigger than a few chips ---
+    // Each stamp is a crop of the product photo, and that photo has its own
+    // broad light and dark areas — uneven studio lighting, and places where
+    // the loose flake happened to pile up lighter or darker. A stamp is
+    // ~123px in a 768px tile, so each one drops a whole patch of that
+    // low-frequency content onto the tile, and the result reads as light
+    // and dark CLOUDS drifting across the finished floor. A real
+    // full-broadcast floor has none of that: coverage is uniform wall to
+    // wall and the only variation is chip to chip.
+    // So the tile is high-passed. A low-pass at roughly three chips across
+    // is built by halving repeatedly (768 -> 24, every step an exact 2x box
+    // filter, so a periodic tile stays periodic and no wrap seam appears),
+    // then subtracted per channel with the tile's own mean added back.
+    // Everything COARSER than ~32px is removed; everything finer — the
+    // individual chips, their edges, their colour — is untouched. This is a
+    // subtraction, not a blur: no smearing, no loss of flake detail.
+    // 24 rather than 48: going finer keeps cutting cloud energy, but the
+    // far floor is minified so heavily that the coarser tile structure is
+    // exactly what still resolves back there. At 48 the back strip lost 20%
+    // of its chip contrast and went flat grey. 24 costs it 6% and still
+    // removes 55% of the cloud energy.
+    var lpSize = TILE;
+    var lpSrc = tileCanvas;
+    while (lpSize > 24) {
+      var lpNext = Math.round(lpSize / 2);
+      var lpc = document.createElement('canvas');
+      lpc.width = lpNext; lpc.height = lpNext;
+      var lpx = lpc.getContext('2d');
+      lpx.imageSmoothingEnabled = true; lpx.imageSmoothingQuality = 'high';
+      lpx.drawImage(lpSrc, 0, 0, lpSize, lpSize, 0, 0, lpNext, lpNext);
+      lpSrc = lpc; lpSize = lpNext;
+    }
+    var lpData = lpSrc.getContext('2d').getImageData(0, 0, lpSize, lpSize).data;
+    var lpMeanR = 0, lpMeanG = 0, lpMeanB = 0;
+    for (var lpi = 0; lpi < lpData.length; lpi += 4) {
+      lpMeanR += lpData[lpi]; lpMeanG += lpData[lpi + 1]; lpMeanB += lpData[lpi + 2];
+    }
+    var lpN = lpData.length / 4;
+    lpMeanR /= lpN; lpMeanG /= lpN; lpMeanB /= lpN;
+
+    var flat = tileCtx.getImageData(0, 0, TILE, TILE);
+    var flatData = flat.data;
+    var lpScale = lpSize / TILE;
+    for (var fy = 0; fy < TILE; fy++) {
+      // Bilinear sample of the low-pass, WRAPPED, so the correction itself
+      // is seamless across the tile edge.
+      var lv = fy * lpScale - 0.5;
+      var ly0 = Math.floor(lv), lfy = lv - ly0;
+      var lya = ((ly0 % lpSize) + lpSize) % lpSize, lyb = (lya + 1) % lpSize;
+      for (var fx = 0; fx < TILE; fx++) {
+        var lu = fx * lpScale - 0.5;
+        var lx0 = Math.floor(lu), lfx = lu - lx0;
+        var lxa = ((lx0 % lpSize) + lpSize) % lpSize, lxb = (lxa + 1) % lpSize;
+        var i00 = (lya * lpSize + lxa) * 4, i10 = (lya * lpSize + lxb) * 4;
+        var i01 = (lyb * lpSize + lxa) * 4, i11 = (lyb * lpSize + lxb) * 4;
+        var w00 = (1 - lfx) * (1 - lfy), w10 = lfx * (1 - lfy);
+        var w01 = (1 - lfx) * lfy, w11 = lfx * lfy;
+        var fi = (fy * TILE + fx) * 4;
+        var nr = flatData[fi] - (lpData[i00] * w00 + lpData[i10] * w10 + lpData[i01] * w01 + lpData[i11] * w11) + lpMeanR;
+        var ng = flatData[fi + 1] - (lpData[i00 + 1] * w00 + lpData[i10 + 1] * w10 + lpData[i01 + 1] * w01 + lpData[i11 + 1] * w11) + lpMeanG;
+        var nb = flatData[fi + 2] - (lpData[i00 + 2] * w00 + lpData[i10 + 2] * w10 + lpData[i01 + 2] * w01 + lpData[i11 + 2] * w11) + lpMeanB;
+        flatData[fi]     = nr < 0 ? 0 : (nr > 255 ? 255 : nr);
+        flatData[fi + 1] = ng < 0 ? 0 : (ng > 255 ? 255 : ng);
+        flatData[fi + 2] = nb < 0 ? 0 : (nb > 255 ? 255 : nb);
+      }
+    }
+    tileCtx.putImageData(flat, 0, 0);
 
     // Mean tile colour, used to tame the product photo's studio-lit
     // contrast. Under a clear coat the extremes soften; raw photo contrast

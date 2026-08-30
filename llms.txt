@@ -72,7 +72,7 @@ Service radius: ~90 miles from Jefferson City, MO
 - Mexico, MO (Audrain County)
 
 ## Area Pages
-- Jefferson City: https://showmeepoxy.com/area-jefferson-city.html
+- Jefferson City: https://showmeepoxy.com/
 - Columbia: https://showmeepoxy.com/area-columbia.html
 - Lake of the Ozarks: https://showmeepoxy.com/area-lake-ozarks.html
 - Osage Beach: https://showmeepoxy.com/area-osage-beach.html

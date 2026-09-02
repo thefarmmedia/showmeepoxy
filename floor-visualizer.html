@@ -1091,8 +1091,19 @@ function fvComposite(room, color, callback){
     // envelope tracks the light falloff while dark contamination drops out
     // entirely. Two mean passes then take the blockiness back off.
     function fvLightField(){
+      // Horizontally coarse, vertically finer. Light on a receding floor
+      // changes far faster with DEPTH than across the room — daylight
+      // spilling in at the garage opening pools in the first few feet and
+      // falls away toward the camera. A square grid tied to width made the
+      // cells ~135px tall here, which swallowed that whole pool into one
+      // row and averaged it flat, so the coating came out evenly lit and
+      // the daylight read as a band that stopped rather than a highlight
+      // that fades. Height now gets its own resolution. Stain rejection is
+      // unaffected: it comes from the 3x3 MAXIMUM below, whose window
+      // still spans three cells horizontally, and stains are localised in
+      // both axes.
       var gw = Math.max(4, Math.min(10, Math.round(bw / 140)));
-      var gh = Math.max(3, Math.min(10, Math.round(gw * bh / Math.max(1, bw))));
+      var gh = Math.max(3, Math.min(18, Math.round(bh / 70)));
       var cur = document.createElement('canvas');
       cur.width = bw; cur.height = bh;
       cur.getContext('2d').drawImage(canvas, minX, minY, bw, bh, 0, 0, bw, bh);
@@ -1257,7 +1268,23 @@ function fvComposite(room, color, callback){
         var dL = lum[i] - (0.299 * fr + 0.587 * fg + 0.114 * fb);
         var ca = (pr - pg) - (fr - fg);
         var cb = (pb - pg) - (fb - fg);
-        dev[i] = 0.6 * (dL < 0 ? -dL : dL) + Math.sqrt(ca * ca + cb * cb);
+        // Brightening and darkening are NOT the same evidence.
+        // An object standing on a floor occludes it, so it reads darker
+        // than its surroundings, or it reads coloured. A large NEUTRAL
+        // patch that is merely brighter than its surroundings is almost
+        // always light — daylight coming through the garage opening,
+        // a reflection, a specular sheen — and light belongs under the
+        // coating, not on top of it. Weighting them equally is what made
+        // the bright threshold strip beneath the door register as an
+        // object: the original photo was then restored over the finished
+        // coating there, which is exactly the hard horizontal edge that
+        // made the floor look like it stopped at the opening.
+        // Darkening still counts fully, colour still counts fully, and a
+        // bright neutral region has to be far brighter before it will
+        // register at all.
+        var dLneg = dL < 0 ? -dL : 0;
+        var dLpos = dL > 0 ? dL : 0;
+        dev[i] = 0.75 * dLneg + 0.18 * dLpos + Math.sqrt(ca * ca + cb * cb);
       }
       // local gradient energy
       var edge = new Float64Array(N);

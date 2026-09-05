@@ -977,13 +977,10 @@ function fvSelectSystem(key){
 }
 
 // ---------- stage rendering ----------
-// Matches the stage box to the current photo's own aspect ratio (clamped to a
-// sane range) so object-fit:cover never has to crop away the calibrated floor
-// area — important once photos aren't all the same shape as our sample room.
+// Keep the whole calibrated photograph visible, including wide phone photos.
 function fvSetStageAspect(w, h){
   if (!w || !h) return;
-  var ratio = Math.max(0.62, Math.min(1.6, w / h));
-  document.getElementById('fvStage').style.aspectRatio = ratio;
+  document.getElementById('fvStage').style.aspectRatio = w / h;
 }
 
 function fvApplyRoom(){
@@ -995,7 +992,9 @@ function fvApplyRoom(){
   if (beforeImg.complete && beforeImg.naturalWidth) fvSetStageAspect(beforeImg.naturalWidth, beforeImg.naturalHeight);
 }
 
+var fvRenderRequest = 0;
 function fvApplyColor(skipTrack){
+  var request = ++fvRenderRequest;
   var color = fvState.color;
   document.getElementById('fvCurrentName').textContent = color ? color.name.toUpperCase() : '—';
   fvRenderColorGrid();
@@ -1008,14 +1007,16 @@ function fvApplyColor(skipTrack){
     var afterImg = document.getElementById('fvImgAfter');
     indicator.classList.add('fv-rendering-show');
     fvComposite(room, color, function(url){
+      if (request !== fvRenderRequest) return;
       afterImg.style.opacity = '0';
       setTimeout(function(){
+        if (request !== fvRenderRequest) return;
         afterImg.src = url;
         afterImg.alt = room.alt + ' coated in ' + color.name;
         afterImg.style.opacity = '1';
         indicator.classList.remove('fv-rendering-show');
       }, 100);
-    });
+    }, function(){ return request !== fvRenderRequest; });
   }
   if (!skipTrack && color) fvTrack('floor_color_selected', {color: color.slug});
 }
@@ -1027,15 +1028,137 @@ function fvApplyColor(skipTrack){
 // shadows / highlights / unevenness), so the result reads as "this floor,
 // coated" instead of a texture swatch stuck over the picture. Same-origin
 // images only, so canvas pixel reads are never CORS-tainted.
-var fvCanvasCache = {};
+var fvCanvasCache = new Map();
 var fvImageCache = {};
+
+function fvCompositeKey(room, color){
+  return JSON.stringify([room.image, room.floorClipPath, room.horizonY,
+    color.texture, color.baseCoatColor]);
+}
+
+// Use each column's actual floor boundary, including angled walls and returns.
+function fvFloorContactLine(poly, minX, width){
+  var contact = new Float64Array(width).fill(Infinity);
+  for (var i = 0; i < poly.length; i++) {
+    var a = poly[i], b = poly[(i + 1) % poly.length];
+    if (a.x === b.x) continue;
+    for (var x = 0; x < width; x++) {
+      var t = (minX + x + 0.5 - a.x) / (b.x - a.x);
+      if (t < 0 || t > 1) continue;
+      contact[x] = Math.min(contact[x], a.y + (b.y - a.y) * t);
+    }
+  }
+  return contact;
+}
+
+function fvInsideFloor(x, y, poly){
+  var inside = false;
+  for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    var a = poly[i], b = poly[j];
+    if ((a.y > y) !== (b.y > y) && x < (b.x - a.x) * (y - a.y) / (b.y - a.y) + a.x) inside = !inside;
+  }
+  return inside;
+}
+
+// Estimate illumination from clean pixels within the floor, never the walls.
+// A local upper percentile rejects small dark marks without expanding every
+// bright patch across the room, as the old coarse maximum filter did.
+function fvBuildLightField(source, width, poly, minX, minY, bw, bh){
+  var gw = Math.max(2, Math.min(48, Math.ceil(bw / 32)));
+  var gh = Math.max(2, Math.min(48, Math.ceil(bh / 32)));
+  var cells = new Float32Array(gw * gh).fill(NaN);
+  var sum = 0, count = 0;
+  for (var y = 0; y < gh; y++) {
+    for (var x = 0; x < gw; x++) {
+      var values = [];
+      for (var sy = 0; sy < 7; sy++) {
+        for (var sx = 0; sx < 7; sx++) {
+          var px = Math.floor(minX + (x + (sx + 0.5) / 7) * bw / gw);
+          var py = Math.floor(minY + (y + (sy + 0.5) / 7) * bh / gh);
+          if (!fvInsideFloor(px + 0.5, py + 0.5, poly)) continue;
+          var p = (py * width + px) * 4;
+          values.push(0.299 * source[p] + 0.587 * source[p + 1] + 0.114 * source[p + 2]);
+        }
+      }
+      if (!values.length) continue;
+      values.sort(function(a, b){ return a - b; });
+      var value = values[Math.floor((values.length - 1) * 0.72)];
+      cells[y * gw + x] = value;
+      sum += value * values.length; count += values.length;
+    }
+  }
+  var mean = count ? sum / count : 128;
+  var filled = new Float32Array(cells);
+  for (var i = 0; i < cells.length; i++) {
+    if (Number.isFinite(cells[i])) continue;
+    var best = Infinity, nearest = mean;
+    for (var j = 0; j < cells.length; j++) {
+      if (!Number.isFinite(cells[j])) continue;
+      var dx = i % gw - j % gw, dy = Math.floor(i / gw) - Math.floor(j / gw);
+      var distance = dx * dx + dy * dy;
+      if (distance < best) { best = distance; nearest = cells[j]; }
+    }
+    filled[i] = nearest;
+  }
+  var grid = document.createElement('canvas');
+  grid.width = gw; grid.height = gh;
+  var gx = grid.getContext('2d'), data = gx.createImageData(gw, gh);
+  for (var yy = 0; yy < gh; yy++) {
+    for (var xx = 0; xx < gw; xx++) {
+      var total = 0, weight = 0;
+      for (var dy = -1; dy <= 1; dy++) {
+        for (var dx = -1; dx <= 1; dx++) {
+          var nx = Math.max(0, Math.min(gw - 1, xx + dx));
+          var ny = Math.max(0, Math.min(gh - 1, yy + dy));
+          var k = (dx === 0 ? 2 : 1) * (dy === 0 ? 2 : 1);
+          total += filled[ny * gw + nx] * k; weight += k;
+        }
+      }
+      var p4 = (yy * gw + xx) * 4;
+      data.data[p4] = data.data[p4 + 1] = data.data[p4 + 2] = total / weight;
+      data.data[p4 + 3] = 255;
+    }
+  }
+  gx.putImageData(data, 0, 0);
+  var field = document.createElement('canvas');
+  field.width = bw; field.height = bh;
+  var fx = field.getContext('2d');
+  fx.imageSmoothingEnabled = true; fx.imageSmoothingQuality = 'high';
+  fx.drawImage(grid, 0, 0, bw, bh);
+  return { data: fx.getImageData(0, 0, bw, bh).data, mean: Math.max(0.05, mean / 255) };
+}
+
+// Blend reflected light in linear space so bright openings retain their sheen.
+var fvReflectChannel = (function(){
+  var linear = new Float32Array(256);
+  var display = new Uint8ClampedArray(4096);
+  for (var i = 0; i < 256; i++) {
+    var s = i / 255;
+    linear[i] = s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  }
+  for (var j = 0; j < 4096; j++) {
+    var l = j / 4095;
+    display[j] = 255 * (l <= 0.0031308 ? 12.92 * l : 1.055 * Math.pow(l, 1 / 2.4) - 0.055);
+  }
+  return function(surface, environment, amount){
+    if (amount < 0.001) return surface;
+    var a = Math.max(0, Math.min(255, Math.round(surface)));
+    var b = Math.max(0, Math.min(255, Math.round(environment)));
+    return display[Math.round((linear[a] * (1 - amount) + linear[b] * amount) * 4095)];
+  };
+})();
+
+function fvReflectionVisibility(sourceY, fade){
+  var t = Math.max(0, Math.min(1, sourceY / Math.max(1, fade)));
+  return t * t * (3 - 2 * t);
+}
 
 function fvLoadImage(src){
   if (fvImageCache[src]) return fvImageCache[src];
   var p = new Promise(function(resolve, reject){
     var img = new Image();
     img.onload = function(){ resolve(img); };
-    img.onerror = reject;
+    img.onerror = function(error){ delete fvImageCache[src]; reject(error); };
     img.src = src;
   });
   fvImageCache[src] = p;
@@ -1050,11 +1173,16 @@ function fvParsePolygon(clipPathStr, w, h){
   });
 }
 
-function fvComposite(room, color, callback){
-  var cacheKey = room.image + '|' + color.texture;
-  if (fvCanvasCache[cacheKey]) { callback(fvCanvasCache[cacheKey]); return; }
+function fvComposite(room, color, callback, shouldCancel){
+  var cacheKey = fvCompositeKey(room, color);
+  if (fvCanvasCache.has(cacheKey)) {
+    var cached = fvCanvasCache.get(cacheKey);
+    fvCanvasCache.delete(cacheKey); fvCanvasCache.set(cacheKey, cached);
+    callback(cached); return;
+  }
 
-  Promise.all([fvLoadImage(room.image), fvLoadImage(color.texture)]).then(function(imgs){
+  Promise.all([fvLoadImage(room.image), fvLoadImage(color.texture)]).then(async function(imgs){
+    if (shouldCancel && shouldCancel()) return;
     var baseImg = imgs[0], texImg = imgs[1];
     var w = baseImg.naturalWidth, h = baseImg.naturalHeight;
 
@@ -1073,115 +1201,14 @@ function fvComposite(room, color, callback){
     var bw = maxX - minX, bh = maxY - minY;
     if (bw <= 0 || bh <= 0) { callback(baseImg.src); return; }
 
-    // ---- LIGHTING ONLY, NOTHING ELSE ------------------------------------
-    // The coating is opaque, so the slab underneath may contribute LIGHTING
-    // and perspective and nothing more — no stains, no oil spots, no
-    // discolouration, no cracks, no saw cuts, no patches, no old damage.
-    // A previous version deliberately multiplied a DET/MID band-pass back
-    // in so joints and surface relief would read through the coating. That
-    // is precisely the "original concrete showing through" problem, so it
-    // is gone; a real full-broadcast system buries all of it.
-    //
-    // What remains is ONE light field, built to be immune to dark marks
-    // rather than merely blurred. Blurring does not remove a stain, it
-    // AVERAGES it in: a big oil patch just becomes a soft dark cloud that
-    // still tracks the stain. Instead the floor is reduced to a coarse
-    // grid and a 3x3 MAXIMUM is taken across it. Room lighting is what the
-    // floor looks like where it is CLEAN, so following the local bright
-    // envelope tracks the light falloff while dark contamination drops out
-    // entirely. Two mean passes then take the blockiness back off.
-    function fvLightField(){
-      // Horizontally coarse, vertically finer. Light on a receding floor
-      // changes far faster with DEPTH than across the room — daylight
-      // spilling in at the garage opening pools in the first few feet and
-      // falls away toward the camera. A square grid tied to width made the
-      // cells ~135px tall here, which swallowed that whole pool into one
-      // row and averaged it flat, so the coating came out evenly lit and
-      // the daylight read as a band that stopped rather than a highlight
-      // that fades. Height now gets its own resolution. Stain rejection is
-      // unaffected: it comes from the 3x3 MAXIMUM below, whose window
-      // still spans three cells horizontally, and stains are localised in
-      // both axes.
-      var gw = Math.max(4, Math.min(10, Math.round(bw / 140)));
-      var gh = Math.max(3, Math.min(18, Math.round(bh / 70)));
-      var cur = document.createElement('canvas');
-      cur.width = bw; cur.height = bh;
-      cur.getContext('2d').drawImage(canvas, minX, minY, bw, bh, 0, 0, bw, bh);
-      var cw = bw, ch = bh;
-      while (cw > gw * 2 || ch > gh * 2) {           // progressive halving = true averaging
-        var nw = Math.max(gw, Math.round(cw / 2)), nh = Math.max(gh, Math.round(ch / 2));
-        var hc = document.createElement('canvas');
-        hc.width = nw; hc.height = nh;
-        var hx = hc.getContext('2d');
-        hx.imageSmoothingEnabled = true; hx.imageSmoothingQuality = 'high';
-        hx.drawImage(cur, 0, 0, cw, ch, 0, 0, nw, nh);
-        cur = hc; cw = nw; ch = nh;
-      }
-      var gc = document.createElement('canvas');
-      gc.width = gw; gc.height = gh;
-      var gx = gc.getContext('2d');
-      gx.imageSmoothingEnabled = true; gx.imageSmoothingQuality = 'high';
-      gx.drawImage(cur, 0, 0, cw, ch, 0, 0, gw, gh);
-      var g = gx.getImageData(0, 0, gw, gh);
-      var gd = g.data;
-
-      function neigh(src, pick){
-        var dst = new Float64Array(gw * gh * 3);
-        for (var yy = 0; yy < gh; yy++) {
-          for (var xx = 0; xx < gw; xx++) {
-            for (var ch3 = 0; ch3 < 3; ch3++) {
-              var acc = pick === 'max' ? -1 : 0, n = 0;
-              for (var dy = -1; dy <= 1; dy++) {
-                var sy = yy + dy; if (sy < 0 || sy >= gh) continue;
-                for (var dx = -1; dx <= 1; dx++) {
-                  var sx = xx + dx; if (sx < 0 || sx >= gw) continue;
-                  var v = src[(sy * gw + sx) * 3 + ch3];
-                  if (pick === 'max') { if (v > acc) acc = v; }
-                  else { acc += v; n++; }
-                }
-              }
-              dst[(yy * gw + xx) * 3 + ch3] = pick === 'max' ? acc : acc / n;
-            }
-          }
-        }
-        return dst;
-      }
-      var lin = new Float64Array(gw * gh * 3);
-      for (var gi = 0; gi < gw * gh; gi++) {
-        lin[gi * 3] = gd[gi * 4]; lin[gi * 3 + 1] = gd[gi * 4 + 1]; lin[gi * 3 + 2] = gd[gi * 4 + 2];
-      }
-      lin = neigh(lin, 'max');     // bright envelope: dark contamination drops out
-      lin = neigh(lin, 'mean');    // de-blockify
-      lin = neigh(lin, 'mean');
-      for (var gj = 0; gj < gw * gh; gj++) {
-        gd[gj * 4] = lin[gj * 3]; gd[gj * 4 + 1] = lin[gj * 3 + 1];
-        gd[gj * 4 + 2] = lin[gj * 3 + 2]; gd[gj * 4 + 3] = 255;
-      }
-      gx.putImageData(g, 0, 0);
-      var up = document.createElement('canvas');
-      up.width = bw; up.height = bh;
-      var ux = up.getContext('2d');
-      ux.imageSmoothingEnabled = true; ux.imageSmoothingQuality = 'high';
-      ux.drawImage(gc, 0, 0, gw, gh, 0, 0, bw, bh);
-      return ux.getImageData(0, 0, bw, bh).data;
-    }
-    var lowData = fvLightField();
-
-    // Relighting is applied RELATIVE to the slab's mean brightness rather
-    // than as an absolute multiply, so a heavily oil-stained or dirty
-    // floor doesn't drag the coated result into dark patches — only
-    // genuine light falloff survives, clamped so nothing blows out.
-    var lumSum = 0, lumCount = 0;
-    for (var li = 0; li < lowData.length; li += 4) {
-      lumSum += (0.299 * lowData[li] + 0.587 * lowData[li + 1] + 0.114 * lowData[li + 2]) / 255;
-      lumCount++;
-    }
-    var lumMean = lumCount ? (lumSum / lumCount) : 0.5;
-    if (lumMean < 0.05) lumMean = 0.05;
-
-    // The untouched photograph, grabbed before any coating goes into ctx.
-    // Used both for the object mask below and for the topcoat reflections.
     var srcFull = ctx.getImageData(0, 0, w, h).data;
+    var light = fvBuildLightField(srcFull, w, poly, minX, minY, bw, bh);
+    var lowData = light.data, lumMean = light.mean;
+    var shadeTable = new Float32Array(256);
+    for (var sl = 0; sl < 256; sl++) {
+      shadeTable[sl] = Math.max(0.52, Math.min(1.55, Math.pow(sl / 255 / lumMean, 0.85)));
+    }
+    var reflectChannel = fvReflectChannel;
 
     // ---- OBJECT-AWARE FOREGROUND MASK -----------------------------------
     // Things physically SITTING on the floor — a toolbox, a tyre, a bike, a
@@ -1443,9 +1470,9 @@ function fvComposite(room, color, callback){
     var stampCtx = stampCanvas.getContext('2d');
     // The opaque core has to be wide. With a mostly-transparent stamp the
     // only thing holding coverage up is how many stamps happen to overlap,
-    // which is exactly what varies. A 0.45 core means each stamp actually
-    // lays down solid flake in its middle and only its rim blends.
-    var featherGrad = stampCtx.createRadialGradient(stampR, stampR, stampR * 0.45, stampR, stampR, stampR);
+    // which is exactly what varies. A 0.72 core keeps more chip edges sharp
+    // while only the outer rim blends into the surrounding flake.
+    var featherGrad = stampCtx.createRadialGradient(stampR, stampR, stampR * 0.72, stampR, stampR, stampR);
     featherGrad.addColorStop(0, 'rgba(0,0,0,1)');
     featherGrad.addColorStop(1, 'rgba(0,0,0,0)');
 
@@ -1721,7 +1748,9 @@ function fvComposite(room, color, callback){
     // darker, which is what the reference installs with a closed dark back
     // wall actually do.
     //
-    // The geometry is exact, not a guess. For a pinhole camera looking at a
+    // Approximate nearby vertical surfaces from their contact with the floor.
+    // A single photo does not contain full room depth or out-of-frame lights.
+    // For a level pinhole camera looking at a
     // horizontal mirror, a point at height H and distance D projects to
     //   y - horizon = f (hc - H) / D
     // and its mirror image (H -> -H) to f (hc + H) / D. Writing g for the
@@ -1733,22 +1762,7 @@ function fvComposite(room, color, callback){
     // srcFull is captured up with the light field, before any coating is
     // drawn into ctx.
 
-    // Contact line per column: the top edge of the floor polygon there.
-    var contactY = new Float64Array(bw);
-    for (var ci = 0; ci < bw; ci++) contactY[ci] = polyTopY;
-    for (var pe = 0; pe < poly.length; pe++) {
-      var pa = poly[pe], pbv = poly[(pe + 1) % poly.length];
-      if (pa.x === pbv.x) continue;
-      var exa = Math.max(minX, Math.floor(Math.min(pa.x, pbv.x)));
-      var exb = Math.min(maxX, Math.ceil(Math.max(pa.x, pbv.x)));
-      for (var ex = exa; ex < exb; ex++) {
-        var et = (ex + 0.5 - pa.x) / (pbv.x - pa.x);
-        if (et < 0 || et > 1) continue;
-        var ey = pa.y + (pbv.y - pa.y) * et;
-        var eidx = ex - minX;
-        if (eidx >= 0 && eidx < bw && ey < contactY[eidx]) contactY[eidx] = ey;
-      }
-    }
+    var contactY = fvFloorContactLine(poly, minX, bw);
 
     // Mirror the photo about that line into the floor's bounding box.
     var reflCanvas = document.createElement('canvas');
@@ -1759,14 +1773,18 @@ function fvComposite(room, color, callback){
     for (var ry = 0; ry < bh; ry++) {
       var rImgY = minY + ry;
       for (var rx = 0; rx < bw; rx++) {
+        if (!Number.isFinite(contactY[rx])) continue;
         var ySrc = 2 * contactY[rx] - rImgY;
+        // The photo has no information above its top edge. Fade that missing
+        // reflection away instead of stretching its first row down the floor.
+        var visibility = fvReflectionVisibility(ySrc, h * 0.06);
         if (ySrc < 0) ySrc = 0; else if (ySrc > h - 1) ySrc = h - 1;
         var si = ((ySrc | 0) * w + (minX + rx)) * 4;
         var ri = (ry * bw + rx) * 4;
         reflRawD[ri] = srcFull[si];
         reflRawD[ri + 1] = srcFull[si + 1];
         reflRawD[ri + 2] = srcFull[si + 2];
-        reflRawD[ri + 3] = 255;
+        reflRawD[ri + 3] = Math.round(255 * visibility);
       }
     }
     reflCtx.putImageData(reflRaw, 0, 0);
@@ -1827,7 +1845,7 @@ function fvComposite(room, color, callback){
     // stand-in for a phone camera).
     var FV_R0 = 0.04;
     var FV_FOCAL = h;
-    var FV_GLOSS = 0.85;   // microroughness: a real floor never reaches full Fresnel
+    var FV_GLOSS = 0.72;   // microroughness: a real floor never reaches full Fresnel
     var FV_SPARKLE = 0.30; // glints off individual chip facets
 
     // BACK-OF-ROOM ROLL-OFF. Schlick alone keeps climbing all the way to
@@ -1837,7 +1855,7 @@ function fvComposite(room, color, callback){
     // reflection scatters instead of mirroring. Two things therefore ease
     // off toward the far edge and reach full strength by mid-floor, so the
     // middle and foreground keep exactly the gloss they had:
-    //   FV_BACK_GLOSS   - reflectance at the far edge, 0.70 = 30% less.
+    //   FV_BACK_GLOSS   - reflectance at the far edge, 0.82 = 18% less.
     //   FV_BACK_CLARITY - how much reflection CONTRAST survives there.
     //         Cutting intensity alone would just dim the bands; cutting
     //         contrast is what turns them into soft broad highlights and
@@ -1845,8 +1863,8 @@ function fvComposite(room, color, callback){
     // Both are driven by a smoothstep on the same depth cosine used for
     // Fresnel, so the falloff is continuous — there is no depth at which
     // anything switches, and therefore no transition line.
-    var FV_BACK_GLOSS = 0.70;
-    var FV_BACK_CLARITY = 0.55;
+    var FV_BACK_GLOSS = 0.82;
+    var FV_BACK_CLARITY = 0.70;
     var fvDepthTop = Math.max(1, polyTopY - horizonY);
     var fvDepthMid = Math.max(2, (polyTopY + polyBotY) / 2 - horizonY);
     var fvCosTop = fvDepthTop / Math.sqrt(fvDepthTop * fvDepthTop + FV_FOCAL * FV_FOCAL);
@@ -1860,6 +1878,11 @@ function fvComposite(room, color, callback){
     var outData = out.data;
 
     for (var py2 = 0; py2 < bh; py2++) {
+      // Let touch/selection events run and stop obsolete previews promptly.
+      if (py2 % 24 === 0) {
+        await new Promise(function(resolve){ setTimeout(resolve, 0); });
+        if (shouldCancel && shouldCancel()) return;
+      }
       var imgY = minY + py2;
       var depth = imgY - horizonY;
       if (depth < 1) depth = 1;
@@ -2041,18 +2064,13 @@ function fvComposite(room, color, callback){
         tb = tb + (bcB - tb) * bMix;
 
         // ---- STEP 4: apply the room's LIGHT, and only its light --------
-        // The flake and basecoat layers above are entirely synthetic — not
-        // one original pixel is mixed into them. All the photograph does
-        // here is set how brightly this patch of floor is lit, from the
-        // stain-immune light field. No slab colour, no slab texture, no
-        // stains, no cracks: only where the room is bright and where it is
-        // in shadow.
+        // Only the room's coarse illumination is transferred to the coating;
+        // the flake material covers the concrete's fine surface detail.
+        // Broad discoloration can still resemble a shadow in a single photo.
         var fi = (py2 * bw + px2) * 4;
         var lumLow = (0.299 * lowData[fi] + 0.587 * lowData[fi + 1] + 0.114 * lowData[fi + 2]) / 255;
 
-        var shade = 1 + (lumLow - lumMean) * 1.42;
-        if (shade < 0.44) shade = 0.44;
-        if (shade > 1.48) shade = 1.48;
+        var shade = shadeTable[lowData[fi]];
 
         tr *= shade; tg *= shade; tb *= shade;
 
@@ -2090,10 +2108,11 @@ function fvComposite(room, color, callback){
         // few percent underfoot, foreground flake colour is essentially
         // untouched; it climbs toward the far wall, which is exactly where
         // the reference photos go glassy.
-        var refl = fres;
-        tr = tr * (1 - refl) + rr * refl;
-        tg = tg * (1 - refl) + rg * refl;
-        tb = tb * (1 - refl) + rb * refl;
+        var reflAlpha = (reflNear[fi + 3] * (1 - spread) + reflFar[fi + 3] * spread) / 255;
+        var refl = fres * reflAlpha;
+        tr = reflectChannel(tr, rr, refl);
+        tg = reflectChannel(tg, rg, refl);
+        tb = reflectChannel(tb, rb, refl);
 
         // Specular glints off individual chip facets. Keyed to the chip's
         // own brightness AND to how bright the reflected surroundings
@@ -2112,7 +2131,7 @@ function fvComposite(room, color, callback){
         if (facet > 0) {
           if (facet > 1) facet = 1;
           var envL = (0.299 * rr + 0.587 * rg + 0.114 * rb) / 255;
-          var glint = facet * facet * envL * fres * FV_SPARKLE;
+          var glint = facet * facet * envL * refl * FV_SPARKLE;
           tr += (255 - tr) * glint; tg += (255 - tg) * glint; tb += (255 - tb) * glint;
         }
 
@@ -2208,8 +2227,10 @@ function fvComposite(room, color, callback){
       ctx.drawImage(objCanvas, minX, minY);
     }
 
-    var url = canvas.toDataURL('image/jpeg', 0.86);
-    fvCanvasCache[cacheKey] = url;
+    var url = canvas.toDataURL('image/jpeg', 0.94);
+    fvCanvasCache.set(cacheKey, url);
+    // Keep a handful of full-resolution previews, including customer photos.
+    while (fvCanvasCache.size > 8) fvCanvasCache.delete(fvCanvasCache.keys().next().value);
     callback(url);
   }).catch(function(){
     callback(room.image); // graceful fallback: show the unmodified room photo
@@ -2230,7 +2251,7 @@ function fvSetReveal(pct){
   pct = Math.max(0, Math.min(100, pct));
   fvState.reveal = pct;
   document.getElementById('fvAfterWrap').style.clipPath = 'inset(0 0 0 ' + (100 - pct) + '%)';
-  document.getElementById('fvDivider').style.left = pct + '%';
+  document.getElementById('fvDivider').style.left = (100 - pct) + '%';
   document.getElementById('fvBtnBefore').classList.toggle('fv-toggle-active', pct === 0);
   document.getElementById('fvBtnSplit').classList.toggle('fv-toggle-active', pct > 0 && pct < 100);
   document.getElementById('fvBtnAfter').classList.toggle('fv-toggle-active', pct === 100);
@@ -2244,7 +2265,7 @@ function fvSetReveal(pct){
   function pctFromEvent(e){
     var rect = stage.getBoundingClientRect();
     var x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-    return Math.max(0, Math.min(100, (x / rect.width) * 100));
+    return Math.max(0, Math.min(100, 100 - (x / rect.width) * 100));
   }
   function start(e){ dragging = true; move(e); }
   function move(e){

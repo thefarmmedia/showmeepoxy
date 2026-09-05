@@ -129,6 +129,9 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 .fv-calibrate-handle:active{cursor:grabbing}
 .fv-calibrate-hint{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(13,45,110,.85);color:#fff;font-size:12px;font-weight:700;padding:7px 16px;border-radius:20px;white-space:nowrap}
 .fv-privacy-note{text-align:center;font-size:12px;color:var(--gray-500);margin-top:10px}
+.fv-disclaimer{margin-top:16px;padding:12px 16px;border:1px solid var(--gray-200);border-left:3px solid var(--gold);border-radius:8px;background:var(--gray-50)}
+.fv-disclaimer p{font-size:12px;line-height:1.6;color:var(--gray-600);margin:0}
+.fv-disclaimer strong{color:var(--navy)}
 .fv-divider{position:absolute;top:0;bottom:0;width:0;border-left:3px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.25);cursor:ew-resize;z-index:5;touch-action:none}
 .fv-divider::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:#fff;box-shadow:var(--shm);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23134db4' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 7l-5 5 5 5M16 7l5 5-5 5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center}
 .fv-tag{position:absolute;top:12px;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:#fff;z-index:3;pointer-events:none}
@@ -357,6 +360,10 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
             <button type="button" class="fv-toggle-btn" onclick="fvCancelCalibration()">Cancel</button>
           </div>
           <p class="fv-privacy-note" id="fvPrivacyNote" style="display:none">🔒 Your photo stays on your device — nothing is uploaded or stored anywhere.</p>
+        </div>
+
+        <div class="fv-disclaimer">
+          <p><strong>Preview only — not an exact match.</strong> This is a digital simulation built from photos of our real flake blends. Your finished floor will differ: screen colors vary by device and brightness, every room lights differently, and the concrete underneath affects the final look. Flake is hand-broadcast, so no two floors are identical. Use this to narrow down a color direction, then confirm your choice with a physical sample at your free on-site quote. Nothing shown here is a quote or a guarantee of appearance.</p>
         </div>
 
         <div class="fv-current-color">

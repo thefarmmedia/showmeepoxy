@@ -1064,8 +1064,10 @@ function fvInsideFloor(x, y, poly){
 // A local upper percentile rejects small dark marks without expanding every
 // bright patch across the room, as the old coarse maximum filter did.
 function fvBuildLightField(source, width, poly, minX, minY, bw, bh){
-  var gw = Math.max(2, Math.min(48, Math.ceil(bw / 32)));
-  var gh = Math.max(2, Math.min(48, Math.ceil(bh / 32)));
+  // Keep this field deliberately broad. A dense grid transfers subtle slab
+  // discoloration as light and makes a uniform broadcast look blotchy.
+  var gw = Math.max(4, Math.min(10, Math.ceil(bw / 160)));
+  var gh = Math.max(6, Math.min(20, Math.ceil(bh / 70)));
   var cells = new Float32Array(gw * gh).fill(NaN);
   var sum = 0, count = 0;
   for (var y = 0; y < gh; y++) {
@@ -1206,7 +1208,9 @@ function fvComposite(room, color, callback, shouldCancel){
     var lowData = light.data, lumMean = light.mean;
     var shadeTable = new Float32Array(256);
     for (var sl = 0; sl < 256; sl++) {
-      shadeTable[sl] = Math.max(0.52, Math.min(1.55, Math.pow(sl / 255 / lumMean, 0.85)));
+      // Retain the overall room lighting without exaggerating modest
+      // variations that should read as even flake coverage.
+      shadeTable[sl] = Math.max(0.64, Math.min(1.38, Math.pow(sl / 255 / lumMean, 0.58)));
     }
     var reflectChannel = fvReflectChannel;
 

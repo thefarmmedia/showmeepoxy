@@ -4,18 +4,18 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Garage Floor Coatings Jefferson City MO | Show Me Epoxy</title>
-<meta content="Prep-first garage floor coatings in Jefferson City &amp; Mid-Missouri. Diamond-ground concrete, industrial materials, 1-day installs. Free quote today." name="description"/>
+<title>Epoxy Flooring Jefferson City, MO | Instant Estimate</title>
+<meta content="Preview floor colors with our interactive visualizer, see real installations, and get an instant estimate. Serving Jefferson City and Mid-Missouri." name="description"/>
 <meta content="epoxy garage floors Jefferson City, epoxy flooring Columbia MO, garage floor coating Lake of the Ozarks, epoxy floor installers Missouri" name="keywords"/>
-<meta content="Garage Floor Coatings Jefferson City MO | Show Me Epoxy" property="og:title"/>
-<meta content="Prep-first garage floor coatings in Jefferson City &amp; Mid-Missouri. Diamond-ground concrete, industrial materials, 1-day installs. Free quote today." property="og:description"/>
+<meta content="Epoxy Flooring Jefferson City, MO | Instant Estimate" property="og:title"/>
+<meta content="Preview floor colors with our interactive visualizer, see real installations, and get an instant estimate. Serving Jefferson City and Mid-Missouri." property="og:description"/>
 <meta content="website" property="og:type"/>
 <meta property="og:image" content="https://showmeepoxy.com/epoxy-garage-floor-gray-flake-jefferson-city-missouri-show-me-epoxy.jpg"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="Garage Floor Coatings Jefferson City MO | Show Me Epoxy"/>
-<meta name="twitter:description" content="Prep-first garage floor coatings in Jefferson City &amp; Mid-Missouri. Diamond-ground concrete, industrial materials, 1-day installs. Free quote today."/>
+<meta name="twitter:title" content="Epoxy Flooring Jefferson City, MO | Instant Estimate"/>
+<meta name="twitter:description" content="Preview floor colors with our interactive visualizer, see real installations, and get an instant estimate. Serving Jefferson City and Mid-Missouri."/>
 <meta name="twitter:image" content="https://showmeepoxy.com/epoxy-garage-floor-gray-flake-jefferson-city-missouri-show-me-epoxy.jpg"/>
 
 <link href="https://showmeepoxy.com/" rel="canonical"/>
@@ -221,6 +221,35 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 
 
 
+
+/* ---- Visualizer promotion (homepage) ---- */
+.viz-promo{display:grid;grid-template-columns:340px 1fr;gap:40px;align-items:center;background:var(--gray-100);border:1px solid var(--gray-200);border-radius:16px;padding:28px 32px}
+.viz-promo-media{border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.10)}
+.viz-promo-media img{width:100%;height:300px;object-fit:cover;display:block}
+.viz-promo-title{font-family:var(--font-cond);font-size:34px;font-weight:900;line-height:1.08;color:var(--navy);margin:6px 0 12px}
+.viz-promo-sub{font-size:16px;line-height:1.65;color:var(--gray-600);margin-bottom:16px}
+.viz-promo-list{list-style:none;margin:0 0 22px;padding:0;display:flex;flex-direction:column;gap:8px}
+.viz-promo-list li{display:flex;align-items:flex-start;gap:10px;font-size:15px;color:var(--gray-800)}
+.viz-promo-list li::before{content:'✓';background:var(--navy);color:#fff;width:19px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:2px}
+.viz-promo-btns{display:flex;gap:12px;flex-wrap:wrap}
+.btn-outline-navy{display:inline-block;border:2px solid var(--navy);color:var(--navy);background:transparent;font-weight:700;font-size:15px;padding:12px 26px;border-radius:var(--radius);text-decoration:none;transition:background .2s,color .2s}
+.btn-outline-navy:hover{background:var(--navy);color:#fff}
+.viz-promo-note{font-size:12px;color:var(--gray-600);margin-top:14px;line-height:1.55}
+@media(max-width:900px){
+  .viz-promo{grid-template-columns:1fr;gap:22px;padding:22px}
+  .viz-promo-media img{height:230px}
+  .viz-promo-title{font-size:28px}
+}
+@media(max-width:600px){
+  .viz-promo{padding:18px}
+  .viz-promo-title{font-size:25px}
+  .viz-promo-sub{font-size:15px}
+  .viz-promo-btns .btn-primary,.viz-promo-btns .btn-outline-navy{width:100%;text-align:center}
+}
+
+/* The sticky call bar carries the number on mobile, so the hero keeps the
+   two named actions instead of four stacked buttons above the fold. */
+@media(max-width:600px){.hero-phone-btn{display:none}}
 </style>
 <style>
 .mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;z-index:150;overflow-y:auto;padding:80px 24px 32px}
@@ -356,8 +385,9 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 </ul>
 <div class="hero-btns">
 <a class="btn-primary" href="/contact.html" onclick="openQuoteModal();return false;">Get My Free Quote →</a>
-<a class="btn-secondary" href="/calculator.html">🧮 Try Our Price Calculator →</a>
-<a class="btn-secondary" href="tel:5736442422">📞 (573) 644-2422</a>
+<a class="btn-secondary" href="/floor-visualizer.html" onclick="smeTrack('visualizer_cta_clicked',{source:'homepage_hero'})">🎨 See Your New Floor →</a>
+<a class="btn-secondary" href="/calculator.html" onclick="smeTrack('calculator_cta_clicked',{source:'homepage_hero'})">🧮 Get My Instant Estimate →</a>
+<a class="btn-secondary hero-phone-btn" href="tel:5736442422" onclick="smeTrack('phone_link_clicked',{source:'homepage_hero'})">📞 (573) 644-2422</a>
 </div>
 </div>
 <div class="hero-card">
@@ -410,6 +440,19 @@ async function submitHeroQuote(){
 </script>
 </div>
 </section>
+<script>
+/* Shared funnel tracking. Pushes to the same window.dataLayer the visualizer
+   already uses, so a GTM or GA4 container added later picks all of it up with
+   no further code changes. Never sends names, phone numbers, emails,
+   addresses or uploaded photos — only the step reached and where it came
+   from. Guarded so a missing dataLayer can never break a click. */
+function smeTrack(eventName, params){
+  try {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(Object.assign({event: eventName}, params || {}));
+  } catch (e) { /* tracking must never block navigation */ }
+}
+</script>
 <!-- TRUST BAR -->
 <div class="trust-bar">
 <div class="container">
@@ -431,6 +474,31 @@ async function submitHeroQuote(){
     </div>
 </div>
 </div>
+<!-- VISUALIZER PROMO -->
+<section class="section" style="padding-top:44px;padding-bottom:44px">
+<div class="container">
+<div class="viz-promo">
+<div class="viz-promo-media">
+<img src="epoxy-floor-finished-gray-flake-full-room-belle-missouri.webp" alt="Finished gray, white and black flake epoxy floor installed by Show Me Epoxy in Belle, Missouri" width="825" height="1100" loading="lazy" decoding="async">
+</div>
+<div class="viz-promo-body">
+<div class="section-label">Free Online Tool</div>
+<h2 class="viz-promo-title">See Your New Floor Before You Choose</h2>
+<p class="viz-promo-sub">Pick from 27 real flake blends and watch them drop onto a garage floor instantly. Upload a photo of your own space to preview the colors right where they'll go, then send your favorite straight to an instant estimate.</p>
+<ul class="viz-promo-list">
+<li>Compare 27 real flake colors side by side</li>
+<li>Upload your own garage photo — it stays on your device</li>
+<li>Carry your color into the estimate in one tap</li>
+</ul>
+<div class="viz-promo-btns">
+<a class="btn-primary" href="/floor-visualizer.html" onclick="smeTrack('visualizer_cta_clicked',{source:'homepage_promo'})">🎨 See Your New Floor →</a>
+<a class="btn-outline-navy" href="/calculator.html" onclick="smeTrack('calculator_cta_clicked',{source:'homepage_promo'})">Get My Instant Estimate →</a>
+</div>
+<p class="viz-promo-note">Preview only — screens and lighting vary, so confirm your color with a physical sample at your free on-site quote.</p>
+</div>
+</div>
+</div>
+</section>
 <!-- WHY SHOW ME EPOXY -->
 <section class="section section-alt">
 <div class="container">
@@ -989,7 +1057,7 @@ function toggleMobileSub(id,e){
 </script>
 <!-- STICKY MOBILE CALL BAR -->
 <div id="stickyCall" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9000;background:#ebfb3b;padding:0;box-shadow:0 -3px 20px rgba(0,0,0,.25)">
-  <a href="tel:5736442422" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 20px;text-decoration:none;color:#0d2d6e;font-weight:800;font-size:16px">
+  <a href="tel:5736442422" onclick="smeTrack('phone_link_clicked',{source:'sticky_bar'})" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 20px;text-decoration:none;color:#0d2d6e;font-weight:800;font-size:16px">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0d2d6e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01.01 1.18 2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"></path></svg>
     Tap to Call — (573) 644-2422
     <span style="background:#0d2d6e;color:#ebfb3b;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.5px">FREE QUOTE</span>

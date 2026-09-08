@@ -524,7 +524,16 @@ async function cRevealPrice(){
   fd.append('low_rate_per_sqft',data.lowRate);fd.append('high_rate_per_sqft',data.highRate);
   if(cSelectedColor)fd.append('selected_floor_color',cSelectedColor);
   fd.append('lead_source','Show Me Epoxy Website Calculator');fd.append('page_url',window.location.href);
-  try{await fetch(C_WEBHOOK,{method:'POST',body:fd});}catch(e){console.error(e);}
+  var smeDelivered=null;
+  try{await fetch(C_WEBHOOK,{method:'POST',body:fd});smeDelivered=true;}catch(e){smeDelivered=false;console.error(e);}
+  /* This marks the lead as SUBMITTED FROM THE BROWSER, which is the furthest
+     this page can honestly verify. The GoHighLevel webhook is cross-origin and
+     returns no CORS headers, so fetch can reject even when the POST was
+     delivered — keying the event off that would under-count real leads. The
+     delivery_confirmed flag carries what we do know, and true confirmation has
+     to come from the GoHighLevel side. No name, phone, email, address or ZIP
+     is ever sent to analytics. */
+  smeTrack('lead_submitted',{project_type:data.projectType,system:data.system,concrete_condition:data.condition,sq_ft:Number(data.sqft)||null,selected_floor_color:cSelectedColor||null,form:'calculator',delivery_confirmed:smeDelivered});
   document.getElementById('cPriceRange').textContent=data.estimatedRange;
   document.getElementById('cResultText').innerHTML='Based on <strong>'+Number(data.sqft).toLocaleString()+' sq ft</strong>, your selected system, and concrete condition, your project falls in the range above. The next step is a free on-site visit to confirm measurements and evaluate the slab.';
   document.getElementById('cUnlockCard').style.display='none';
@@ -786,6 +795,34 @@ function toggleMobileSub(id,e){e.preventDefault();var el=document.getElementById
     document.body.style.paddingBottom='56px';
   }
 })();
+</script>
+<script>
+/* Shared funnel tracking — same window.dataLayer the visualizer uses, so one
+   GTM/GA4 container added later collects the whole funnel. Deliberately sends
+   NO name, phone, email, address or ZIP: only which step was reached and the
+   non-identifying project attributes. */
+function smeTrack(eventName, params){
+  try {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(Object.assign({event: eventName}, params || {}));
+  } catch (e) {}
+}
+/* Fires once, on the first real interaction, so a page view alone is not
+   counted as a started estimate and repeated fiddling does not spam events. */
+var smeCalcStarted = false;
+function smeCalcStart(){
+  if (smeCalcStarted) return;
+  smeCalcStarted = true;
+  var c = null;
+  try { c = new URLSearchParams(window.location.search).get('color'); } catch (e) {}
+  smeTrack('calculator_started', c ? {source:'floor_visualizer', selected_floor_color:c} : {source:'direct'});
+}
+document.addEventListener('DOMContentLoaded', function(){
+  var form = document.querySelector('form') || document.body;
+  ['change','input'].forEach(function(evt){
+    form.addEventListener(evt, smeCalcStart, {once:false, passive:true});
+  });
+}, {once:true});
 </script>
 </body>
 </html>

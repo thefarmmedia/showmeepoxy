@@ -103,6 +103,16 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 #hamburgerBtn{display:none}
 @media(max-width:900px){nav ul{display:none}#hamburgerBtn{display:flex!important}.footer-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:600px){.article-wrap h1{font-size:30px}.article-wrap h2{font-size:22px}.footer-grid{grid-template-columns:1fr}.related-grid{grid-template-columns:1fr}}
+
+/* ---- Inline contextual invitation (articles) ---- */
+.inline-cta{margin:30px 0;padding:18px 22px;background:#f4f5f7;border:1px solid #e8eaed;border-left:4px solid #134db4;border-radius:10px}
+.inline-cta p{font-size:15px;line-height:1.65;color:#444750;margin:0 0 14px}
+.inline-cta-btns{display:flex;gap:10px;flex-wrap:wrap}
+.inline-cta-btns a{display:inline-block;font-size:14px;font-weight:700;padding:10px 20px;border-radius:8px;text-decoration:none}
+.inline-cta-a{background:#ebfb3b;color:#0d2d6e}
+.inline-cta-b{border:2px solid #134db4;color:#134db4}
+.inline-cta-b:hover{background:#134db4;color:#fff}
+@media(max-width:600px){.inline-cta-btns a{width:100%;text-align:center}}
 </style>
 </head>
 <body>
@@ -217,6 +227,15 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 
   <h2>How Long Does Each Layer Take to Cure?</h2>
   <p>Timing between layers matters as much as the layers themselves. After the basecoat and flake broadcast, the floor typically needs a few hours before it can be scraped and vacuumed. The topcoat is usually applied the same day once that's done. From there, walk time is typically around 24 hours and drive time around 48 hours, though this varies by product and weather — see our full breakdown in <a href="/blog-how-long-epoxy-installation-takes.html">how long epoxy installation takes</a>.</p>
+
+
+  <div class="inline-cta">
+    <p>Curious what a full three-layer flake system would look like in your garage? Preview our 27 real flake blends on a garage floor, or upload a photo of your own space. When you find one you like, carry it straight into an instant estimate.</p>
+    <div class="inline-cta-btns">
+      <a class="inline-cta-a" href="/floor-visualizer.html" onclick="smeTrack('visualizer_cta_clicked',{source:'blog_how_many_coats'})">See Your New Floor →</a>
+      <a class="inline-cta-b" href="/calculator.html" onclick="smeTrack('calculator_cta_clicked',{source:'blog_how_many_coats'})">Get My Instant Estimate →</a>
+    </div>
+  </div>
 
   <h2>The Bottom Line</h2>
   <p>If someone tells you their epoxy floor is "one coat," ask what's actually in that coat — a real system still needs a bonding basecoat and a protective topcoat around whatever decorative layer is used, even if it's marketed as a single product. The number of layers matters less than whether each layer is doing its job on a properly prepared slab.</p>
@@ -391,6 +410,15 @@ async function submitQuoteForm(){
 function toggleMobileMenu(){document.getElementById('mobileMenu').classList.toggle('open');document.getElementById('mobileOverlay').classList.toggle('open');}
 function closeMobileMenu(){document.getElementById('mobileMenu').classList.remove('open');document.getElementById('mobileOverlay').classList.remove('open');}
 function toggleMobileSub(id,e){e.preventDefault();document.getElementById(id).classList.toggle('open');}
+</script>
+<script>
+/* Shared funnel tracking — same window.dataLayer the visualizer uses. No PII. */
+function smeTrack(eventName, params){
+  try {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(Object.assign({event: eventName}, params || {}));
+  } catch (e) {}
+}
 </script>
 </body>
 </html>

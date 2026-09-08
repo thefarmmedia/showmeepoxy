@@ -103,6 +103,16 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 #hamburgerBtn{display:none}
 @media(max-width:900px){nav ul{display:none}#hamburgerBtn{display:flex!important}.footer-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:600px){.article-wrap h1{font-size:30px}.article-wrap h2{font-size:22px}.footer-grid{grid-template-columns:1fr}.related-grid{grid-template-columns:1fr}}
+
+/* ---- Inline contextual invitation (articles) ---- */
+.inline-cta{margin:30px 0;padding:18px 22px;background:#f4f5f7;border:1px solid #e8eaed;border-left:4px solid #134db4;border-radius:10px}
+.inline-cta p{font-size:15px;line-height:1.65;color:#444750;margin:0 0 14px}
+.inline-cta-btns{display:flex;gap:10px;flex-wrap:wrap}
+.inline-cta-btns a{display:inline-block;font-size:14px;font-weight:700;padding:10px 20px;border-radius:8px;text-decoration:none}
+.inline-cta-a{background:#ebfb3b;color:#0d2d6e}
+.inline-cta-b{border:2px solid #134db4;color:#134db4}
+.inline-cta-b:hover{background:#134db4;color:#fff}
+@media(max-width:600px){.inline-cta-btns a{width:100%;text-align:center}}
 </style>
 </head>
 <body>
@@ -204,6 +214,15 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 
   <h2>Why Full Broadcast Flake Hides This Better</h2>
   <p>One practical note: a full broadcast <a href="/type-flake.html">flake system</a> is much more forgiving of minor application inconsistencies than a smooth solid-color coating, because the flake pattern itself breaks up the visual field. This is part of why full broadcast is our default recommendation for most garage floors — it looks great even when the world isn't perfectly uniform underneath, and it still requires the same quality prep to actually perform well long-term.</p>
+
+
+  <div class="inline-cta">
+    <p>In Mid-Missouri and weighing a flake floor? You can preview all 27 of our real flake blends on a garage floor before you commit to one — or upload a photo of your own garage and see the colors in your space. It takes about a minute, and there's no form to fill in first.</p>
+    <div class="inline-cta-btns">
+      <a class="inline-cta-a" href="/floor-visualizer.html" onclick="smeTrack('visualizer_cta_clicked',{source:'blog_uneven_blotchy'})">See Your New Floor →</a>
+      <a class="inline-cta-b" href="/calculator.html" onclick="smeTrack('calculator_cta_clicked',{source:'blog_uneven_blotchy'})">Get My Instant Estimate →</a>
+    </div>
+  </div>
 
   <h2>The Bottom Line</h2>
   <p>An uneven or blotchy epoxy floor is worth taking seriously, even if it doesn't look dramatic yet. Sometimes it's a simple cosmetic issue. Other times it's an early warning sign of the same prep-related problems that eventually cause peeling. If you're not sure which one you're looking at, an in-person evaluation is the fastest way to get a real answer.</p>
@@ -374,6 +393,15 @@ async function submitQuoteForm(){
 function toggleMobileMenu(){document.getElementById('mobileMenu').classList.toggle('open');document.getElementById('mobileOverlay').classList.toggle('open');}
 function closeMobileMenu(){document.getElementById('mobileMenu').classList.remove('open');document.getElementById('mobileOverlay').classList.remove('open');}
 function toggleMobileSub(id,e){e.preventDefault();document.getElementById(id).classList.toggle('open');}
+</script>
+<script>
+/* Shared funnel tracking — same window.dataLayer the visualizer uses. No PII. */
+function smeTrack(eventName, params){
+  try {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(Object.assign({event: eventName}, params || {}));
+  } catch (e) {}
+}
 </script>
 </body>
 </html>

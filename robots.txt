@@ -1,3 +1,7 @@
 User-agent: *
 Allow: /
+
+# Unused post template. It is noindex and unlinked, but blocking the fetch
+# keeps it out of crawler reports; its JSON-LD holds [YYYY-MM-DD] placeholders.
+Disallow: /blog-post-TEMPLATE.html
 Sitemap: https://showmeepoxy.com/sitemap.xml

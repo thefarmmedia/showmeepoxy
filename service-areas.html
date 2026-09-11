@@ -140,6 +140,10 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 
 
 
+
+/* Gold text on a light background is nearly invisible (1.1:1). A hairline navy outline makes it legible without changing the brand colour. */
+.section-label,.stars,.review-stars,.service-link,.service-list li::before,.reviews-more li span,.area-tag:hover,.gold-legible{text-shadow:-.6px 0 0 var(--navy),.6px 0 0 var(--navy),0 -.6px 0 var(--navy),0 .6px 0 var(--navy)}
+.service-link:hover{text-shadow:none}
 </style>
 <style>
 .mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;z-index:150;overflow-y:auto;padding:80px 24px 32px}
@@ -287,109 +291,109 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <p class="section-sub" style="margin-bottom:40px">Each city page acts as a hub with helpful links to garage floors, basement coatings, <a href="/service-commercial.html" title="Commercial Epoxy Flooring Jefferson City">commercial epoxy</a>, metallic epoxy, and cost information where available. That keeps the site easy for homeowners to use while giving Google a clear local structure.</p>
 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px">
 <a href="/area-jefferson-city.html" onmouseout="this.style.boxShadow='';this.style.transform=''" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,0,0,.11)';this.style.transform='translateY(-2px)'" style="display:block;background:#fff;border:1px solid var(--gray-200);border-radius:var(--rl);padding:24px;text-decoration:none;transition:box-shadow .2s,transform .2s">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 State Capital Region</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 State Capital Region</div>
 <h3 style="font-family:var(--cond);font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px">Jefferson City, MO</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:14px">Capital city homes, older concrete slabs, basements, garages, and commercial spaces throughout Cole County.</p>
 <span style="font-size:14px;font-weight:700;color:var(--navy)">View Jefferson City epoxy services →</span>
 </a>
 <a href="/area-columbia.html" onmouseout="this.style.boxShadow='';this.style.transform=''" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,0,0,.11)';this.style.transform='translateY(-2px)'" style="display:block;background:#fff;border:1px solid var(--gray-200);border-radius:var(--rl);padding:24px;text-decoration:none;transition:box-shadow .2s,transform .2s">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Boone County</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Boone County</div>
 <h3 style="font-family:var(--cond);font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px">Columbia, MO</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:14px">Busy family garages, student rentals, basements, and commercial floors around Columbia and Boone County.</p>
 <span style="font-size:14px;font-weight:700;color:var(--navy)">View Columbia epoxy services →</span>
 </a>
 <a href="/area-rolla.html" onmouseout="this.style.boxShadow='';this.style.transform=''" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,0,0,.11)';this.style.transform='translateY(-2px)'" style="display:block;background:#fff;border:1px solid var(--gray-200);border-radius:var(--rl);padding:24px;text-decoration:none;transition:box-shadow .2s,transform .2s">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Workshops & Shops</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Workshops & Shops</div>
 <h3 style="font-family:var(--cond);font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px">Rolla, MO</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:14px">Garage floors, workshops, shops, and equipment spaces built for daily use in Rolla and Phelps County.</p>
 <span style="font-size:14px;font-weight:700;color:var(--navy)">View Rolla epoxy services →</span>
 </a>
 <a href="/area-lake-ozarks.html" onmouseout="this.style.boxShadow='';this.style.transform=''" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,0,0,.11)';this.style.transform='translateY(-2px)'" style="display:block;background:#fff;border:1px solid var(--gray-200);border-radius:var(--rl);padding:24px;text-decoration:none;transition:box-shadow .2s,transform .2s">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Lake Homes & Storage</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Lake Homes & Storage</div>
 <h3 style="font-family:var(--cond);font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px">Lake of the Ozarks, MO</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:14px">Lake homes, vacation properties, boat storage areas, and garages exposed to humidity and seasonal use.</p>
 <span style="font-size:14px;font-weight:700;color:var(--navy)">View Lake of the Ozarks epoxy services →</span>
 </a>
 <a href="/area-osage-beach.html" onmouseout="this.style.boxShadow='';this.style.transform=''" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,0,0,.11)';this.style.transform='translateY(-2px)'" style="display:block;background:#fff;border:1px solid var(--gray-200);border-radius:var(--rl);padding:24px;text-decoration:none;transition:box-shadow .2s,transform .2s">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Lake Area Coatings</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Lake Area Coatings</div>
 <h3 style="font-family:var(--cond);font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px">Osage Beach, MO</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:14px">Lakefront homes, second homes, garages, patios, and commercial floors in the Osage Beach area.</p>
 <span style="font-size:14px;font-weight:700;color:var(--navy)">View Osage Beach epoxy services →</span>
 </a>
 <a href="/area-camdenton.html" onmouseout="this.style.boxShadow='';this.style.transform=''" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,0,0,.11)';this.style.transform='translateY(-2px)'" style="display:block;background:#fff;border:1px solid var(--gray-200);border-radius:var(--rl);padding:24px;text-decoration:none;transition:box-shadow .2s,transform .2s">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Lake-Area Homes</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Lake-Area Homes</div>
 <h3 style="font-family:var(--cond);font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px">Camdenton, MO</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:14px">Garage, basement, patio, and shop coatings built for Camdenton and Lake-area conditions.</p>
 <span style="font-size:14px;font-weight:700;color:var(--navy)">View Camdenton epoxy services →</span>
 </a>
 <a href="/area-fulton.html" onmouseout="this.style.boxShadow='';this.style.transform=''" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,0,0,.11)';this.style.transform='translateY(-2px)'" style="display:block;background:#fff;border:1px solid var(--gray-200);border-radius:var(--rl);padding:24px;text-decoration:none;transition:box-shadow .2s,transform .2s">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Callaway County</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Callaway County</div>
 <h3 style="font-family:var(--cond);font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px">Fulton, MO</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:14px">Garage floors, basements, and light commercial spaces throughout Fulton and Callaway County.</p>
 <span style="font-size:14px;font-weight:700;color:var(--navy)">View Fulton epoxy services →</span>
 </a>
 <a href="/area-holts-summit.html" onmouseout="this.style.boxShadow='';this.style.transform=''" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,0,0,.11)';this.style.transform='translateY(-2px)'" style="display:block;background:#fff;border:1px solid var(--gray-200);border-radius:var(--rl);padding:24px;text-decoration:none;transition:box-shadow .2s,transform .2s">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Jefferson City Metro</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Jefferson City Metro</div>
 <h3 style="font-family:var(--cond);font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px">Holts Summit, MO</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:14px">Home garages, basements, shops, and nearby Mid-Missouri properties.</p>
 <span style="font-size:14px;font-weight:700;color:var(--navy)">View Holts Summit epoxy services →</span>
 </a>
 <a href="/area-ashland.html" onmouseout="this.style.boxShadow='';this.style.transform=''" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,0,0,.11)';this.style.transform='translateY(-2px)'" style="display:block;background:#fff;border:1px solid var(--gray-200);border-radius:var(--rl);padding:24px;text-decoration:none;transition:box-shadow .2s,transform .2s">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Growing Mid-Missouri Homes</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Growing Mid-Missouri Homes</div>
 <h3 style="font-family:var(--cond);font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px">Ashland, MO</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:14px">Garage and basement coatings for growing neighborhoods between Jefferson City and Columbia.</p>
 <span style="font-size:14px;font-weight:700;color:var(--navy)">View Ashland epoxy services →</span>
 </a>
 <a href="/area-sedalia.html" onmouseout="this.style.boxShadow='';this.style.transform=''" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,0,0,.11)';this.style.transform='translateY(-2px)'" style="display:block;background:#fff;border:1px solid var(--gray-200);border-radius:var(--rl);padding:24px;text-decoration:none;transition:box-shadow .2s,transform .2s">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Garages, Shops & Equipment</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Garages, Shops & Equipment</div>
 <h3 style="font-family:var(--cond);font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px">Sedalia, MO</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:14px">Durable coating systems for garages, workshops, agricultural spaces, and businesses.</p>
 <span style="font-size:14px;font-weight:700;color:var(--navy)">View Sedalia epoxy services →</span>
 </a>
 <a href="/area-eldon.html" onmouseout="this.style.boxShadow='';this.style.transform=''" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,0,0,.11)';this.style.transform='translateY(-2px)'" style="display:block;background:#fff;border:1px solid var(--gray-200);border-radius:var(--rl);padding:24px;text-decoration:none;transition:box-shadow .2s,transform .2s">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Lake & Mid-MO Properties</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Lake & Mid-MO Properties</div>
 <h3 style="font-family:var(--cond);font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px">Eldon, MO</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:14px">Garage floors, shops, lake-area properties, and concrete surfaces that need real protection.</p>
 <span style="font-size:14px;font-weight:700;color:var(--navy)">View Eldon epoxy services →</span>
 </a>
 <a href="/area-versailles.html" onmouseout="this.style.boxShadow='';this.style.transform=''" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,0,0,.11)';this.style.transform='translateY(-2px)'" style="display:block;background:#fff;border:1px solid var(--gray-200);border-radius:var(--rl);padding:24px;text-decoration:none;transition:box-shadow .2s,transform .2s">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Morgan County</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Morgan County</div>
 <h3 style="font-family:var(--cond);font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px">Versailles, MO</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:14px">Garage floors, workshops, lake homes, and rural properties around Morgan County.</p>
 <span style="font-size:14px;font-weight:700;color:var(--navy)">View Versailles epoxy services →</span>
 </a>
 <a href="/area-california.html" onmouseout="this.style.boxShadow='';this.style.transform=''" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,0,0,.11)';this.style.transform='translateY(-2px)'" style="display:block;background:#fff;border:1px solid var(--gray-200);border-radius:var(--rl);padding:24px;text-decoration:none;transition:box-shadow .2s,transform .2s">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Moniteau County</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Moniteau County</div>
 <h3 style="font-family:var(--cond);font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px">California, MO</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:14px">Garage floors, basements, shops, and concrete coatings for Moniteau County homes.</p>
 <span style="font-size:14px;font-weight:700;color:var(--navy)">View California epoxy services →</span>
 </a>
 <a href="/area-mexico.html" onmouseout="this.style.boxShadow='';this.style.transform=''" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,0,0,.11)';this.style.transform='translateY(-2px)'" style="display:block;background:#fff;border:1px solid var(--gray-200);border-radius:var(--rl);padding:24px;text-decoration:none;transition:box-shadow .2s,transform .2s">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Audrain County</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Audrain County</div>
 <h3 style="font-family:var(--cond);font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px">Mexico, MO</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:14px">Residential garage coatings, basement floors, and light commercial concrete protection.</p>
 <span style="font-size:14px;font-weight:700;color:var(--navy)">View Mexico epoxy services →</span>
 </a>
 <a href="/area-linn.html" onmouseout="this.style.boxShadow='';this.style.transform=''" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,0,0,.11)';this.style.transform='translateY(-2px)'" style="display:block;background:#fff;border:1px solid var(--gray-200);border-radius:var(--rl);padding:24px;text-decoration:none;transition:box-shadow .2s,transform .2s">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Osage County</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Osage County</div>
 <h3 style="font-family:var(--cond);font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px">Linn, MO</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:14px">Garage, shop, and basement coatings for homes and properties around Linn.</p>
 <span style="font-size:14px;font-weight:700;color:var(--navy)">View Linn epoxy services →</span>
 </a>
 <a href="/area-russellville.html" onmouseout="this.style.boxShadow='';this.style.transform=''" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,0,0,.11)';this.style.transform='translateY(-2px)'" style="display:block;background:#fff;border:1px solid var(--gray-200);border-radius:var(--rl);padding:24px;text-decoration:none;transition:box-shadow .2s,transform .2s">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Cole County Area</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Cole County Area</div>
 <h3 style="font-family:var(--cond);font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px">Russellville, MO</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:14px">Garage floors, basement coatings, and shop floors near Jefferson City.</p>
 <span style="font-size:14px;font-weight:700;color:var(--navy)">View Russellville epoxy services →</span>
 </a>
 <a href="/area-tipton.html" onmouseout="this.style.boxShadow='';this.style.transform=''" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,0,0,.11)';this.style.transform='translateY(-2px)'" style="display:block;background:#fff;border:1px solid var(--gray-200);border-radius:var(--rl);padding:24px;text-decoration:none;transition:box-shadow .2s,transform .2s">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Moniteau County Area</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Moniteau County Area</div>
 <h3 style="font-family:var(--cond);font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px">Tipton, MO</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:14px">Durable coating systems for garages, shops, and concrete spaces in and around Tipton.</p>
 <span style="font-size:14px;font-weight:700;color:var(--navy)">View Tipton epoxy services →</span>
 </a>
 <a href="/area-wardsville.html" onmouseout="this.style.boxShadow='';this.style.transform=''" onmouseover="this.style.boxShadow='0 6px 28px rgba(0,0,0,.11)';this.style.transform='translateY(-2px)'" style="display:block;background:#fff;border:1px solid var(--gray-200);border-radius:var(--rl);padding:24px;text-decoration:none;transition:box-shadow .2s,transform .2s">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Jefferson City Area</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">📍 Jefferson City Area</div>
 <h3 style="font-family:var(--cond);font-size:20px;font-weight:800;color:var(--navy);margin-bottom:8px">Wardsville, MO</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:14px">Garage floor coatings and concrete protection for homes near Jefferson City.</p>
 <span style="font-size:14px;font-weight:700;color:var(--navy)">View Wardsville epoxy services →</span>

@@ -50,7 +50,7 @@ Pricing depends on square footage, concrete condition, repairs needed, coating s
 
 ## Service Areas
 
-- [Jefferson City](https://showmeepoxy.com/area-jefferson-city.html): Cole County, primary market, state capital
+- [Jefferson City](https://showmeepoxy.com/): Cole County, primary market, state capital
 - [Columbia](https://showmeepoxy.com/area-columbia.html): Boone County, University of Missouri area
 - [Lake of the Ozarks](https://showmeepoxy.com/area-lake-ozarks.html): Miller and Morgan County
 - [Osage Beach](https://showmeepoxy.com/area-osage-beach.html): Camden County

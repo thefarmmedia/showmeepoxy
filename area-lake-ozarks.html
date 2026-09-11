@@ -151,6 +151,10 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 .viz-cta-links{font-size:13px;color:var(--gray-600,#5f6368);margin-top:16px;line-height:1.6}
 @media(max-width:900px){.viz-cta{grid-template-columns:1fr;gap:20px;padding:20px}.viz-cta-media img{height:210px}}
 @media(max-width:600px){.viz-cta{padding:16px}.viz-cta-btns .btn-gold,.viz-cta-btns .btn-outline-navy{width:100%;text-align:center}}
+
+/* Gold text on a light background is nearly invisible (1.1:1). A hairline navy outline makes it legible without changing the brand colour. */
+.section-label,.stars,.review-stars,.service-link,.service-list li::before,.reviews-more li span,.area-tag:hover,.gold-legible{text-shadow:-.6px 0 0 var(--navy),.6px 0 0 var(--navy),0 -.6px 0 var(--navy),0 .6px 0 var(--navy)}
+.service-link:hover{text-shadow:none}
 </style>
 
 <style>

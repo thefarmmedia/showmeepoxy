@@ -141,6 +141,10 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 
 
 
+
+/* Gold text on a light background is nearly invisible (1.1:1). A hairline navy outline makes it legible without changing the brand colour. */
+.section-label,.stars,.review-stars,.service-link,.service-list li::before,.reviews-more li span,.area-tag:hover,.gold-legible{text-shadow:-.6px 0 0 var(--navy),.6px 0 0 var(--navy),0 -.6px 0 var(--navy),0 .6px 0 var(--navy)}
+.service-link:hover{text-shadow:none}
 </style>
 <style>
 .mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;z-index:150;overflow-y:auto;padding:80px 24px 32px}
@@ -575,7 +579,7 @@ cUpdatePreview();
 </section><section style="padding:64px 0">
 <div class="wrap" style="max-width:900px">
 <div class="text-center" style="margin-bottom:32px">
-<div style="font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">How Pricing Works</div>
+<div class="gold-legible" style="font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">How Pricing Works</div>
 <h2 style="font-family:var(--font-cond);font-size:32px;font-weight:900;color:var(--navy);line-height:1.15;margin-bottom:10px">What Actually Drives Epoxy Flooring Cost</h2>
 <p style="font-size:15px;color:var(--gray-600);max-width:640px;margin:0 auto">The calculator above gives a real ballpark, but here's what's actually behind that number.</p>
 </div>
@@ -591,7 +595,7 @@ cUpdatePreview();
 <section style="padding:64px 0;background:var(--gray-100)">
 <div class="wrap" style="max-width:860px">
 <div class="text-center" style="margin-bottom:28px">
-<div style="font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">FAQ</div>
+<div class="gold-legible" style="font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">FAQ</div>
 <h2 style="font-family:var(--font-cond);font-size:32px;font-weight:900;color:var(--navy);line-height:1.15">Calculator &amp; Pricing Questions</h2>
 </div>
 <div class="faq-list" style="max-width:860px;margin:0 auto">

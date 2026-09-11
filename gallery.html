@@ -141,6 +141,10 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 
 
 
+
+/* Gold text on a light background is nearly invisible (1.1:1). A hairline navy outline makes it legible without changing the brand colour. */
+.section-label,.stars,.review-stars,.service-link,.service-list li::before,.reviews-more li span,.area-tag:hover,.gold-legible{text-shadow:-.6px 0 0 var(--navy),.6px 0 0 var(--navy),0 -.6px 0 var(--navy),0 .6px 0 var(--navy)}
+.service-link:hover{text-shadow:none}
 </style>
 <style>
 .mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#fff;z-index:150;overflow-y:auto;padding:80px 24px 32px}
@@ -287,7 +291,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <p class="section-sub" style="margin-bottom:8px">Bare, stained concrete on the left. A diamond-ground, fully broadcast flake floor on the right. These are two actual Show Me Epoxy installs — not stock photos.</p>
 
 <div style="margin-top:40px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Project — Jefferson City, MO</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Project — Jefferson City, MO</div>
 <div class="ba-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;border-radius:12px;overflow:hidden;box-shadow:var(--shm)">
 <div style="position:relative">
 <img alt="Bare stained concrete garage floor before epoxy coating Jefferson City Missouri" src="epoxy-garage-floor-before-bare-stained-concrete-jefferson-city-missouri.webp" class="gallery-img" style="width:100%;height:340px;object-fit:cover;display:block;cursor:zoom-in" width="900" height="1200" loading="eager" fetchpriority="high">
@@ -315,7 +319,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 </div>
 
 <div style="margin-top:48px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Project — Holts Summit, MO</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Project — Holts Summit, MO</div>
 <div class="ba-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;border-radius:12px;overflow:hidden;box-shadow:var(--shm)">
 <div style="position:relative">
 <img alt="Cracked stained concrete garage floor before epoxy coating Holts Summit Missouri" loading="lazy" src="epoxy-garage-floor-before-cracked-stained-concrete-holts-summit-missouri.webp" class="gallery-img" style="width:100%;height:340px;object-fit:cover;display:block;cursor:zoom-in" width="825" height="1100">
@@ -339,7 +343,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 </div>
 
 <div style="margin-top:48px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Project — Wardsville, MO</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Project — Wardsville, MO</div>
 <div class="ba-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;border-radius:12px;overflow:hidden;box-shadow:var(--shm)">
 <div style="position:relative">
 <img alt="Bare stained concrete garage floor before epoxy coating Wardsville Missouri" loading="lazy" src="epoxy-garage-floor-before-stained-concrete-wardsville-missouri.webp" class="gallery-img" style="width:100%;height:340px;object-fit:cover;display:block;cursor:zoom-in" width="960" height="720">
@@ -358,7 +362,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 </div>
 </div>
 <div style="margin-top:48px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Project — Belle, MO</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Project — Belle, MO</div>
 <div class="ba-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;border-radius:12px;overflow:hidden;box-shadow:var(--shm)">
 <div style="position:relative">
 <img alt="Worn brown shop floor during diamond grinding surface prep Belle Missouri" loading="lazy" src="epoxy-floor-prep-diamond-grinding-shop-slab-belle-missouri.webp" class="gallery-img" style="width:100%;height:340px;object-fit:cover;display:block;cursor:zoom-in" width="825" height="1100">
@@ -410,7 +414,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Two-man Show Me Epoxy crew broadcasting flake on garage floor Missouri" loading="lazy" src="show-me-epoxy-two-man-crew-broadcasting-flake-garage-floor-missouri.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="825" height="1100">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Behind the Scenes — Jefferson City</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Behind the Scenes — Jefferson City</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Flake Broadcast — Two-Person Coverage</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · <a href="/type-flake.html" title="Full Broadcast Flake Epoxy System">Full broadcast flake</a> · Garage floor install</p>
 </div>
@@ -418,7 +422,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Show Me Epoxy logo decal closeup on work truck Missouri" loading="lazy" src="show-me-epoxy-logo-decal-closeup-work-truck-missouri.jpg" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1050" height="1400">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Our Fleet — Show Me Epoxy</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Our Fleet — Show Me Epoxy</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">The Truck You'll See in Your Driveway</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · (573) 644-2422 · ShowMeEpoxy.com</p>
 </div>
@@ -426,7 +430,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Show Me Epoxy work truck arriving at job site Eldon Missouri" loading="lazy" src="show-me-epoxy-work-truck-job-site-arrival-eldon-missouri.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="825" height="1100">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Behind the Scenes — Eldon</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Behind the Scenes — Eldon</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Job Site Arrival</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -434,7 +438,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Show Me Epoxy work truck at job site Linn Missouri" loading="lazy" src="show-me-epoxy-work-truck-job-site-arrival-linn-missouri.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="825" height="1100">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Behind the Scenes — Linn</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Behind the Scenes — Linn</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">On-Site and Ready to Work</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -442,7 +446,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Show Me Epoxy work truck and equipment staged at job site Versailles Missouri" loading="lazy" src="show-me-epoxy-work-truck-job-site-setup-versailles-missouri.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="825" height="1100">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Behind the Scenes — Versailles</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Behind the Scenes — Versailles</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Equipment Staged, Ready to Grind</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -450,7 +454,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Epoxy garage floor gray flake wide angle finished Show Me Epoxy Missouri" loading="lazy" src="epoxy-garage-floor-gray-flake-wide-angle-finished-show-me-epoxy-missouri.jpg" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1536" height="2048">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Mid-Missouri</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Mid-Missouri</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Full Broadcast Flake — Wide View</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · <a href="/type-polyaspartic.html" title="Polyaspartic Floor Coatings Missouri">Polyaspartic</a> topcoat</p>
 </div>
@@ -458,7 +462,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Epoxy garage floor two car Jefferson City Missouri gray flake system" loading="lazy" src="epoxy-garage-floor-two-car-gray-flake-jefferson-city-missouri.jpg" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1280" height="1280">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Jefferson City</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Jefferson City</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Full Broadcast Flake — Gray Blend</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -466,7 +470,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Epoxy garage floor blue gray two tone flake Lake of the Ozarks Missouri" loading="lazy" src="epoxy-garage-floor-blue-gray-flake-two-color-show-me-epoxy-missouri.jpg" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1280" height="1280">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Lake of the Ozarks</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Lake of the Ozarks</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Two-Tone Blue-Gray Flake</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -474,7 +478,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Epoxy bathroom countertop metallic marble effect Show Me Epoxy Jefferson City" loading="lazy" src="epoxy-bathroom-countertop-after-metallic-marble-effect-show-me-epoxy-missouri.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1280" height="1280">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Countertop — Jefferson City</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Countertop — Jefferson City</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Metallic Marble Effect</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -482,7 +486,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Epoxy recreation room floor blue flake Show Me Epoxy Missouri" loading="lazy" src="epoxy-floor-recreation-room-blue-flake-show-me-epoxy-missouri.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1280" height="1280">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Recreation Room — Missouri</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Recreation Room — Missouri</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Blue Blend Flake Floor</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -490,7 +494,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Epoxy garage floor light gray flake Osage Beach Missouri" loading="lazy" src="epoxy-garage-floor-light-gray-flake-finished-show-me-epoxy-mo.jpg" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1280" height="1280">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Osage Beach</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Osage Beach</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Light Gray Flake System</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -498,7 +502,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Epoxy flake floor dark blue black white closeup Show Me Epoxy Missouri" loading="lazy" src="epoxy-flake-floor-dark-blue-black-white-closeup-show-me-epoxy.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1100" height="1100">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Camdenton</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Camdenton</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Dark Blue Black White Flake</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -506,7 +510,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Epoxy workshop garage floor gray flake Jefferson City Missouri" loading="lazy" src="epoxy-garage-floor-workshop-gray-flake-jefferson-city-missouri.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1280" height="1280">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Workshop Garage — Jefferson City</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Workshop Garage — Jefferson City</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Charcoal Gray Flake</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -514,7 +518,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Epoxy workshop floor gray flake high gloss Show Me Epoxy Missouri" loading="lazy" src="epoxy-workshop-floor-gray-flake-high-gloss-show-me-epoxy-missouri.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1280" height="1280">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Workshop Floor — Columbia</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Workshop Floor — Columbia</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Gray Flake High Gloss</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -522,7 +526,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Full broadcast flake epoxy floor black white closeup Show Me Epoxy Missouri" loading="lazy" src="full-broadcast-flake-epoxy-closeup-black-white-show-me-epoxy.jpg" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1280" height="1280">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Rolla</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Rolla</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Full Broadcast Black White Flake</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -530,7 +534,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Epoxy garage floor dark gray flake high gloss finished Missouri" loading="lazy" src="epoxy-garage-floor-dark-gray-flake-high-gloss-finished-missouri.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1280" height="1280">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Fulton</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Fulton</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Dark Gray High Gloss Flake</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -538,7 +542,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Diamond grinding concrete garage floor surface prep Show Me Epoxy Missouri" loading="lazy" src="diamond-grinding-concrete-garage-floor-surface-prep-show-me-epoxy-missouri.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1280" height="1280">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Surface Prep — Jefferson City</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Surface Prep — Jefferson City</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Diamond Grinding in Progress</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -546,7 +550,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Show Me Epoxy crew broadcasting flake garage floor Jefferson City Missouri" loading="lazy" src="show-me-epoxy-crew-broadcasting-flake-garage-floor-jefferson-city-missouri.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1280" height="1280">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Installation — Jefferson City</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Installation — Jefferson City</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Flake Broadcast in Progress</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -554,7 +558,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Show Me Epoxy installer rolling epoxy base coat garage floor Jefferson City Missouri" loading="lazy" src="show-me-epoxy-installer-rolling-basecoat-wide-shot-jefferson-city-missouri.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="825" height="1100">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Behind the Scenes — Jefferson City</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Behind the Scenes — Jefferson City</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Rolling the Base Coat</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -562,7 +566,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Show Me Epoxy crew finishing garage floor install Jefferson City Missouri" loading="lazy" src="show-me-epoxy-crew-finishing-garage-floor-install-jefferson-city-missouri.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="825" height="1100">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Behind the Scenes — Jefferson City</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Behind the Scenes — Jefferson City</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Crew Finishing the Install</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -570,7 +574,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Epoxy garage floor black and white flake low angle Jefferson City Missouri" loading="lazy" src="show-me-epoxy-garage-floor-black-white-flake-low-angle-jefferson-city-mo.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1100" height="1100">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Jefferson City</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Jefferson City</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Black &amp; White Flake — Low Angle</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -578,7 +582,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Epoxy garage floor gray flake low angle view Jefferson City Missouri" loading="lazy" src="show-me-epoxy-garage-floor-gray-flake-low-angle-view-jefferson-city-mo.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1100" height="1100">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Jefferson City</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Jefferson City</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Gray Flake — Low Angle View</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -586,7 +590,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Epoxy garage floor gray flake single car garage Jefferson City Missouri" loading="lazy" src="show-me-epoxy-garage-floor-gray-flake-single-car-jefferson-city-missouri.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1100" height="1100">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Jefferson City</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Jefferson City</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Gray Flake — Single-Car Garage</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -594,7 +598,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Epoxy garage floor gray flake wide view two car garage Jefferson City Missouri" loading="lazy" src="show-me-epoxy-garage-floor-gray-flake-wide-toyota-chevrolet-jefferson-city.jpg" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1280" height="1280">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Jefferson City</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Jefferson City</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Gray Flake — Wide Two-Car View</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -602,7 +606,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Epoxy garage floor Houndstooth blend flake two tone Jefferson City Missouri" loading="lazy" src="show-me-epoxy-garage-floor-houndstooth-black-white-two-tone-jefferson-city.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1100" height="1100">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Jefferson City</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Jefferson City</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px"><a href="/colors.html" title="Houndstooth Flake Color" style="color:inherit;text-decoration:none">Houndstooth</a> Blend Flake Floor</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -610,7 +614,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Epoxy garage floor Houndstooth flake driveway transition Jefferson City Missouri" loading="lazy" src="show-me-epoxy-garage-floor-houndstooth-driveway-transition-jefferson-city.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1100" height="1100">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Jefferson City</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Jefferson City</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Houndstooth Blend — Driveway Transition</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -618,7 +622,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Epoxy garage floor Houndstooth flake closeup detail Jefferson City Missouri" loading="lazy" src="show-me-epoxy-garage-floor-houndstooth-flake-closeup-jefferson-city-mo.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1100" height="1100">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Jefferson City</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Garage Floor — Jefferson City</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Houndstooth Blend — Closeup Detail</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>
@@ -626,7 +630,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div style="border-radius:12px;overflow:hidden;border:1px solid var(--gray-200);box-shadow:var(--sh)">
 <img alt="Epoxy workshop garage floor black and white flake with cabinets Missouri" loading="lazy" src="show-me-epoxy-garage-workshop-floor-black-white-flake-cabinets-missouri.webp" class="gallery-img" style="width:100%;height:200px;object-fit:cover;display:block;cursor:zoom-in" width="1100" height="1100">
 <div style="padding:18px">
-<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Workshop Garage — Holts Summit</div>
+<div class="gold-legible" style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">Workshop Garage — Holts Summit</div>
 <h3 style="font-family:var(--cond);font-size:18px;font-weight:800;color:var(--navy);margin-bottom:6px">Black &amp; White Flake — Workshop Cabinets</h3>
 <p style="font-size:13px;color:var(--gray-600);line-height:1.6">Show Me Epoxy · Diamond-ground prep · Polyaspartic topcoat</p>
 </div>

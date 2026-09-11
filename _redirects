@@ -107,6 +107,12 @@
 # Legacy URLs from the prior site structure (Search Console 404s)
 /fulton-mo-epoxy-flooring-7586-483758-986368 /area-fulton.html 301!
 /contact-us /contact.html 301!
+# Legacy blog posts that still have a live equivalent. These must stay above the
+# /blog/* splat, which matches first and would otherwise dump them on the index.
+/blog/why-diamond-grinding-matters-epoxy /blog-why-diamond-grinding-matters.html 301!
+/blog/polyaspartic-vs-epoxy-missouri /type-polyaspartic.html 301!
+/blog/how-much-does-epoxy-floor-cost-missouri /calculator.html 301!
+# Tag archives and anything else under /blog/ have no equivalent; send them to the index.
 /blog/* /blog.html 301!
 /about-us /about.html 301!
 /home-page / 301!

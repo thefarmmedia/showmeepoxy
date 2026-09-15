@@ -1,0 +1,13 @@
+{
+  "name": "Show Me Epoxy",
+  "short_name": "Show Me Epoxy",
+  "description": "Epoxy and polyaspartic floor coatings in Jefferson City and Mid-Missouri.",
+  "icons": [
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" }
+  ],
+  "theme_color": "#134db4",
+  "background_color": "#ffffff",
+  "display": "browser",
+  "start_url": "/"
+}

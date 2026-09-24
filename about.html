@@ -148,9 +148,11 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 
 
 
-/* Gold text on a light background is nearly invisible (1.1:1). A hairline navy outline makes it legible without changing the brand colour. */
-.section-label,.stars,.review-stars,.service-link,.service-list li::before,.reviews-more li span,.area-tag:hover,.gold-legible{text-shadow:-.6px 0 0 var(--navy),.6px 0 0 var(--navy),0 -.6px 0 var(--navy),0 .6px 0 var(--navy)}
-.service-link:hover{text-shadow:none}
+/* Brand gold reads 1.1:1 on white, far below the 4.5:1 needed. Rather than darken
+   the gold, these sit it on navy, where the same gold measures 6.7:1. */
+.section-label,.gold-legible{display:inline-block;background:var(--navy);color:var(--gold);padding:5px 12px;border-radius:999px;text-shadow:none}
+.stars,.review-stars,.reviews-more li span{display:inline-block;background:var(--navy);color:var(--gold);padding:3px 10px;border-radius:999px;line-height:1.4;text-shadow:none}
+.service-link,.service-link:hover,.service-list li::before,.area-tag:hover{color:var(--navy);text-shadow:none}
 </style>
 
 <style>

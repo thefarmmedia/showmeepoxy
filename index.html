@@ -73,7 +73,10 @@ nav ul li:hover .sub{display:block}
 .container{max-width:1140px;margin:0 auto;padding:0 24px}
 
 /* ── HERO ── */
-.hero{background:url('epoxy-flooring-jefferson-city-missouri-state-capitol.jpg') center center/cover no-repeat;color:var(--white);padding:72px 0 64px;position:relative;overflow:hidden}
+/* Hero photo sits under a 0.82-0.92 opacity gradient, so it is served as WebP at
+   two widths instead of one 280KB 2000px JPEG. Phones fetch 28KB. */
+.hero{background:url('epoxy-flooring-jefferson-city-missouri-state-capitol-900.webp') center center/cover no-repeat;color:var(--white);padding:72px 0 64px;position:relative;overflow:hidden}
+@media (min-width:768px){.hero{background-image:url('epoxy-flooring-jefferson-city-missouri-state-capitol-1800.webp')}}
 .hero::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(13,45,110,0.92) 0%,rgba(19,77,180,0.82) 55%,rgba(13,45,110,0.88) 100%);z-index:0}
 .hero::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,0.25) 0%,rgba(0,0,0,0) 70%);z-index:0}
 .hero .container{display:grid;grid-template-columns:1fr 400px;gap:56px;align-items:center;position:relative;z-index:1}
@@ -275,7 +278,7 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://showmeepoxy.com/"}]}</script>
 
-<link rel="preload" as="image" href="/epoxy-garage-floor-two-car-gray-flake-jefferson-city-missouri.webp" fetchpriority="high"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><meta name="theme-color" content="#134db4">
+<link rel="preload" as="image" href="/epoxy-flooring-jefferson-city-missouri-state-capitol-900.webp" media="(max-width:767px)" fetchpriority="high"><link rel="preload" as="image" href="/epoxy-flooring-jefferson-city-missouri-state-capitol-1800.webp" media="(min-width:768px)" fetchpriority="high"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><meta name="theme-color" content="#134db4">
 <script src="/lead-submit.js" defer></script>
 </head>
 <body>
@@ -405,11 +408,11 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 <div class="hero-card">
 <h2>Request a Free Estimate</h2>
 <div class="quick-quote">
-<input id="hqName" placeholder="Full name" type="text"/>
-<input id="hqPhone" placeholder="Phone number" type="tel"/>
-<input id="hqEmail" placeholder="Email address" type="email"/>
-<input id="hqZip" placeholder="ZIP code" type="text" maxlength="5"/>
-<input id="hqAddress" placeholder="Property address" type="text"/>
+<input id="hqName" placeholder="Full name" type="text" aria-label="Full name"/>
+<input id="hqPhone" placeholder="Phone number" type="tel" aria-label="Phone number"/>
+<input id="hqEmail" placeholder="Email address" type="email" aria-label="Email address"/>
+<input id="hqZip" placeholder="ZIP code" type="text" maxlength="5" aria-label="ZIP code"/>
+<input id="hqAddress" placeholder="Property address" type="text" aria-label="Property address"/>
 <select id="hqType" aria-label="Project Type">
 <option disabled="" selected="" value="">What type of project?</option>
 <option>Garage Floor</option>
@@ -419,7 +422,7 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 <option>Epoxy Countertops</option>
 <option>Other</option>
 </select>
-<textarea id="hqMessage" placeholder="Square footage, current condition, any questions... (optional)" rows="2"></textarea>
+<textarea id="hqMessage" placeholder="Square footage, current condition, any questions... (optional)" rows="2" aria-label="Project details (optional)"></textarea>
 <button class="btn-primary" onclick="submitHeroQuote()" type="button">Request My Free Estimate →</button>
 </div>
 <p style="font-size:12px;color:rgba(255,255,255,.75);margin:10px 0 0;text-align:center">No obligation · We respond within 1 business day</p>
@@ -975,30 +978,30 @@ function smeTrack(eventName, params){
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
 <div>
 <label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px">Full Name *</label>
-<input id="qName" placeholder="John Smith" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" type="text"/>
+<input id="qName" placeholder="John Smith" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" type="text" aria-label="Full name"/>
 </div>
 <div>
 <label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px">Phone Number *</label>
-<input id="qPhone" placeholder="(573) 555-1234" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" type="tel"/>
+<input id="qPhone" placeholder="(573) 555-1234" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" type="tel" aria-label="Phone number"/>
 </div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
 <div>
 <label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px">Email Address *</label>
-<input id="qEmail" placeholder="you@email.com" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" type="email"/>
+<input id="qEmail" placeholder="you@email.com" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" type="email" aria-label="Email address"/>
 </div>
 <div>
 <label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px">ZIP Code *</label>
-<input id="qZip" placeholder="65101" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" type="text"/>
+<input id="qZip" placeholder="65101" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" type="text" aria-label="ZIP code"/>
 </div>
 </div>
 <div style="margin-bottom:12px">
 <label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px">Property Address *</label>
-<input id="qAddress" placeholder="123 Main St, Jefferson City, MO" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" type="text"/>
+<input id="qAddress" placeholder="123 Main St, Jefferson City, MO" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" type="text" aria-label="Property address"/>
 </div>
 <div style="margin-bottom:12px">
 <label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qProject">Project Type</label>
-<select id="qProject" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit">
+<select id="qProject" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" aria-label="Type of project">
 <option>Garage Floor</option>
 <option>Basement Floor</option>
 <option>Patio / Outdoor</option>
@@ -1009,7 +1012,7 @@ function smeTrack(eventName, params){
 </div>
 <div style="margin-bottom:20px">
 <label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px">Tell Us About Your Project</label>
-<textarea id="qMessage" placeholder="Square footage, current condition, any questions..." rows="3" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit;resize:vertical"></textarea>
+<textarea id="qMessage" placeholder="Square footage, current condition, any questions..." rows="3" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit;resize:vertical" aria-label="Project details (optional)"></textarea>
 </div>
 <button id="qSubmitBtn" onclick="submitQuoteForm()" style="width:100%;background:#ebfb3b;color:#0d2d6e;border:none;border-radius:12px;padding:15px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;transition:background .2s">Send My Quote Request →</button>
 <p style="font-size:12px;color:#777;text-align:center;margin-top:12px">We respond within 1 business day. No spam, ever.</p>

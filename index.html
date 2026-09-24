@@ -276,6 +276,7 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://showmeepoxy.com/"}]}</script>
 
 <link rel="preload" as="image" href="/epoxy-garage-floor-two-car-gray-flake-jefferson-city-missouri.webp" fetchpriority="high"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><meta name="theme-color" content="#134db4">
+<script src="/lead-submit.js" defer></script>
 </head>
 <body>
 <!-- TOP BAR -->
@@ -444,7 +445,7 @@ async function submitHeroQuote(){
   fd.append('project_type',type);fd.append('message',message);
   fd.append('lead_source','Show Me Epoxy Estimate Request Form');
   fd.append('page_url',window.location.href);
-  try{await fetch('https://services.leadconnectorhq.com/hooks/UDCPiPWt9uV7guaCe7PH/webhook-trigger/09162da4-f3af-45b1-8080-acf28096d4a3',{method:'POST',body:fd});}catch(e){}
+  try{await smeSubmitLead('quote',fd);}catch(e){ smeLeadError(btn,'Request My Free Estimate →'); return; }
   btn.textContent='✅ Request sent! We\'ll be in touch soon.';
   btn.style.background='#22c55e';btn.style.color='#fff';
 }
@@ -1054,8 +1055,8 @@ async function submitQuoteForm(){
   fd.append('project_type',project); fd.append('message',message);
   fd.append('lead_source','Show Me Epoxy Website'); fd.append('page_url',window.location.href);
   try{
-    await fetch('https://services.leadconnectorhq.com/hooks/UDCPiPWt9uV7guaCe7PH/webhook-trigger/09162da4-f3af-45b1-8080-acf28096d4a3',{method:'POST',body:fd});
-  }catch(e){ console.error(e); }
+    await smeSubmitLead('quote',fd);
+  }catch(e){ smeLeadError(btn,'Send My Quote Request →'); return; }
   document.getElementById('quoteFormWrap').style.display='none';
   document.getElementById('quoteSuccess').style.display='block';
   btn.disabled=false; btn.textContent='Send My Quote Request →';

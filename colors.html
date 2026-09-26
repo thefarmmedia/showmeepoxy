@@ -94,6 +94,15 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 
 
 
+
+/* Pigment swatch grids. repeat(6,1fr) could not shrink below the min-content
+   width of labels like "Chestnut Brown", so the grid overflowed the viewport on
+   phones and dragged the page sideways. minmax(0,1fr) lets cells shrink, and the
+   column count steps down with the screen. */
+.pigment-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:40px}
+@media(max-width:900px){.pigment-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:600px){.pigment-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:400px){.pigment-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 
 <style>
@@ -549,7 +558,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
     <div style="margin:0 0 14px">
 <div style="font-family:var(--cond);font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold)">Whites, Grays & Metals — 8 Pigments</div>
 </div>
-    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:40px">
+    <div class="pigment-grid">
       <div style="background:#e8e8e8;border-radius:10px;padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.1)"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f0f0f0,#d0d0d0);margin:0 auto 8px;box-shadow:0 2px 8px rgba(0,0,0,.35)"></div><div style="font-family:var(--cond);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#111">Bright White</div></div>
       <div style="background:#c8c8c8;border-radius:10px;padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.1)"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#d8d8d8,#b0b0b0);margin:0 auto 8px;box-shadow:0 2px 8px rgba(0,0,0,.35)"></div><div style="font-family:var(--cond);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#111">Pearl</div></div>
       <div style="background:#b0b0a8;border-radius:10px;padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.1)"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#c0c0b8,#989890);margin:0 auto 8px;box-shadow:0 2px 8px rgba(0,0,0,.35)"></div><div style="font-family:var(--cond);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#111">Oyster</div></div>
@@ -562,7 +571,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
     <div style="margin:0 0 14px">
 <div style="font-family:var(--cond);font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold)">Golds, Browns & Earth Tones — 11 Pigments</div>
 </div>
-    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:40px">
+    <div class="pigment-grid">
       <div style="background:#c8a020;border-radius:10px;padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.1)"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#d4ae28,#a08010);margin:0 auto 8px;box-shadow:0 2px 8px rgba(0,0,0,.35)"></div><div style="font-family:var(--cond);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#fff">Gold Rush</div></div>
       <div style="background:#c8c020;border-radius:10px;padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.1)"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#d4cc28,#a0a010);margin:0 auto 8px;box-shadow:0 2px 8px rgba(0,0,0,.35)"></div><div style="font-family:var(--cond);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#fff">Aztec Gold</div></div>
       <div style="background:#d07818;border-radius:10px;padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.1)"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#dc8820,#a05808);margin:0 auto 8px;box-shadow:0 2px 8px rgba(0,0,0,.35)"></div><div style="font-family:var(--cond);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#fff">Marigold</div></div>
@@ -578,7 +587,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
     <div style="margin:0 0 14px">
 <div style="font-family:var(--cond);font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold)">Greens & Teals — 11 Pigments</div>
 </div>
-    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:40px">
+    <div class="pigment-grid">
       <div style="background:#80d040;border-radius:10px;padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.1)"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#90e050,#60a828);margin:0 auto 8px;box-shadow:0 2px 8px rgba(0,0,0,.35)"></div><div style="font-family:var(--cond);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#fff">Lime</div></div>
       <div style="background:#70c030;border-radius:10px;padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.1)"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#80d040,#509818);margin:0 auto 8px;box-shadow:0 2px 8px rgba(0,0,0,.35)"></div><div style="font-family:var(--cond);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#fff">Apple Green</div></div>
       <div style="background:#88c878;border-radius:10px;padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.1)"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#98d888,#68a858);margin:0 auto 8px;box-shadow:0 2px 8px rgba(0,0,0,.35)"></div><div style="font-family:var(--cond);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#333">Pistachio</div></div>
@@ -594,7 +603,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
     <div style="margin:0 0 14px">
 <div style="font-family:var(--cond);font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold)">Blues — 8 Pigments</div>
 </div>
-    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:40px">
+    <div class="pigment-grid">
       <div style="background:#2890e0;border-radius:10px;padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.1)"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#38a0f0,#0870c0);margin:0 auto 8px;box-shadow:0 2px 8px rgba(0,0,0,.35)"></div><div style="font-family:var(--cond);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#fff">Luster Blue</div></div>
       <div style="background:#3098d0;border-radius:10px;padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.1)"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#40a8e0,#1078b0);margin:0 auto 8px;box-shadow:0 2px 8px rgba(0,0,0,.35)"></div><div style="font-family:var(--cond);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#fff">Surf Blue</div></div>
       <div style="background:#60a8c8;border-radius:10px;padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.1)"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#70b8d8,#4088a8);margin:0 auto 8px;box-shadow:0 2px 8px rgba(0,0,0,.35)"></div><div style="font-family:var(--cond);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#fff">Shimmer Blue</div></div>
@@ -607,7 +616,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
     <div style="margin:0 0 14px">
 <div style="font-family:var(--cond);font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold)">Reds, Pinks & Purples — 11 Pigments</div>
 </div>
-    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:40px">
+    <div class="pigment-grid">
       <div style="background:#c02020;border-radius:10px;padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.1)"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#d03030,#a00808);margin:0 auto 8px;box-shadow:0 2px 8px rgba(0,0,0,.35)"></div><div style="font-family:var(--cond);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#fff">Crimson</div></div>
       <div style="background:#c03040;border-radius:10px;padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.1)"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#d04050,#a01020);margin:0 auto 8px;box-shadow:0 2px 8px rgba(0,0,0,.35)"></div><div style="font-family:var(--cond);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#fff">Red Blossom</div></div>
       <div style="background:#c84060;border-radius:10px;padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.1)"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#d85070,#a02040);margin:0 auto 8px;box-shadow:0 2px 8px rgba(0,0,0,.35)"></div><div style="font-family:var(--cond);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#fff">Rose</div></div>
@@ -623,7 +632,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
     <div style="margin:0 0 14px">
 <div style="font-family:var(--cond);font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold)">Neon Pigments — 10 Pigments</div>
 </div>
-    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:40px">
+    <div class="pigment-grid">
       <div style="background:#e0f020;border-radius:10px;padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.1);box-shadow:0 0 20px rgba(224,240,32,.35)"><div style="width:40px;height:40px;border-radius:50%;background:#e0f020;margin:0 auto 8px;box-shadow:0 0 14px rgba(224,240,32,.65)"></div><div style="font-family:var(--cond);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#333">Neon Yellow</div></div>
       <div style="background:#f0a000;border-radius:10px;padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.1);box-shadow:0 0 20px rgba(240,160,0,.35)"><div style="width:40px;height:40px;border-radius:50%;background:#f0a000;margin:0 auto 8px;box-shadow:0 0 14px rgba(240,160,0,.65)"></div><div style="font-family:var(--cond);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#fff">Neon Orange Yellow</div></div>
       <div style="background:#f07010;border-radius:10px;padding:14px 10px;text-align:center;border:1px solid rgba(255,255,255,.1);box-shadow:0 0 20px rgba(240,112,16,.35)"><div style="width:40px;height:40px;border-radius:50%;background:#f07010;margin:0 auto 8px;box-shadow:0 0 14px rgba(240,112,16,.65)"></div><div style="font-family:var(--cond);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#fff">Neon Orange</div></div>

@@ -196,6 +196,14 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
+  /* The hero is two columns on desktop, so its copy is left-aligned against the
+     quote form. Once it stacks there is nothing to align to, so centre it. */
+  .hero-content{text-align:center}
+  .hero-content>img{margin-left:auto;margin-right:auto}
+  .hero-sub{margin-left:auto;margin-right:auto}
+  .hero-btns{justify-content:center}
+  /* The tick list stays left-aligned inside a centred block so the ✓ marks line up. */
+  .hero-checks{width:fit-content;max-width:100%;margin-left:auto;margin-right:auto;text-align:left}
   .hero .container{grid-template-columns:1fr;gap:40px}
   .hero-card{max-width:480px}
   .hero h1{font-size:40px}

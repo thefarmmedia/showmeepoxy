@@ -164,6 +164,18 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 .service-link,.service-link:hover,.service-list li::before,.area-tag:hover{color:var(--navy);text-shadow:none}
 
 .article-wrap a{color:var(--navy);font-weight:600}
+
+/* Section headings were centred on some sections and left-aligned on others,
+   often on the same page, because only some had a .text-center wrapper. Once the
+   page is a single stacked column there is nothing to align left against, so the
+   heading block is centred everywhere. Card bodies and lists keep their left
+   alignment for readability. The label is a pill, so it is centred as a block
+   rather than with text-align. */
+@media(max-width:900px){
+  .section-title,.section-sub{text-align:center}
+  .section-sub{margin-left:auto;margin-right:auto}
+  .section-label{display:table;margin-left:auto;margin-right:auto}
+}
 </style>
 
 <style>

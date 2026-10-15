@@ -46,5 +46,5 @@ test('every quote form preserves fields and avoids false success on failure',asy
    }checked++;
   }
  }
- assert.equal(checked,101);
+ assert.equal(checked,102);
 });

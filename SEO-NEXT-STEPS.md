@@ -31,7 +31,7 @@ Per explicit instruction, these were removed from the live site because nothing 
 
 ## No analytics/tracking pixel found in the codebase
 
-Checked the full git history — Google Analytics, Google Tag Manager, and Meta Pixel have never existed in this repository at any point. This isn't something this SEO work removed; it was never installed. The only tracking mechanism on the site is the CRM webhook (leadconnectorhq.com) that fires on form/calculator submissions, which is intact and unchanged. If the business wants visibility into traffic/behavior beyond what the CRM captures and Search Console already provides, GA4 or GTM would need to be added — that's a decision for the business, not something this pass added unprompted.
+Checked the full git history — Google Analytics, Google Tag Manager, and Meta Pixel have never existed in this repository at any point. This isn't something this SEO work removed; it was never installed. Lead capture now runs through the FloorNexus quote builder, embedded as an iframe in the sitewide quote popup and on the calculator. The former GoHighLevel webhook relay (lead-submit.js and the submit-lead Netlify function) was removed when FloorNexus replaced it, so there is no first-party submission tracking on the site. If the business wants visibility into traffic/behavior beyond what the CRM captures and Search Console already provides, GA4 or GTM would need to be added — that's a decision for the business, not something this pass added unprompted.
 
 ## Google Business Profile (the highest-leverage item not in this repo)
 

@@ -44,7 +44,8 @@
 /blog-why-diamond-grinding-matters /blog-why-diamond-grinding-matters.html 301!
 /blog-why-epoxy-floor-looks-uneven-blotchy /blog-why-epoxy-floor-looks-uneven-blotchy.html 301!
 /blog /blog.html 301!
-/calculator /calculator.html 301!
+/calculator.html /contact.html 301!
+/calculator /contact.html 301!
 /california-cost /california-cost.html 301!
 /camdenton-basement /camdenton-basement.html 301!
 /camdenton-commercial /camdenton-commercial.html 301!
@@ -111,7 +112,7 @@
 # /blog/* splat, which matches first and would otherwise dump them on the index.
 /blog/why-diamond-grinding-matters-epoxy /blog-why-diamond-grinding-matters.html 301!
 /blog/polyaspartic-vs-epoxy-missouri /type-polyaspartic.html 301!
-/blog/how-much-does-epoxy-floor-cost-missouri /calculator.html 301!
+/blog/how-much-does-epoxy-floor-cost-missouri /contact.html 301!
 # Tag archives and anything else under /blog/ have no equivalent; send them to the index.
 /blog/* /blog.html 301!
 /about-us /about.html 301!
@@ -165,7 +166,7 @@
 /blog-why-diamond-grinding-matters/ /blog-why-diamond-grinding-matters.html 301!
 /blog-why-epoxy-floor-looks-uneven-blotchy/ /blog-why-epoxy-floor-looks-uneven-blotchy.html 301!
 /blog/ /blog.html 301!
-/calculator/ /calculator.html 301!
+/calculator/ /contact.html 301!
 /california-cost/ /california-cost.html 301!
 /camdenton-basement/ /camdenton-basement.html 301!
 /camdenton-commercial/ /camdenton-commercial.html 301!

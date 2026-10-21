@@ -24,7 +24,7 @@ for (const file of fs.readdirSync(root).filter(f=>f.endsWith('.html')&&!f.includ
   if (allReviewsPage) {
     const marker = '<div class="reviews-grid">';
     const missing = written.filter(r=>!html.toLowerCase().includes(`>${r.name.toLowerCase()}</div>`));
-    html = html.replace(marker, marker + '\n' + missing.map(r=>card(r,file==='index.html')).join(''));
+    if (missing.length) html = html.replace(marker, marker + '\n' + missing.map(r=>card(r,file==='index.html')).join(''));
   }
   const visible = new Set();
   html = html.replace(/<div class="review-card">[\s\S]*?(?=<div class="review-card">|<\/section>)/g, chunk => {

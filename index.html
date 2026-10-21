@@ -79,7 +79,8 @@ nav ul li:hover .sub{display:block}
 @media (min-width:768px){.hero{background-image:url('epoxy-flooring-jefferson-city-missouri-state-capitol-1800.webp')}}
 .hero::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(13,45,110,0.92) 0%,rgba(19,77,180,0.82) 55%,rgba(13,45,110,0.88) 100%);z-index:0}
 .hero::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,0.25) 0%,rgba(0,0,0,0) 70%);z-index:0}
-.hero .container{display:grid;grid-template-columns:1fr 400px;gap:56px;align-items:center;position:relative;z-index:1}
+.hero .container{position:relative;z-index:1}
+.hero-content{max-width:760px}
 .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(232,160,32,0.15);border:1px solid rgba(232,160,32,0.3);border-radius:20px;padding:5px 14px;font-size:13px;color:var(--gold-light);font-weight:600;margin-bottom:18px}
 .hero h1{font-family:var(--font-cond);font-size:52px;font-weight:900;line-height:1.0;letter-spacing:-0.5px;margin-bottom:20px}
 .hero h1 em{color:var(--gold);font-style:normal}
@@ -92,16 +93,6 @@ nav ul li:hover .sub{display:block}
 .btn-primary:hover{background:var(--gold-light);transform:translateY(-1px)}
 .btn-secondary{display:inline-block;border:2px solid rgba(255,255,255,0.35);color:var(--white);font-weight:600;font-size:15px;padding:13px 26px;border-radius:var(--radius);text-decoration:none;transition:border-color .2s,background .2s}
 .btn-secondary:hover{border-color:rgba(255,255,255,0.65);background:rgba(255,255,255,0.07)}
-.hero-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:var(--radius-lg);padding:28px;backdrop-filter:blur(4px)}
-.hero-card h2{font-size:17px;font-weight:700;margin-bottom:16px;color:var(--white)}
-.quick-quote{display:flex;flex-direction:column;gap:10px}
-.quick-quote input,
-.quick-quote select,
-.quick-quote textarea{width:100%;padding:11px 14px;border:1px solid rgba(255,255,255,0.2);border-radius:var(--radius);background:rgba(255,255,255,0.08);color:var(--white);font-size:14px;font-family:var(--font-main);outline:none}
-.quick-quote textarea{resize:vertical;min-height:60px}
-.quick-quote input::placeholder{color:rgba(255,255,255,0.45)}
-.quick-quote select option{background:var(--navy);color:var(--white)}
-.quick-quote .btn-primary{text-align:center;cursor:pointer;border:none;font-family:var(--font-main);font-size:15px}
 
 /* ── TRUST BAR ── */
 .trust-bar{background:var(--gold);padding:14px 0}
@@ -196,16 +187,14 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
-  /* The hero is two columns on desktop, so its copy is left-aligned against the
-     quote form. Once it stacks there is nothing to align to, so centre it. */
+  /* The hero copy is left-aligned on desktop. On a narrow screen there is
+     nothing beside it to align to, so centre it. */
   .hero-content{text-align:center}
   .hero-content>img{margin-left:auto;margin-right:auto}
   .hero-sub{margin-left:auto;margin-right:auto}
   .hero-btns{justify-content:center}
   /* The tick list stays left-aligned inside a centred block so the ✓ marks line up. */
   .hero-checks{width:fit-content;max-width:100%;margin-left:auto;margin-right:auto;text-align:left}
-  .hero .container{grid-template-columns:1fr;gap:40px}
-  .hero-card{max-width:480px}
   .hero h1{font-size:40px}
   .footer-grid{grid-template-columns:1fr 1fr}
   .process-steps::before{display:none}
@@ -421,19 +410,9 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 <div class="hero-btns">
 <a class="btn-primary" href="/contact.html" onclick="openQuoteModal();return false;">Get My Free Quote →</a>
 <a class="btn-secondary" href="/floor-visualizer.html" onclick="smeTrack('visualizer_cta_clicked',{source:'homepage_hero'})">🎨 See Your New Floor →</a>
-<a class="btn-secondary" href="/contact.html" onclick="openQuoteModal();return false;" onclick="smeTrack('calculator_cta_clicked',{source:'homepage_hero'})">Get a Free Quote →</a>
 <a class="btn-secondary hero-phone-btn" href="tel:5736442422" onclick="smeTrack('phone_link_clicked',{source:'homepage_hero'})">📞 (573) 644-2422</a>
 </div>
 </div>
-<div class="hero-card">
-<h2>Request a Free Estimate</h2>
-<p style="font-size:14px;color:rgba(255,255,255,.78);line-height:1.6;margin-bottom:18px">Answer a few quick questions about your space and we'll come back with a real, no-pressure quote — usually within 1 business day.</p>
-<a class="btn-primary" href="/contact.html" onclick="openQuoteModal();return false;" style="display:block;text-align:center;text-decoration:none">Start My Free Quote →</a>
-<p style="font-size:12px;color:rgba(255,255,255,.75);margin:10px 0 0;text-align:center">No obligation · Takes about a minute</p>
-</div>
-<script>
-
-</script>
 </div>
 </section>
 <script>
@@ -488,7 +467,7 @@ function smeTrack(eventName, params){
 </ul>
 <div class="viz-promo-btns">
 <a class="btn-primary" href="/floor-visualizer.html" onclick="smeTrack('visualizer_cta_clicked',{source:'homepage_promo'})">🎨 See Your New Floor →</a>
-<a class="btn-outline-navy" href="/contact.html" onclick="openQuoteModal();return false;" onclick="smeTrack('calculator_cta_clicked',{source:'homepage_promo'})">Get a Free Quote →</a>
+<a class="btn-outline-navy" href="/contact.html" onclick="smeTrack('quote_cta_clicked',{source:'homepage_promo'});openQuoteModal();return false;">Get a Free Quote →</a>
 </div>
 <p class="viz-promo-note">Preview only — screens and lighting vary, so confirm your color with a physical sample at your free on-site quote.</p>
 </div>
@@ -1017,7 +996,6 @@ function smeTrack(eventName, params){
 <p>In the Show Me State, we don't just talk about quality — we prove it with every install. Get a real quote, see real installs, then decide.</p>
 <div class="cta-btns">
 <a class="btn-primary" href="/contact.html" onclick="openQuoteModal();return false;">Get My Free Quote →</a>
-<a class="btn-outline-white" href="/contact.html" onclick="openQuoteModal();return false;">Get a Free Quote →</a>
 <a class="btn-outline-white" href="tel:5736442422">📞 Call (573) 644-2422</a>
 </div>
 </div>

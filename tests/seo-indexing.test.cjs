@@ -64,3 +64,33 @@ test('business schema does not present a city name or city-center coordinates as
     assert.equal(item.geo, undefined);
   }
 });
+
+test('all redirects resolve directly to canonical sitemap pages', () => {
+  const urls = new Set([...read('sitemap.xml').matchAll(/<loc>(.*?)<\/loc>/g)].map(m => new URL(m[1]).pathname));
+  const sources = new Set();
+  for (const line of read('_redirects').split(/\r?\n/).filter(l => l && !l.startsWith('#'))) {
+    const [source, target, status] = line.split(/\s+/);
+    assert.ok(!sources.has(source), `duplicate redirect source: ${source}`);
+    sources.add(source);
+    assert.ok(urls.has(target), `${source}: redirect target is not a canonical page: ${target}`);
+    assert.equal(status, '301!', `${source}: preserve permanent forced redirect`);
+  }
+});
+
+test('internal project links reach real anchors and landing links avoid redirect sources', () => {
+  const sources = new Set(read('_redirects').split(/\r?\n/).filter(l => l && !l.startsWith('#')).map(l => l.split(/\s+/)[0]));
+  for (const file of pages) {
+    for (const match of read(file).matchAll(/<a\b[^>]*href="([^"]+)"/gi)) {
+      const href = match[1];
+      if (!href.startsWith('/') || href.startsWith('//')) continue;
+      const url = new URL(href, 'https://showmeepoxy.com');
+      assert.ok(!sources.has(url.pathname), `${file}: link still points to redirect ${href}`);
+      const target = url.pathname === '/' ? 'index.html' : url.pathname.slice(1);
+      assert.ok(fs.existsSync(path.join(root, target)), `${file}: missing target ${href}`);
+      if (url.hash) {
+        const anchor = decodeURIComponent(url.hash.slice(1));
+        assert.ok(read(target).includes(`id="${anchor}"`), `${file}: missing anchor ${href}`);
+      }
+    }
+  }
+});

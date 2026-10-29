@@ -25,6 +25,8 @@ Service radius: approximately 90 miles from Jefferson City, MO
 
 ## Tools
 
+- [Instant Price Calculator](https://showmeepoxy.com/calculator.html): Estimated price range based on square footage, coating system, concrete condition, and layout; final pricing confirmed on site.
+
 - [Floor Visualizer](https://showmeepoxy.com/floor-visualizer.html): Preview all 26 flake blends on a garage floor, or upload a photo of your own space
 - [Free Quote](https://showmeepoxy.com/contact.html): Request a free, no-pressure quote for your space
 - [Colour Options](https://showmeepoxy.com/colors.html): All 26 flake blends

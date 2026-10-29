@@ -204,6 +204,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 }
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><meta name="theme-color" content="#134db4">
+<script src="/lead-submit.js" defer></script>
 </head>
 <body>
 <div class="nav-top"><div class="wrap"><span>📍 Serving Jefferson City, Columbia, Lake of the Ozarks &amp; surrounding Missouri areas</span><span>Call: <a href="tel:5736442422">(573) 644-2422</a></span></div></div>
@@ -286,7 +287,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
       </ul>
     </li>
     <li><a href="/colors.html">Colors</a></li>
-    <li><a href="/floor-visualizer.html">Floor Visualizer</a></li>
+    <li><a href="/floor-visualizer.html">Floor Visualizer</a></li><li><a href="/calculator.html">Pricing Calculator</a></li>
     <li><a href="/gallery.html">Gallery</a></li>
     <li><a href="/faq.html">FAQ</a></li>
     <li><a href="/blog.html">Blog</a></li>
@@ -379,7 +380,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
           <div class="fv-cta-card fv-cta-primary">
             <h3>Love This Floor?</h3>
             <p>See what a professionally installed floor like this could cost in your space.</p>
-            <a href="/contact.html" onclick="openQuoteModal();return false;" id="fvQuoteBtn" class="fv-btn-gold">Get a Free Quote →</a>
+            <a href="/calculator.html" id="fvQuoteBtn" class="fv-btn-gold">Get My Instant Price →</a>
           </div>
           <div class="fv-cta-card fv-cta-secondary">
             <h3>Not Sure Which Color?</h3>
@@ -495,7 +496,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 <div class="footer-col">
 <h4>Floor Tools</h4>
 <ul>
-<li><a href="/floor-visualizer.html">Floor Visualizer</a></li>
+<li><a href="/floor-visualizer.html">Floor Visualizer</a></li><li><a href="/calculator.html">Pricing Calculator</a></li>
 <li><a href="/colors.html">Color Options</a></li>
 <li><a href="/gallery.html">Project Gallery</a></li>
 </ul>
@@ -517,17 +518,40 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 
 <!-- QUOTE MODAL (same as all pages) -->
 <div id="quoteModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);overflow-y:auto;padding:20px">
-  <div style="background:#0e3a90;border:1px solid rgba(255,255,255,.1);border-radius:20px;max-width:760px;margin:40px auto;padding:36px;position:relative">
-    <button onclick="closeQuoteModal()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.1);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center">×</button>
+  <div style="background:#0e3a90;border:1px solid rgba(255,255,255,.1);border-radius:20px;max-width:540px;margin:40px auto;padding:36px;position:relative">
+    <button type="button" aria-label="Close quote form" onclick="closeQuoteModal()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.1);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center">×</button>
     <img src="show-me-epoxy-logo-jefferson-city-missouri-320.webp" alt="Show Me Epoxy Logo" style="height:90px;width:auto;margin-bottom:16px;display:block" loading="lazy" width="320" height="320">
     <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#ebfb3b;margin-bottom:8px">Free Quote — No Pressure</div>
     <h2 style="font-family:var(--cond);font-size:24px;font-weight:800;color:#fff;margin-bottom:6px;line-height:1.2">Get Your Free Epoxy Floor Quote</h2>
     <p style="font-size:14px;color:#aaa;margin-bottom:24px;line-height:1.6">Tell us about your project and we'll reach out within 1 business day with a real, no-pressure quote.</p>
-    <div id="quoteFormWrap">
-<iframe src="https://app.floornexus.com/?fn_embed=%2Fquote%2Fw-8b0b2a3df7" width="100%" height="800" frameborder="0" loading="lazy" style="border:none;max-width:100%;display:block;border-radius:12px;background:#fff" title="Get a Free Epoxy Flooring Quote"></iframe>
-<p style="font-size:12px;color:#aaa;text-align:center;margin-top:12px">Form not loading? <a href="https://app.floornexus.com/quote/w-8b0b2a3df7" target="_blank" rel="noopener" style="color:#ebfb3b;font-weight:700">Open it in a new tab</a>.</p>
+    <form id="quoteFormWrap" onsubmit="submitQuoteForm();return false;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div><label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qName">Full Name *</label><input id="qName" type="text" placeholder="John Smith" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" aria-label="Full name" required></div>
+        <div><label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qPhone">Phone Number *</label><input id="qPhone" type="tel" placeholder="(573) 555-1234" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" aria-label="Phone number" required></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div><label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qEmail">Email Address *</label><input id="qEmail" type="email" placeholder="you@email.com" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" aria-label="Email address" required></div>
+        <div><label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qZip">ZIP Code *</label><input id="qZip" type="text" placeholder="65101" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" aria-label="ZIP code" required></div>
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qAddress">Property Address *</label>
+        <input id="qAddress" placeholder="123 Main St, Jefferson City, MO" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" type="text" aria-label="Property address" required>
+      </div>
+      <div style="margin-bottom:12px"><label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qProject">Project Type</label><select id="qProject" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" aria-label="Type of project"><option>Garage Floor</option><option>Basement Floor</option><option>Patio / Outdoor</option><option>Commercial / Warehouse</option><option>Epoxy Countertops</option><option>Other</option></select></div>
+      <div style="margin-bottom:20px"><label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qMessage">Tell Us About Your Project</label><textarea id="qMessage" rows="3" placeholder="Square footage, current condition, any questions..." style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit;resize:vertical" aria-label="Project details (optional)"></textarea></div>
+      <div class="sme-consent" style="font-size:12px;color:#ddd;line-height:1.6;margin:16px 0">
+<label style="display:flex;gap:9px;align-items:flex-start;margin-bottom:10px"><input id="qServiceSms" type="checkbox" style="margin-top:4px;flex-shrink:0"> <span>I agree to receive service-related text messages from Show Me Epoxy about my inquiry, quote, or appointment.</span></label>
+<label style="display:flex;gap:9px;align-items:flex-start;margin-bottom:10px"><input id="qPromoSms" type="checkbox" style="margin-top:4px;flex-shrink:0"> <span>I agree to receive promotional text messages from Show Me Epoxy.</span></label>
+<p>Both choices are optional. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase. See our <a href="/privacy.html" style="color:#ebfb3b">Privacy Policy</a> and <a href="/terms.html" style="color:#ebfb3b">Terms &amp; Conditions</a>.</p>
 </div>
-
+<button type="submit" id="qSubmitBtn" style="width:100%;background:#ebfb3b;color:#0d2d6e;border:none;border-radius:12px;padding:15px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit">Send My Quote Request →</button>
+      <p style="font-size:12px;color:#777;text-align:center;margin-top:12px">We respond within 1 business day. No spam, ever.</p>
+    </div>
+    <div id="quoteSuccess" style="display:none;text-align:center;padding:20px 0">
+      <div style="font-size:48px;margin-bottom:16px">✅</div>
+      <h3 style="font-family:var(--cond);font-size:22px;color:#fff;margin-bottom:10px">Request Received!</h3>
+      <p style="font-size:15px;color:#aaa;line-height:1.65">Thanks! We'll reach out within 1 business day.<br><br>Questions? Call us at <a href="tel:5736442422" style="color:#ebfb3b;font-weight:700">(573) 644-2422</a>.</p>
+    </div>
   </div>
 </div>
 
@@ -587,7 +611,7 @@ var ROOM_ORDER = ['garage', 'basement', 'shop'];
 
 // ---------- FLOOR SYSTEMS ----------
 const FLAKE_COLORS = [
-  {"slug": "Domino", "name": "Domino", "desc": "Black, white & gray \u2014 bold, dramatic, our most requested blend", "thumb": "visualizer-swatch-domino.webp", "texture": "visualizer-texture-domino.webp", "baseCoat": "gray", "baseCoatColor": "#6F7276"},
+  {"slug": "Houndstooth", "name": "Houndstooth", "desc": "Black, gray, white & red \u2014 clean, classic, most popular blend", "thumb": "visualizer-swatch-houndstooth.webp", "texture": "visualizer-texture-houndstooth.webp", "baseCoat": "gray", "baseCoatColor": "#6F7276"},
   {"slug": "Arrowhead", "name": "Arrowhead", "desc": "Charcoal, gray, white & red \u2014 bold contrast, great for garages", "thumb": "visualizer-swatch-arrowhead.webp", "texture": "visualizer-texture-arrowhead.webp", "baseCoat": "gray", "baseCoatColor": "#6F7276"},
   {"slug": "Mushroom", "name": "Mushroom", "desc": "Gray, brown, red & white \u2014 warm, natural earth tones", "thumb": "visualizer-swatch-mushroom.webp", "texture": "visualizer-texture-mushroom.webp", "baseCoat": "tan", "baseCoatColor": "#8A7358"},
   {"slug": "Nightfall", "name": "Nightfall", "desc": "Dark charcoal, gray & white \u2014 dramatic, sleek finish", "thumb": "visualizer-swatch-nightfall.webp", "texture": "visualizer-texture-nightfall.webp", "baseCoat": "gray", "baseCoatColor": "#6F7276"},
@@ -596,6 +620,7 @@ const FLAKE_COLORS = [
   {"slug": "Tidal-Wave", "name": "Tidal Wave", "desc": "Light blue, gray & white \u2014 cool, airy, show-stopping finish", "thumb": "visualizer-swatch-tidal-wave.webp", "texture": "visualizer-texture-tidal-wave.webp", "baseCoat": "gray", "baseCoatColor": "#6F7276"},
   {"slug": "Wombat", "name": "Wombat", "desc": "Gray, black & white \u2014 clean with a bold contrast", "thumb": "visualizer-swatch-wombat.webp", "texture": "visualizer-texture-wombat.webp", "baseCoat": "gray", "baseCoatColor": "#6F7276"},
   {"slug": "Creekbed", "name": "Creekbed", "desc": "Tan, brown, gold & gray \u2014 warm, rustic, natural look", "thumb": "visualizer-swatch-creekbed.webp", "texture": "visualizer-texture-creekbed.webp", "baseCoat": "tan", "baseCoatColor": "#8A7358"},
+  {"slug": "Domino", "name": "Domino", "desc": "Black, white & gray \u2014 bold, dramatic floor", "thumb": "visualizer-swatch-domino.webp", "texture": "visualizer-texture-domino.webp", "baseCoat": "gray", "baseCoatColor": "#6F7276"},
   {"slug": "Carbon", "name": "Carbon", "desc": "Pure black flake \u2014 deep, sleek, high-contrast look", "thumb": "visualizer-swatch-carbon.webp", "texture": "visualizer-texture-carbon.webp", "baseCoat": "black", "baseCoatColor": "#17171A"},
   {"slug": "Safari", "name": "Safari", "desc": "Tan, cream, gray & black \u2014 warm neutral, very popular", "thumb": "visualizer-swatch-safari.webp", "texture": "visualizer-texture-safari.webp", "baseCoat": "tan", "baseCoatColor": "#8A7358"},
   {"slug": "Shoreline", "name": "Shoreline", "desc": "Tan, beige & cream \u2014 warm, inviting, light feel", "thumb": "visualizer-swatch-shoreline.webp", "texture": "visualizer-texture-shoreline.webp", "baseCoat": "tan", "baseCoatColor": "#8A7358"},
@@ -1654,7 +1679,7 @@ function fvComposite(room, color, callback, shouldCancel){
     // under-exposed gets more latitude to be pulled back to a realistic
     // in-situ appearance; every blend shot at a normal exposure has
     // tileLift exactly 1 and keeps the old 2.0 ceiling unchanged. Raising
-    // the ceiling globally instead would have moved 20 of the 26 blends,
+    // the ceiling globally instead would have moved 20 of the 27 blends,
     // which is far more than the dark ones needed.
     var tileStd = Math.sqrt(Math.max(1, lSum2 / tmN - (lSum / tmN) * (lSum / tmN)));
     var FV_MAX_CONTRAST = 2.0 * tileLift;
@@ -2237,11 +2262,9 @@ function fvComposite(room, color, callback, shouldCancel){
 function fvUpdateQuoteLink(){
   var link = document.getElementById('fvQuoteBtn');
   var color = fvState.color;
-  link.href = '/contact.html';
+  link.href = color ? ('/calculator.html?color=' + encodeURIComponent(color.slug)) : '/calculator.html';
   link.onclick = function(){
     fvTrack('floor_visualizer_quote_clicked', {color: color ? color.slug : null});
-    openQuoteModal();
-    return false;
   };
 }
 
@@ -2431,7 +2454,27 @@ function closeQuoteModal(){document.getElementById('quoteModal').style.display='
 document.getElementById('quoteModal').addEventListener('click',function(e){if(e.target===this)closeQuoteModal();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeQuoteModal();});
 
-
+async function submitQuoteForm(){
+  var name=document.getElementById('qName').value.trim();
+  var phone=document.getElementById('qPhone').value.trim();
+  var email=document.getElementById('qEmail').value.trim();
+  var zip=document.getElementById('qZip').value.trim();
+  var address=document.getElementById('qAddress').value.trim();
+  if(!name||!phone||!email||!zip||!address){alert('Please fill in all required fields.');return;}
+  var btn=document.getElementById('qSubmitBtn');
+  btn.disabled=true;btn.textContent='Sending...';
+  var parts=name.split(/\s+/);var fd=new FormData();
+  fd.append('name',name);fd.append('first_name',parts[0]||'');fd.append('last_name',parts.slice(1).join(' '));
+  fd.append('phone',phone.replace(/[^\d+]/g,''));fd.append('email',email);fd.append('zip',zip);fd.append('address',address);
+  fd.append('project_type',document.getElementById('qProject').value);
+  fd.append('message',document.getElementById('qMessage').value.trim());
+  if(fvState.color)fd.append('selected_floor_color',fvState.color.name);
+  fd.append('lead_source','Show Me Epoxy Floor Visualizer');fd.append('page_url',window.location.href);
+  try{await smeSubmitLead('quote',fd);}catch(e){ smeLeadError(btn,'Send My Quote Request →'); return; }
+  document.getElementById('quoteFormWrap').style.display='none';
+  document.getElementById('quoteSuccess').style.display='block';
+  btn.disabled=false;btn.textContent='Send My Quote Request →';
+}
 
 // ---------- mobile menu (shared across site) ----------
 function toggleMobileMenu(){
@@ -2480,6 +2523,7 @@ function toggleAcc(btn){
   fvTrack('floor_visualizer_opened', {color: fvState.color ? fvState.color.slug : null});
 })();
 </script>
+<!-- END QUOTE MODAL -->
 
 <!-- STICKY MOBILE CALL BAR -->
 <div id="stickyCall" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9000;background:#ebfb3b;padding:0;box-shadow:0 -3px 20px rgba(0,0,0,.25)">

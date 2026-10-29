@@ -45,3 +45,15 @@ test('calculator is discoverable and never redirected to the contact page',()=>{
   assert.doesNotMatch(page,/app\.floornexus\.com/i,file);
  }
 });
+test('quote success panels sit outside each native form',()=>{
+ for(const file of fs.readdirSync('.').filter(f=>f.endsWith('.html'))){
+  const page=fs.readFileSync(file,'utf8');
+  const quote=page.match(/<form id="quoteFormWrap"[\s\S]*?(?=<div id="quoteSuccess")/);
+  if(quote){
+   assert.match(quote[0],/<\/form>/,file);
+   for(const id of ['qName','qPhone','qEmail','qZip','qAddress'])assert.match(quote[0],new RegExp('<input[^>]*id="'+id+'"[^>]*required'),file);
+   assert.match(page.match(/async function submitQuoteForm\([\s\S]*?\n}/)[0],/smeAppendConsent\(fd,'q'\)/,file);
+  }
+  assert.equal((page.match(/<form\b/g)||[]).length,(page.match(/<\/form>/g)||[]).length,file);
+ }
+});

@@ -447,7 +447,7 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 </div>
 <button type="submit" id="qSubmitBtn" style="width:100%;background:#ebfb3b;color:#0d2d6e;border:none;border-radius:12px;padding:15px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit">Send My Quote Request →</button>
       <p style="font-size:12px;color:#777;text-align:center;margin-top:12px">We respond within 1 business day. No spam, ever.</p>
-    </div>
+    </form>
     <div id="quoteSuccess" style="display:none;text-align:center;padding:20px 0">
       <div style="font-size:48px;margin-bottom:16px">✅</div>
       <h3 style="font-family:Georgia,serif;font-size:22px;color:#fff;margin-bottom:10px">Request Received!</h3>
@@ -477,6 +477,7 @@ async function submitQuoteForm(){
   fd.append('phone',phone.replace(/[^\d+]/g,''));fd.append('email',email);fd.append('zip',zip);fd.append('address',address);
   fd.append('project_type',project);fd.append('message',message);
   fd.append('lead_source','Show Me Epoxy Blog');fd.append('page_url',window.location.href);
+  smeAppendConsent(fd,'q');
   try{await smeSubmitLead('quote',fd);}catch(e){ smeLeadError(btn,'Send My Quote Request →'); return; }
   document.getElementById('quoteFormWrap').style.display='none';
   document.getElementById('quoteSuccess').style.display='block';

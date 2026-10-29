@@ -27,7 +27,7 @@ structured data, and other redirect rules are retained. Visualizer rendering
 and calibration code are unchanged; only its shared quote form and calculator
 navigation are restored.
 
-Verification before preview: 26 tests pass, including pricing, invalid input,
+Verification before preview: 27 tests pass, including pricing, invalid input,
 all form success/failure paths, relay routing, consent payloads, reviews,
 visualizer behavior, sitemap, canonical and redirect checks. All 274 executable
 inline scripts and 350 JSON-LD blocks parse. CRM HTTP acceptance and downstream

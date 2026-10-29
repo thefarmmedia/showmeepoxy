@@ -792,6 +792,8 @@ function closeQuoteModal(){document.getElementById('quoteModal').style.display='
 document.getElementById('quoteModal').addEventListener('click',function(e){if(e.target===this)closeQuoteModal();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeColorModal();closeQuoteModal();}});
 
+
+
 async function submitQuoteForm(){
   var name=document.getElementById('qName').value.trim();
   var phone=document.getElementById('qPhone').value.trim();

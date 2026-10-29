@@ -57,3 +57,11 @@ test('quote success panels sit outside each native form',()=>{
   assert.equal((page.match(/<form\b/g)||[]).length,(page.match(/<\/form>/g)||[]).length,file);
  }
 });
+test('homepage embeds the working calculator and links to it throughout the page',()=>{
+ const home=fs.readFileSync('index.html','utf8');
+ const block=page=>page.match(/<!-- CALCULATOR SECTION -->\s*<section id="calculator"[\s\S]*?<\/section>\s*<script>[\s\S]*?<\/script>/)[0];
+ assert.equal(block(home),block(html));
+ assert.ok((home.match(/href="#calculator"/g)||[]).length>=7);
+ assert.equal((home.match(/id="calculator"/g)||[]).length,1);
+ for(const id of ['cSqft','cSystem','cCondition','cDifficulty','cUnlockCard','cResultBox'])assert.equal((home.match(new RegExp('id="'+id+'"','g'))||[]).length,1,id);
+});

@@ -19,7 +19,10 @@ workflows must honor those choices; this repository does not configure them.
 The newer privacy and terms text is retained, with provider references updated
 to match the restored connection.
 
-Calculator navigation, homepage copy and promotions, contextual calculator
+The full working calculator is embedded on the homepage, with jump links from
+the hero, services, visualizer promotion, gallery, reviews, and closing section.
+Both pages use the same calculator markup and engine, guarded by a consistency
+test. Eight homepage links jump directly to the calculator. Calculator navigation, homepage copy and promotions, contextual calculator
 links, the sitemap entry, and extensionless calculator redirects are restored.
 All 99 existing HTML page titles and canonical URLs are unchanged. The newer
 Columbia and Sedalia content, all 22 Google ratings, project anchors, FAQ
@@ -27,9 +30,9 @@ structured data, and other redirect rules are retained. Visualizer rendering
 and calibration code are unchanged; only its shared quote form and calculator
 navigation are restored.
 
-Verification before preview: 27 tests pass, including pricing, invalid input,
+Verification before preview: 28 tests pass, including pricing, invalid input,
 all form success/failure paths, relay routing, consent payloads, reviews,
-visualizer behavior, sitemap, canonical and redirect checks. All 274 executable
+visualizer behavior, sitemap, canonical and redirect checks. All 275 executable
 inline scripts and 350 JSON-LD blocks parse. CRM HTTP acceptance and downstream
 workflow completion are different: no live test lead has been submitted.
 

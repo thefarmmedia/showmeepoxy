@@ -611,7 +611,7 @@ var ROOM_ORDER = ['garage', 'basement', 'shop'];
 
 // ---------- FLOOR SYSTEMS ----------
 const FLAKE_COLORS = [
-  {"slug": "Houndstooth", "name": "Houndstooth", "desc": "Black, gray, white & red \u2014 clean, classic, most popular blend", "thumb": "visualizer-swatch-houndstooth.webp", "texture": "visualizer-texture-houndstooth.webp", "baseCoat": "gray", "baseCoatColor": "#6F7276"},
+  {"slug": "Domino", "name": "Domino", "desc": "Black, white & gray \u2014 bold, dramatic, our most requested blend", "thumb": "visualizer-swatch-domino.webp", "texture": "visualizer-texture-domino.webp", "baseCoat": "gray", "baseCoatColor": "#6F7276"},
   {"slug": "Arrowhead", "name": "Arrowhead", "desc": "Charcoal, gray, white & red \u2014 bold contrast, great for garages", "thumb": "visualizer-swatch-arrowhead.webp", "texture": "visualizer-texture-arrowhead.webp", "baseCoat": "gray", "baseCoatColor": "#6F7276"},
   {"slug": "Mushroom", "name": "Mushroom", "desc": "Gray, brown, red & white \u2014 warm, natural earth tones", "thumb": "visualizer-swatch-mushroom.webp", "texture": "visualizer-texture-mushroom.webp", "baseCoat": "tan", "baseCoatColor": "#8A7358"},
   {"slug": "Nightfall", "name": "Nightfall", "desc": "Dark charcoal, gray & white \u2014 dramatic, sleek finish", "thumb": "visualizer-swatch-nightfall.webp", "texture": "visualizer-texture-nightfall.webp", "baseCoat": "gray", "baseCoatColor": "#6F7276"},
@@ -620,7 +620,6 @@ const FLAKE_COLORS = [
   {"slug": "Tidal-Wave", "name": "Tidal Wave", "desc": "Light blue, gray & white \u2014 cool, airy, show-stopping finish", "thumb": "visualizer-swatch-tidal-wave.webp", "texture": "visualizer-texture-tidal-wave.webp", "baseCoat": "gray", "baseCoatColor": "#6F7276"},
   {"slug": "Wombat", "name": "Wombat", "desc": "Gray, black & white \u2014 clean with a bold contrast", "thumb": "visualizer-swatch-wombat.webp", "texture": "visualizer-texture-wombat.webp", "baseCoat": "gray", "baseCoatColor": "#6F7276"},
   {"slug": "Creekbed", "name": "Creekbed", "desc": "Tan, brown, gold & gray \u2014 warm, rustic, natural look", "thumb": "visualizer-swatch-creekbed.webp", "texture": "visualizer-texture-creekbed.webp", "baseCoat": "tan", "baseCoatColor": "#8A7358"},
-  {"slug": "Domino", "name": "Domino", "desc": "Black, white & gray \u2014 bold, dramatic floor", "thumb": "visualizer-swatch-domino.webp", "texture": "visualizer-texture-domino.webp", "baseCoat": "gray", "baseCoatColor": "#6F7276"},
   {"slug": "Carbon", "name": "Carbon", "desc": "Pure black flake \u2014 deep, sleek, high-contrast look", "thumb": "visualizer-swatch-carbon.webp", "texture": "visualizer-texture-carbon.webp", "baseCoat": "black", "baseCoatColor": "#17171A"},
   {"slug": "Safari", "name": "Safari", "desc": "Tan, cream, gray & black \u2014 warm neutral, very popular", "thumb": "visualizer-swatch-safari.webp", "texture": "visualizer-texture-safari.webp", "baseCoat": "tan", "baseCoatColor": "#8A7358"},
   {"slug": "Shoreline", "name": "Shoreline", "desc": "Tan, beige & cream \u2014 warm, inviting, light feel", "thumb": "visualizer-swatch-shoreline.webp", "texture": "visualizer-texture-shoreline.webp", "baseCoat": "tan", "baseCoatColor": "#8A7358"},
@@ -1679,7 +1678,7 @@ function fvComposite(room, color, callback, shouldCancel){
     // under-exposed gets more latitude to be pulled back to a realistic
     // in-situ appearance; every blend shot at a normal exposure has
     // tileLift exactly 1 and keeps the old 2.0 ceiling unchanged. Raising
-    // the ceiling globally instead would have moved 20 of the 27 blends,
+    // the ceiling globally instead would have moved 20 of the 26 blends,
     // which is far more than the dark ones needed.
     var tileStd = Math.sqrt(Math.max(1, lSum2 / tmN - (lSum / tmN) * (lSum / tmN)));
     var FV_MAX_CONTRAST = 2.0 * tileLift;
@@ -2262,9 +2261,11 @@ function fvComposite(room, color, callback, shouldCancel){
 function fvUpdateQuoteLink(){
   var link = document.getElementById('fvQuoteBtn');
   var color = fvState.color;
-  link.href = color ? ('/calculator.html?color=' + encodeURIComponent(color.slug)) : '/calculator.html';
+  link.href = '/contact.html';
   link.onclick = function(){
     fvTrack('floor_visualizer_quote_clicked', {color: color ? color.slug : null});
+    openQuoteModal();
+    return false;
   };
 }
 
@@ -2454,28 +2455,7 @@ function closeQuoteModal(){document.getElementById('quoteModal').style.display='
 document.getElementById('quoteModal').addEventListener('click',function(e){if(e.target===this)closeQuoteModal();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeQuoteModal();});
 
-async function submitQuoteForm(){
-  var name=document.getElementById('qName').value.trim();
-  var phone=document.getElementById('qPhone').value.trim();
-  var email=document.getElementById('qEmail').value.trim();
-  var zip=document.getElementById('qZip').value.trim();
-  var address=document.getElementById('qAddress').value.trim();
-  if(!name||!phone||!email||!zip||!address){alert('Please fill in all required fields.');return;}
-  var btn=document.getElementById('qSubmitBtn');
-  btn.disabled=true;btn.textContent='Sending...';
-  var parts=name.split(/\s+/);var fd=new FormData();
-  fd.append('name',name);fd.append('first_name',parts[0]||'');fd.append('last_name',parts.slice(1).join(' '));
-  fd.append('phone',phone.replace(/[^\d+]/g,''));fd.append('email',email);fd.append('zip',zip);fd.append('address',address);
-  fd.append('project_type',document.getElementById('qProject').value);
-  fd.append('message',document.getElementById('qMessage').value.trim());
-  if(fvState.color)fd.append('selected_floor_color',fvState.color.name);
-  fd.append('lead_source','Show Me Epoxy Floor Visualizer');fd.append('page_url',window.location.href);
-  smeAppendConsent(fd,'q');
-  try{await smeSubmitLead('quote',fd);}catch(e){ smeLeadError(btn,'Send My Quote Request →'); return; }
-  document.getElementById('quoteFormWrap').style.display='none';
-  document.getElementById('quoteSuccess').style.display='block';
-  btn.disabled=false;btn.textContent='Send My Quote Request →';
-}
+
 
 // ---------- mobile menu (shared across site) ----------
 function toggleMobileMenu(){
@@ -2523,6 +2503,29 @@ function toggleAcc(btn){
   fvRenderFavorites();
   fvTrack('floor_visualizer_opened', {color: fvState.color ? fvState.color.slug : null});
 })();
+
+async function submitQuoteForm(){
+  var name=document.getElementById('qName').value.trim();
+  var phone=document.getElementById('qPhone').value.trim();
+  var email=document.getElementById('qEmail').value.trim();
+  var zip=document.getElementById('qZip').value.trim();
+  var address=document.getElementById('qAddress').value.trim();
+  if(!name||!phone||!email||!zip||!address){alert('Please fill in all required fields.');return;}
+  var btn=document.getElementById('qSubmitBtn');
+  btn.disabled=true;btn.textContent='Sending...';
+  var parts=name.split(/\s+/);var fd=new FormData();
+  fd.append('name',name);fd.append('first_name',parts[0]||'');fd.append('last_name',parts.slice(1).join(' '));
+  fd.append('phone',phone.replace(/[^\d+]/g,''));fd.append('email',email);fd.append('zip',zip);fd.append('address',address);
+  fd.append('project_type',document.getElementById('qProject').value);
+  fd.append('message',document.getElementById('qMessage').value.trim());
+  if(fvState.color)fd.append('selected_floor_color',fvState.color.name);
+  fd.append('lead_source','Show Me Epoxy Floor Visualizer');fd.append('page_url',window.location.href);
+  smeAppendConsent(fd,'q');
+  try{await smeSubmitLead('quote',fd);}catch(e){ smeLeadError(btn,'Send My Quote Request →'); return; }
+  document.getElementById('quoteFormWrap').style.display='none';
+  document.getElementById('quoteSuccess').style.display='block';
+  btn.disabled=false;btn.textContent='Send My Quote Request →';
+}
 </script>
 <!-- END QUOTE MODAL -->
 

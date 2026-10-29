@@ -185,6 +185,34 @@ footer{background:#134db4;color:rgba(255,255,255,0.65);padding:56px 0 28px}
 .footer-bottom a{color:rgba(255,255,255,0.45);text-decoration:none}
 .phone-link{color:var(--gold-light);text-decoration:none;font-weight:600}
 
+/* Homepage flake colors: square samples with room for the complete label. */
+.home-colors{padding:56px 0;background:#0b2f78;scroll-margin-top:90px}
+.home-colors-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:28px}
+.home-colors-label{font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#ebfb3b;margin-bottom:8px}
+.home-colors-title{font-family:var(--font-cond);font-size:38px;font-weight:900;color:#fff;line-height:1.1;margin-bottom:10px}
+.home-colors-copy{font-size:15px;color:rgba(255,255,255,.8);max-width:480px;line-height:1.7}
+.home-colors-browse{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.3);color:#fff;font-weight:700;font-size:14px;padding:12px 20px;border-radius:10px;text-decoration:none;white-space:nowrap;flex-shrink:0}
+.home-color-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}
+.home-color-card{display:flex;flex-direction:column;min-width:0;text-decoration:none;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.2);background:#082453;transition:border-color .2s}
+.home-color-card img{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:cover;flex:none}
+.home-color-name{display:flex;align-items:center;justify-content:center;flex:1;min-height:48px;padding:12px 10px;color:#fff;font-size:15px;font-weight:700;line-height:1.3;text-align:center;overflow-wrap:anywhere}
+.home-color-card:hover,.home-color-card:focus-visible,.home-colors-browse:hover,.home-colors-browse:focus-visible{border-color:#ebfb3b}
+.home-color-card:focus-visible,.home-colors-browse:focus-visible{outline:2px solid #ebfb3b;outline-offset:4px}
+.home-colors-note{margin-top:24px;padding:18px 20px;background:rgba(235,251,59,.08);border:1px solid rgba(235,251,59,.2);border-radius:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.home-colors-note p{font-size:14px;color:rgba(255,255,255,.8);flex:1 1 360px}
+.home-colors-note strong{color:#fff}
+.home-colors-note a{font-size:14px;font-weight:700;color:#ebfb3b;text-decoration:none}
+@media(max-width:900px){.home-color-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.home-colors-heading{align-items:flex-start;flex-direction:column}}
+@media(max-width:600px){
+ .home-colors{padding:40px 0}
+ .home-colors-heading{align-items:center;text-align:center;gap:20px;margin-bottom:24px}
+ .home-colors-title{font-size:34px}
+ .home-colors-copy{margin:0 auto}
+ .home-color-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+ .home-color-name{font-size:14px;min-height:48px}
+ .home-colors-note{padding:16px;gap:14px}
+}
+
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
   /* The hero copy is left-aligned on desktop. On a narrow screen there is
@@ -613,62 +641,61 @@ function smeTrack(eventName, params){
 <div class="wrap" style="text-align:center;margin:28px auto 0"><p style="margin-bottom:14px;color:var(--gray-600)">Wondering what a floor like this could cost? Build your project and get an estimated range right here.</p><a class="btn-primary" href="#calculator" onclick="smeTrack('calculator_cta_clicked',{source:'homepage_services'})">🧮 Calculate My Floor Price Range →</a></div>
 </section>
 <!-- COLOR SWATCHES -->
-<section style="padding:56px 0;background:#0b2f78">
+<section class="home-colors" id="floor-colors">
 <div class="container">
-  <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:28px">
+  <div class="home-colors-heading">
     <div>
-      <div style="font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#ebfb3b;margin-bottom:8px">Flake Color Options</div>
-      <h2 style="font-family:var(--font-cond);font-size:34px;font-weight:900;color:#fff;line-height:1.05;margin-bottom:6px">26 Signature Blends</h2>
-      <p style="font-size:15px;color:rgba(255,255,255,.75);max-width:480px">From subtle stone looks to bold contrasts — we bring physical samples to every free quote so you can see them in your space.</p>
+      <div class="home-colors-label">Flake Color Options</div>
+      <h2 class="home-colors-title">26 Signature Blends</h2>
+      <p class="home-colors-copy">From subtle stone looks to bold contrasts — we bring physical samples to every free quote so you can see them in your space.</p>
     </div>
-    <a href="/colors.html" style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.2);color:#fff;font-weight:700;font-size:14px;padding:11px 20px;border-radius:20px;text-decoration:none;white-space:nowrap;flex-shrink:0">See All 26 Colors →</a>
+    <a class="home-colors-browse" href="/colors.html">See All 26 Colors →</a>
   </div>
-  <!-- Swatch scroll row -->
-  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
-    <a href="/colors.html" style="text-decoration:none;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,.08);transition:border-color .2s;display:block" onmouseover="this.style.borderColor='#ebfb3b'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)'">
-      <img src="epoxy-flake-color-domino.webp" alt="Domino epoxy flake color" style="width:100%;height:120px;object-fit:cover;display:block" loading="lazy" width="1100" height="1100">
-      <div style="padding:9px 12px;background:rgba(0,0,0,.35)"><div style="font-size:13px;font-weight:700;color:#fff">Domino</div></div>
+  <div class="home-color-grid">
+    <a class="home-color-card" href="/colors.html">
+      <img src="epoxy-flake-color-domino.webp" alt="Domino epoxy flake color" loading="lazy" width="1100" height="1100">
+      <span class="home-color-name">Domino</span>
     </a>
-    <a href="/colors.html" style="text-decoration:none;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,.08);transition:border-color .2s;display:block" onmouseover="this.style.borderColor='#ebfb3b'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)'">
-      <img src="epoxy-flake-color-orbit.webp" alt="Orbit epoxy flake color" style="width:100%;height:120px;object-fit:cover;display:block" loading="lazy" width="300" height="300">
-      <div style="padding:9px 12px;background:rgba(0,0,0,.35)"><div style="font-size:13px;font-weight:700;color:#fff">Orbit</div></div>
+    <a class="home-color-card" href="/colors.html">
+      <img src="epoxy-flake-color-orbit.webp" alt="Orbit epoxy flake color" loading="lazy" width="300" height="300">
+      <span class="home-color-name">Orbit</span>
     </a>
-    <a href="/colors.html" style="text-decoration:none;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,.08);transition:border-color .2s;display:block" onmouseover="this.style.borderColor='#ebfb3b'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)'">
-      <img src="epoxy-flake-color-ozark.webp" alt="Ozark epoxy flake color" style="width:100%;height:120px;object-fit:cover;display:block" loading="lazy" width="1100" height="1100">
-      <div style="padding:9px 12px;background:rgba(0,0,0,.35)"><div style="font-size:13px;font-weight:700;color:#fff">Ozark</div></div>
+    <a class="home-color-card" href="/colors.html">
+      <img src="epoxy-flake-color-ozark.webp" alt="Ozark epoxy flake color" loading="lazy" width="1100" height="1100">
+      <span class="home-color-name">Ozark</span>
     </a>
-    <a href="/colors.html" style="text-decoration:none;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,.08);transition:border-color .2s;display:block" onmouseover="this.style.borderColor='#ebfb3b'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)'">
-      <img src="epoxy-flake-color-carbon.webp" alt="Carbon epoxy flake color" style="width:100%;height:120px;object-fit:cover;display:block" loading="lazy" width="1100" height="1100">
-      <div style="padding:9px 12px;background:rgba(0,0,0,.35)"><div style="font-size:13px;font-weight:700;color:#fff">Carbon</div></div>
+    <a class="home-color-card" href="/colors.html">
+      <img src="epoxy-flake-color-carbon.webp" alt="Carbon epoxy flake color" loading="lazy" width="1100" height="1100">
+      <span class="home-color-name">Carbon</span>
     </a>
-    <a href="/colors.html" style="text-decoration:none;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,.08);transition:border-color .2s;display:block" onmouseover="this.style.borderColor='#ebfb3b'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)'">
-      <img src="epoxy-flake-color-agate.webp" alt="Agate epoxy flake color" style="width:100%;height:120px;object-fit:cover;display:block" loading="lazy" width="1100" height="1100">
-      <div style="padding:9px 12px;background:rgba(0,0,0,.35)"><div style="font-size:13px;font-weight:700;color:#fff">Agate</div></div>
+    <a class="home-color-card" href="/colors.html">
+      <img src="epoxy-flake-color-agate.webp" alt="Agate epoxy flake color" loading="lazy" width="1100" height="1100">
+      <span class="home-color-name">Agate</span>
     </a>
-    <a href="/colors.html" style="text-decoration:none;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,.08);transition:border-color .2s;display:block" onmouseover="this.style.borderColor='#ebfb3b'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)'">
-      <img src="epoxy-flake-color-safari.webp" alt="Safari epoxy flake color" style="width:100%;height:120px;object-fit:cover;display:block" loading="lazy" width="1100" height="1100">
-      <div style="padding:9px 12px;background:rgba(0,0,0,.35)"><div style="font-size:13px;font-weight:700;color:#fff">Safari</div></div>
+    <a class="home-color-card" href="/colors.html">
+      <img src="epoxy-flake-color-safari.webp" alt="Safari epoxy flake color" loading="lazy" width="1100" height="1100">
+      <span class="home-color-name">Safari</span>
     </a>
-    <a href="/colors.html" style="text-decoration:none;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,.08);transition:border-color .2s;display:block" onmouseover="this.style.borderColor='#ebfb3b'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)'">
-      <img src="epoxy-flake-color-tidal-wave.webp" alt="Tidal Wave epoxy flake color" style="width:100%;height:120px;object-fit:cover;display:block" loading="lazy" width="1100" height="1100">
-      <div style="padding:9px 12px;background:rgba(0,0,0,.35)"><div style="font-size:13px;font-weight:700;color:#fff">Tidal Wave</div></div>
+    <a class="home-color-card" href="/colors.html">
+      <img src="epoxy-flake-color-tidal-wave.webp" alt="Tidal Wave epoxy flake color" loading="lazy" width="1100" height="1100">
+      <span class="home-color-name">Tidal Wave</span>
     </a>
-    <a href="/colors.html" style="text-decoration:none;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,.08);transition:border-color .2s;display:block" onmouseover="this.style.borderColor='#ebfb3b'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)'">
-      <img src="epoxy-flake-color-arrowhead.webp" alt="Arrowhead epoxy flake color" style="width:100%;height:120px;object-fit:cover;display:block" loading="lazy" width="1280" height="1280">
-      <div style="padding:9px 12px;background:rgba(0,0,0,.35)"><div style="font-size:13px;font-weight:700;color:#fff">Arrowhead</div></div>
+    <a class="home-color-card" href="/colors.html">
+      <img src="epoxy-flake-color-arrowhead.webp" alt="Arrowhead epoxy flake color" loading="lazy" width="1280" height="1280">
+      <span class="home-color-name">Arrowhead</span>
     </a>
-    <a href="/colors.html" style="text-decoration:none;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,.08);transition:border-color .2s;display:block" onmouseover="this.style.borderColor='#ebfb3b'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)'">
-      <img src="epoxy-flake-color-glacier.webp" alt="Glacier epoxy flake color" style="width:100%;height:120px;object-fit:cover;display:block" loading="lazy" width="990" height="990">
-      <div style="padding:9px 12px;background:rgba(0,0,0,.35)"><div style="font-size:13px;font-weight:700;color:#fff">Glacier</div></div>
+    <a class="home-color-card" href="/colors.html">
+      <img src="epoxy-flake-color-glacier.webp" alt="Glacier epoxy flake color" loading="lazy" width="990" height="990">
+      <span class="home-color-name">Glacier</span>
     </a>
-    <a href="/colors.html" style="text-decoration:none;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,.08);transition:border-color .2s;display:block" onmouseover="this.style.borderColor='#ebfb3b'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)'">
-      <img src="epoxy-flake-color-creekbed.webp" alt="Creekbed epoxy flake color" style="width:100%;height:120px;object-fit:cover;display:block" loading="lazy" width="1100" height="1100">
-      <div style="padding:9px 12px;background:rgba(0,0,0,.35)"><div style="font-size:13px;font-weight:700;color:#fff">Creekbed</div></div>
+    <a class="home-color-card" href="/colors.html">
+      <img src="epoxy-flake-color-creekbed.webp" alt="Creekbed epoxy flake color" loading="lazy" width="1100" height="1100">
+      <span class="home-color-name">Creekbed</span>
     </a>
   </div>
-  <div style="margin-top:20px;padding:16px 20px;background:rgba(235,251,59,.08);border:1px solid rgba(235,251,59,.2);border-radius:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-    <div style="font-size:14px;color:rgba(255,255,255,.8)">🎨 <strong style="color:#fff">Custom blends available</strong> · Hybrid flake (multi-size) available at a small upcharge · Samples brought to every quote</div>
-    <a href="/colors.html" style="font-size:13px;font-weight:700;color:#ebfb3b;text-decoration:none;white-space:nowrap">Browse all 26 colors →</a>
+  <div class="home-colors-note">
+    <p>🎨 <strong>Custom blends available</strong> · Hybrid flake (multi-size) available at a small upcharge · Samples brought to every quote</p>
+    <a href="/colors.html">Browse all 26 colors →</a>
   </div>
 </div>
 </section>

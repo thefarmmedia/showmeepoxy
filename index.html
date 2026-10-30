@@ -1366,65 +1366,15 @@ cUpdatePreview();
 </footer>
 <!-- QUOTE MODAL -->
 <div id="quoteModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);overflow-y:auto;padding:20px">
-<div style="background:#0e3a90;border:1px solid rgba(255,255,255,.1);border-radius:20px;max-width:540px;margin:40px auto;padding:36px;position:relative">
+<div style="background:#0e3a90;border:1px solid rgba(255,255,255,.1);border-radius:20px;max-width:760px;margin:40px auto;padding:36px;position:relative">
 <button type="button" aria-label="Close quote form" onclick="closeQuoteModal()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,.1);border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center">×</button>
 <img alt="Show Me Epoxy Logo" loading="lazy" src="show-me-epoxy-logo-jefferson-city-missouri-320.webp" style="height:90px;width:auto;margin-bottom:16px;display:block" width="320" height="320">
 <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#ebfb3b;margin-bottom:8px">Free Quote — No Pressure</div>
 <h2 style="font-family:Georgia,serif;font-size:24px;font-weight:800;color:#fff;margin-bottom:6px;line-height:1.2">Get Your Free Epoxy Floor Quote</h2>
 <p style="font-size:14px;color:#aaa;margin-bottom:24px;line-height:1.6">Tell us about your project and we'll reach out within 1 business day with a real, no-pressure quote.</p>
-<form id="quoteFormWrap" onsubmit="submitQuoteForm();return false;">
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-<div>
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qName">Full Name *</label>
-<input id="qName" placeholder="John Smith" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" type="text" aria-label="Full name"/ required>
-</div>
-<div>
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qPhone">Phone Number *</label>
-<input id="qPhone" placeholder="(573) 555-1234" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" type="tel" aria-label="Phone number"/ required>
-</div>
-</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-<div>
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qEmail">Email Address *</label>
-<input id="qEmail" placeholder="you@email.com" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" type="email" aria-label="Email address"/ required>
-</div>
-<div>
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qZip">ZIP Code *</label>
-<input id="qZip" placeholder="65101" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" type="text" aria-label="ZIP code"/ required>
-</div>
-</div>
-<div style="margin-bottom:12px">
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qAddress">Property Address *</label>
-<input id="qAddress" placeholder="123 Main St, Jefferson City, MO" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" type="text" aria-label="Property address"/ required>
-</div>
-<div style="margin-bottom:12px">
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qProject">Project Type</label>
-<select id="qProject" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit" aria-label="Type of project">
-<option>Garage Floor</option>
-<option>Basement Floor</option>
-<option>Patio / Outdoor</option>
-<option>Commercial / Warehouse</option>
-<option>Epoxy Countertops</option>
-<option>Other</option>
-</select>
-</div>
-<div style="margin-bottom:20px">
-<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:6px" for="qMessage">Tell Us About Your Project</label>
-<textarea id="qMessage" placeholder="Square footage, current condition, any questions..." rows="3" style="width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:#0a2866;color:#fff;font-size:14px;outline:none;font-family:inherit;resize:vertical" aria-label="Project details (optional)"></textarea>
-</div>
-<div class="sme-consent" style="font-size:12px;color:#ddd;line-height:1.6;margin:16px 0">
-<label style="display:flex;gap:9px;align-items:flex-start;margin-bottom:10px"><input id="qServiceSms" type="checkbox" style="margin-top:4px;flex-shrink:0"> <span>I agree to receive service-related text messages from Show Me Epoxy about my inquiry, quote, or appointment.</span></label>
-<label style="display:flex;gap:9px;align-items:flex-start;margin-bottom:10px"><input id="qPromoSms" type="checkbox" style="margin-top:4px;flex-shrink:0"> <span>I agree to receive promotional text messages from Show Me Epoxy.</span></label>
-<p>Both choices are optional. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase. See our <a href="/privacy.html" style="color:#ebfb3b">Privacy Policy</a> and <a href="/terms.html" style="color:#ebfb3b">Terms &amp; Conditions</a>.</p>
-</div>
-<button type="submit" id="qSubmitBtn" style="width:100%;background:#ebfb3b;color:#0d2d6e;border:none;border-radius:12px;padding:15px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;transition:background .2s">Send My Quote Request →</button>
-<p style="font-size:12px;color:#777;text-align:center;margin-top:12px">We respond within 1 business day. No spam, ever.</p>
-</form>
-<div id="quoteSuccess" style="display:none;text-align:center;padding:20px 0">
-<div style="font-size:48px;margin-bottom:16px">✅</div>
-<h3 style="font-family:Georgia,serif;font-size:22px;color:#fff;margin-bottom:10px">Request Received!</h3>
-<p style="font-size:15px;color:#aaa;line-height:1.65">Thanks! We'll reach out within 1 business day with your free, no-pressure quote.<br/><br/>Questions in the meantime? Call us at <a href="tel:5736442422" style="color:#ebfb3b;font-weight:700">(573) 644-2422</a>.</p>
-</div>
+<iframe src="https://app.floornexus.com/?fn_embed=%2Flead-form%2Flf-1bc8646631" width="100%" height="800" frameborder="0" loading="lazy" style="border:none;max-width:100%;display:block;border-radius:12px;background:#fff" title="Contact Show Me Epoxy"></iframe>
+    <p style="font-size:12px;color:#aaa;text-align:center;margin-top:12px">Form not loading? <a href="https://app.floornexus.com/lead-form/lf-1bc8646631" target="_blank" rel="noopener" style="color:#ebfb3b;font-weight:600">Open it in a new tab</a>, or call <a href="tel:5736442422" style="color:#ebfb3b;font-weight:600">(573) 644-2422</a>.</p>
+
 </div>
 </div>
 <script>
@@ -1441,33 +1391,7 @@ document.getElementById('quoteModal').addEventListener('click',function(e){
 });
 document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeQuoteModal(); });
 
-async function submitQuoteForm(){
-  const name=document.getElementById('qName').value.trim();
-  const phone=document.getElementById('qPhone').value.trim();
-  const email=document.getElementById('qEmail').value.trim();
-  const zip=document.getElementById('qZip').value.trim();
-  const address=document.getElementById('qAddress').value.trim();
-  const project=document.getElementById('qProject').value;
-  const message=document.getElementById('qMessage').value.trim();
-  if(!name||!phone||!email||!zip||!address){ alert('Please fill in all required fields.'); return; }
-  const btn=document.getElementById('qSubmitBtn');
-  btn.disabled=true; btn.textContent='Sending...';
-  const parts=name.split(/\s+/);
-  const firstName=parts.shift()||'';
-  const lastName=parts.join(' ');
-  const fd=new FormData();
-  fd.append('name',name); fd.append('first_name',firstName); fd.append('last_name',lastName);
-  fd.append('phone',phone.replace(/[^\d+]/g,'')); fd.append('email',email); fd.append('zip',zip);fd.append('address',address);
-  fd.append('project_type',project); fd.append('message',message);
-  smeAppendConsent(fd,'q');
-  fd.append('lead_source','Show Me Epoxy Website'); fd.append('page_url',window.location.href);
-  try{
-    await smeSubmitLead('quote',fd);
-  }catch(e){ smeLeadError(btn,'Send My Quote Request →'); return; }
-  document.getElementById('quoteFormWrap').style.display='none';
-  document.getElementById('quoteSuccess').style.display='block';
-  btn.disabled=false; btn.textContent='Send My Quote Request →';
-}
+
 </script>
 <!-- END QUOTE MODAL -->
 <script>

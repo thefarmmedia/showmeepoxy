@@ -42,7 +42,26 @@ test('calculator is discoverable and never redirected to the contact page',()=>{
  for(const file of fs.readdirSync('.').filter(f=>f.endsWith('.html')&&!f.includes('TEMPLATE')&&f!=='404.html')){
   const page=fs.readFileSync(file,'utf8');
   assert.match(page,/href="\/calculator.html"/,file);
-  assert.doesNotMatch(page,/app\.floornexus\.com/i,file);
+ }
+});
+// The quote popup now carries the FloorNexus contact form sitewide, so a blanket
+// ban on app.floornexus.com no longer describes the site. What still has to hold
+// is that no embed reaches the calculator itself.
+test('the calculator is never replaced by an embedded form',()=>{
+ const calcRegion=page=>{
+  const start=page.indexOf('<!-- CALCULATOR SECTION -->');
+  if(start>=0)return page.slice(start,page.indexOf('</section>',start));
+  const modal=page.indexOf('<!-- QUOTE MODAL -->');
+  return modal>=0?page.slice(0,modal):page;
+ };
+ for(const file of ['calculator.html','index.html']){
+  const page=fs.readFileSync(file,'utf8');
+  assert.doesNotMatch(calcRegion(page),/<iframe/i,file);
+  assert.doesNotMatch(calcRegion(page),/app\.floornexus\.com/i,file);
+  for(const id of ['cSqft','cSystem','cCondition','cDifficulty','cUnlockCard','cResultBox'])
+   assert.match(page,new RegExp('id="'+id+'"'),file+' '+id);
+  for(const fn of ['function cShowUnlock(','async function cRevealPrice('])
+   assert.ok(page.includes(fn),file+' '+fn);
  }
 });
 test('quote success panels sit outside each native form',()=>{

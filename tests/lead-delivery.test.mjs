@@ -66,5 +66,8 @@ test('every quote form preserves fields and avoids false success on failure',asy
    }checked++;
   }
  }
- assert.equal(checked,103);
+ // Was 103 when every page hand-rolled its own quote and contact forms. Those are
+ // FloorNexus embeds now, so the only native handler left is the calculator's
+ // price gate, on calculator.html and index.html.
+ assert.equal(checked,2);
 });

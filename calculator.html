@@ -408,6 +408,16 @@ footer{background:var(--navy);color:rgba(255,255,255,.75);padding:56px 0 28px}
 </div>
 </div>
 <div style="margin-bottom:12px">
+<label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px" for="cBestContactTime">Best Time to Contact You <span aria-hidden="true">*</span></label>
+<select id="cBestContactTime" name="best_time_to_contact" required aria-label="Best time to contact you" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0a2866;color:#fff;font-size:15px;outline:none;font-family:var(--font)">
+<option value="" selected disabled>Select a time</option>
+<option value="Morning (8 AM – 12 PM)">Morning (8 AM – 12 PM)</option>
+<option value="Afternoon (12 PM – 5 PM)">Afternoon (12 PM – 5 PM)</option>
+<option value="Evening (After 5 PM)">Evening (After 5 PM)</option>
+<option value="Anytime is Fine">Anytime is Fine</option>
+</select>
+</div>
+<div style="margin-bottom:12px">
 <label style="display:block;font-size:13px;font-weight:600;color:#ddd;margin-bottom:7px" for="cAddress">Property Address</label>
 <input id="cAddress" placeholder="123 Main St, Jefferson City, MO" style="width:100%;padding:13px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:#0a2866;color:#fff;font-size:15px;outline:none;font-family:var(--font)" type="text" aria-label="Property address"/ required>
 </div>
@@ -543,13 +553,15 @@ async function cRevealPrice(){
   const email=document.getElementById('cEmail').value.trim();
   const zip=document.getElementById('cZip').value.trim();
   const address=document.getElementById('cAddress').value.trim();
-  if(!name||!phone||!email||!zip||!address){alert('Please complete all contact fields.');return;}
+  const bestContactTime=document.getElementById('cBestContactTime').value;
+  if(!name||!phone||!email||!zip||!address||!bestContactTime){alert('Please complete all contact fields, including your preferred contact time.');return;}
   const {firstName,lastName}=cSplitName(name);
   const btn=document.getElementById('cRevealBtn');
   btn.disabled=true;btn.textContent='Revealing Price...';
   const fd=new FormData();
   fd.append('name',name);fd.append('first_name',firstName);fd.append('last_name',lastName);
   fd.append('phone',phone);fd.append('email',email);fd.append('zip',zip);fd.append('address',address);
+  fd.append('best_time_to_contact',bestContactTime);
   fd.append('project_type',data.projectType);fd.append('sq_ft',data.sqft);
   fd.append('system',data.system);fd.append('concrete_condition',data.condition);
   fd.append('layout_difficulty',data.difficulty);
@@ -576,6 +588,7 @@ function cReset(){
   document.getElementById('cEmail').value='';
   document.getElementById('cZip').value='';
   document.getElementById('cAddress').value='';
+  document.getElementById('cBestContactTime').selectedIndex=0;
   document.getElementById('cUnlockCard').style.display='none';
   document.getElementById('cResultBox').style.display='none';
   document.getElementById('cWhyBox').style.display='block';

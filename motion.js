@@ -28,6 +28,8 @@
 
     // Groups that reveal together, each with a variant and a stagger.
     var REVEAL = [
+      // Feature photos wipe on left to right, like a topcoat being pulled.
+      { sel: '.two-col img,.area-gallery img,.feat-img img', variant: 'm-wipe', stagger: true },
       { sel: '.section-label,.section-title,.section-sub,.sub-label', variant: '', stagger: false },
       { sel: '.card,.why-card,.service-card,.feat-card,.sb-card', variant: 'm-rise', stagger: true },
       { sel: '.review-card', variant: 'm-rise', stagger: true },
@@ -234,5 +236,172 @@
       sweep();
       if (++ticks > 15 || !document.querySelector('.m-pre')) clearInterval(poll);
     }, 400);
+  }
+}());
+
+/* ══ Motion layer 2 ═══════════════════════════════════════════════════════
+   Headline parallax, scroll progress, section-title
+   underlines, process-step sequence, and (mouse only) card tilt and magnetic
+   buttons. Kept in its own closure so a failure here can never affect the
+   reveal guarantees above. Purely decorative: nothing in this block hides
+   content, and it does nothing at all under prefers-reduced-motion. */
+(function () {
+  'use strict';
+  var mm = window.matchMedia ? function (q) { return window.matchMedia(q).matches; } : function () { return false; };
+  if (mm('(prefers-reduced-motion: reduce)')) return;
+
+  var raf = window.requestAnimationFrame;
+  if (typeof raf !== 'function') return;
+  raf = raf.bind(window);
+  var hasIO = 'IntersectionObserver' in window;
+  var fine = mm('(hover: hover) and (pointer: fine)');
+
+  function safe(fn) { try { fn(); } catch (e) { /* decorative only */ } }
+  function each(sel, fn) { Array.prototype.forEach.call(document.querySelectorAll(sel), fn); }
+  // Fires fn once, the first time enough of el is on screen.
+  function onceVisible(el, ratio, fn) {
+    if (!hasIO) { fn(); return; }
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { io.disconnect(); fn(); } });
+    }, { threshold: ratio });
+    io.observe(el);
+  }
+  function heroInner(hero) {
+    var kids = hero.children;
+    for (var i = 0; i < kids.length; i++) {
+      if (kids[i].classList.contains('container') || kids[i].classList.contains('wrap')) return kids[i];
+    }
+    return null;
+  }
+
+  // Scroll-driven effects share one listener and one frame per scroll burst.
+  var scrollFns = [];
+  var queued = false;
+  function onScroll() {
+    if (queued) return;
+    queued = true;
+    raf(function () {
+      queued = false;
+      var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+      for (var i = 0; i < scrollFns.length; i++) scrollFns[i](y);
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+
+  safe(progressBar);
+  safe(heroParallax);
+  safe(underlines);
+  safe(processSteps);
+  if (fine) { safe(tilt); safe(magnetic); }
+  onScroll();
+
+  // ---- scroll progress -----------------------------------------------------
+  function progressBar() {
+    var bar = document.createElement('div');
+    bar.className = 'm-progress';
+    bar.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(bar);
+    scrollFns.push(function (y) {
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      // Short pages get no bar: there is nothing to track.
+      var p = max > window.innerHeight * 0.5 ? Math.min(Math.max(y / max, 0), 1) : 0;
+      bar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
+    });
+  }
+
+  // ---- hero parallax -------------------------------------------------------
+  // The hero copy drifts and softens as it leaves. At the top of the page the
+  // inline styles are cleared entirely, so the first paint is untouched.
+  function heroParallax() {
+    var hero = document.querySelector('.hero,.page-hero');
+    if (!hero) return;
+    var inner = heroInner(hero);
+    if (!inner) return;
+    inner.classList.add('m-para');
+    scrollFns.push(function (y) {
+      var h = hero.offsetHeight || 1;
+      if (y <= 0) { inner.style.transform = ''; inner.style.opacity = ''; return; }
+      if (y > h) return;
+      inner.style.transform = 'translate3d(0,' + (y * 0.22).toFixed(1) + 'px,0)';
+      // Copy stays fully opaque for the first third, then softens.
+      var fade = Math.max(0, y - h * 0.35) / (h * 0.8);
+      inner.style.opacity = Math.max(1 - fade, 0.35).toFixed(3);
+    });
+  }
+
+  // ---- section title underline ---------------------------------------------
+  function underlines() {
+    each('.section-title', function (el) {
+      if (el.closest('header,footer,#quoteModal')) return;
+      el.classList.add('m-ul');
+      onceVisible(el, 0.6, function () { el.classList.add('m-ul-in'); });
+    });
+  }
+
+  // ---- process steps -------------------------------------------------------
+  function processSteps() {
+    each('.process-steps', function (box) {
+      var cols = window.getComputedStyle(box).gridTemplateColumns.split(' ').length;
+      // The fill line only makes sense when the steps sit in a row.
+      if (cols > 1) box.classList.add('m-steps');
+      Array.prototype.forEach.call(box.querySelectorAll('.step-num'), function (n, i) {
+        n.style.setProperty('--m-s', String(i));
+      });
+      onceVisible(box, 0.35, function () { box.classList.add('m-steps-in'); });
+    });
+  }
+
+  // ---- card tilt with glare (mouse only) -----------------------------------
+  function tilt() {
+    var SEL = '.card,.why-card,.service-card,.feat-card,.related-card,.post-card,' +
+              '.review-card,.sb-card,.home-color-card';
+    each(SEL, function (el) {
+      if (el.closest('#quoteModal')) return;
+      el.classList.add('m-tilt');
+      if (window.getComputedStyle(el).position === 'static') el.style.position = 'relative';
+      var glare = document.createElement('span');
+      glare.className = 'm-glare';
+      glare.setAttribute('aria-hidden', 'true');
+      el.appendChild(glare);
+      var pending = null;
+      el.addEventListener('pointerenter', function () {
+        el.style.transition = 'transform .14s ease-out,box-shadow .28s ease';
+      });
+      el.addEventListener('pointermove', function (e) {
+        var first = !pending;
+        pending = e;
+        if (!first) return;
+        raf(function () {
+          if (!pending) return;
+          var r = el.getBoundingClientRect();
+          var px = (pending.clientX - r.left) / r.width, py = (pending.clientY - r.top) / r.height;
+          pending = null;
+          el.style.transform = 'perspective(900px) rotateX(' + ((0.5 - py) * 7).toFixed(2) +
+            'deg) rotateY(' + ((px - 0.5) * 8).toFixed(2) + 'deg) translateY(-4px)';
+          el.style.setProperty('--gx', (px * 100).toFixed(1) + '%');
+          el.style.setProperty('--gy', (py * 100).toFixed(1) + '%');
+        });
+      });
+      el.addEventListener('pointerleave', function () {
+        pending = null;
+        el.style.transform = '';
+        el.style.transition = '';
+      });
+    });
+  }
+
+  // ---- magnetic primary buttons (mouse only) -------------------------------
+  function magnetic() {
+    each('.btn-primary,.btn-gold,.nav-cta', function (el) {
+      if (el.closest('#quoteModal')) return;
+      el.addEventListener('pointermove', function (e) {
+        var r = el.getBoundingClientRect();
+        var dx = (e.clientX - (r.left + r.width / 2)) / r.width;
+        var dy = (e.clientY - (r.top + r.height / 2)) / r.height;
+        el.style.transform = 'translate(' + (dx * 10).toFixed(1) + 'px,' + (dy * 8 - 2).toFixed(1) + 'px)';
+      });
+      el.addEventListener('pointerleave', function () { el.style.transform = ''; });
+    });
   }
 }());

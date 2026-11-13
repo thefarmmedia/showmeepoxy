@@ -85,3 +85,70 @@ html.m-smooth{scroll-behavior:smooth}
   .m-media:hover img{transform:none}
   .m-btn:hover::after{animation:none}
 }
+
+/* ══ Motion layer 2 ═══════════════════════════════════════════════════════
+   Same rules as above: nothing here can leave content hidden, and every
+   effect is switched off under prefers-reduced-motion (motion.js bails out
+   before adding any of these classes, and the block at the end covers the
+   pure-CSS ones). */
+
+/* ── scroll progress ───────────────────────────────────────────────────── */
+.m-progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:1001;pointer-events:none;
+  background:linear-gradient(90deg,#ebfb3b,#faff4a 60%,#fff);transform:scaleX(0);transform-origin:0 50%;
+  box-shadow:0 0 8px rgba(235,251,59,.55)}
+
+/* ── wet-gloss sheen across the gold headline ──────────────────────────── */
+/* The text is painted gold from the first frame, so the LCP element is never
+   hidden; only the highlight inside the gradient moves. */
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .hero h1 em{
+    background:linear-gradient(105deg,#ebfb3b 0%,#ebfb3b 42%,#fffef0 50%,#ebfb3b 58%,#ebfb3b 100%) 100% 0/250% 100% no-repeat;
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    animation:mGloss 5s cubic-bezier(.45,0,.2,1) 1.4s infinite}
+}
+@keyframes mGloss{0%{background-position:100% 0}38%,100%{background-position:0 0}}
+
+/* ── hero scroll parallax ──────────────────────────────────────────────── */
+.m-para{will-change:transform,opacity}
+
+/* ── topcoat wipe on feature photos ────────────────────────────────────── */
+/* Uses the reveal machinery above, so its fallbacks apply: the clip only
+   exists while .m-pre is on, and every path ends by removing it. */
+.m-pre.m-wipe{opacity:1;transform:none;clip-path:inset(0 100% 0 0)}
+.m-in.m-wipe{opacity:1;transform:none;clip-path:inset(0 0 0 0);
+  transition:clip-path 1.05s cubic-bezier(.65,0,.35,1)}
+.m-done.m-wipe{clip-path:none}
+
+/* ── section title underline ───────────────────────────────────────────── */
+.m-ul::after{content:'';display:block;width:64px;height:4px;border-radius:4px;margin-top:14px;
+  background:linear-gradient(90deg,#134db4,#ebfb3b);transform:scaleX(0);transform-origin:0 50%;
+  transition:transform .85s cubic-bezier(.22,.61,.36,1) .15s}
+.text-center .m-ul::after,.text-center.m-ul::after{margin-left:auto;margin-right:auto;transform-origin:50% 50%}
+.m-ul.m-ul-in::after{transform:scaleX(1)}
+
+/* ── process steps ─────────────────────────────────────────────────────── */
+/* A coloured line fills over the grey connector, then each number pops in
+   turn with a gold ring. No hidden pre-state: the pop only starts once the
+   section is on screen, and the number is visible before and after it. */
+.m-steps::after{content:'';position:absolute;top:32px;left:10%;right:10%;height:2px;z-index:0;
+  background:linear-gradient(90deg,#134db4,#ebfb3b);transform:scaleX(0);transform-origin:0 50%;
+  transition:transform 1.6s cubic-bezier(.65,0,.35,1) .2s}
+.m-steps.m-steps-in::after{transform:scaleX(1)}
+.m-steps-in .step-num{animation:mPop .6s cubic-bezier(.34,1.56,.64,1) backwards,mRing 1s ease-out backwards;
+  animation-delay:calc(.25s + var(--m-s,0) * .32s),calc(.55s + var(--m-s,0) * .32s)}
+@keyframes mPop{from{transform:scale(.55);opacity:.2}}
+@keyframes mRing{from{box-shadow:0 0 0 0 rgba(235,251,59,.85)}to{box-shadow:0 0 0 16px rgba(235,251,59,0)}}
+
+/* ── 3D tilt with glare (mouse only) ───────────────────────────────────── */
+.m-glare{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;opacity:0;
+  background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,.38),rgba(255,255,255,0) 55%);
+  transition:opacity .3s ease}
+.m-tilt:hover .m-glare{opacity:1}
+
+@media (prefers-reduced-motion:reduce){
+  .m-progress,.m-glare{display:none}
+  .hero h1 em{animation:none;background:none;-webkit-text-fill-color:currentColor}
+  .m-pre.m-wipe,.m-in.m-wipe{clip-path:none!important;transition:none!important}
+  .m-ul::after,.m-steps::after{transform:none;transition:none}
+  .m-steps-in .step-num{animation:none}
+}

@@ -55,6 +55,9 @@ The GoHighLevel relay is kept, switched off: `netlify/functions/submit-lead.mjs`
 answers 503 and forwards nothing unless the Netlify environment variable
 `GHL_RELAY_ENABLED` is `true`. To restore GoHighLevel, set that variable, set
 `SME_LEAD_DESTINATION` in `lead-submit.js` to `'ghl-relay'`, and redeploy.
+Also change the calculator wording in privacy.html (section 4) and terms.html
+(section 9), which now name Netlify as the calculator's processor, and update
+their "Last updated" dates and sitemap `lastmod`.
 
 The quote modal and contact page use the FloorNexus embed, which does not go
 through GoHighLevel, so they were not changed.

@@ -1,8 +1,15 @@
 // Same-origin relay: HTTP acceptance is not proof that downstream CRM actions finished.
-const endpoints = {'quote': 'https://services.leadconnectorhq.com/hooks/UDCPiPWt9uV7guaCe7PH/webhook-trigger/09162da4-f3af-45b1-8080-acf28096d4a3', 'calculator': 'https://services.leadconnectorhq.com/hooks/UDCPiPWt9uV7guaCe7PH/webhook-trigger/cf22005c-1be6-4647-8009-5d5ef2c85ddd'};
+//
+// DISABLED (Nov 2026): the GoHighLevel sub-account is unavailable, so calculator
+// leads go to Netlify Forms instead (see lead-submit.js). This relay is kept intact
+// and forwards to GoHighLevel only when the Netlify environment variable
+// GHL_RELAY_ENABLED is "true". Until then it answers 503 and forwards nothing.
+const relayEnabled = () => process.env.GHL_RELAY_ENABLED === 'true';
+const endpoints ={'quote': 'https://services.leadconnectorhq.com/hooks/UDCPiPWt9uV7guaCe7PH/webhook-trigger/09162da4-f3af-45b1-8080-acf28096d4a3', 'calculator': 'https://services.leadconnectorhq.com/hooks/UDCPiPWt9uV7guaCe7PH/webhook-trigger/cf22005c-1be6-4647-8009-5d5ef2c85ddd'};
 const reply = (status, body) => Response.json(body, {status, headers: {'Cache-Control':'no-store'}});
 export default async function submitLead(request) {
   if (request.method !== 'POST') return reply(405, {ok:false});
+  if (!relayEnabled()) return reply(503, {ok:false, disabled:true});
   const kind = new URL(request.url).searchParams.get('kind');
   if (!Object.hasOwn(endpoints, kind)) return reply(400, {ok:false});
   const origin = request.headers.get('origin');

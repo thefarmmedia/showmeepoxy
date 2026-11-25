@@ -875,6 +875,7 @@ function smeTrack(eventName, params){
 <label style="display:flex;gap:9px;align-items:flex-start;margin-bottom:10px"><input id="cPromoSms" type="checkbox" style="margin-top:4px;flex-shrink:0"> <span>I agree to receive promotional text messages from Show Me Epoxy.</span></label>
 <p>Both choices are optional. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of purchase. See our <a href="/privacy.html" style="color:#ebfb3b">Privacy Policy</a> and <a href="/terms.html" style="color:#ebfb3b">Terms &amp; Conditions</a>.</p>
 </div>
+<p style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden" aria-hidden="true"><label>Leave this field empty <input id="cBotField" name="bot-field" type="text" tabindex="-1" autocomplete="off"></label></p>
 <button type="submit" id="cRevealBtn" style="width:100%;background:#ebfb3b;color:#0d2d6e;border:none;border-radius:12px;padding:15px 20px;font-size:16px;font-weight:800;cursor:pointer;font-family:var(--font);transition:all .2s;box-shadow:0 0 24px rgba(235,251,59,.35)" onmouseover="this.style.boxShadow='0 0 40px rgba(235,251,59,.6)'" onmouseout="this.style.boxShadow='0 0 24px rgba(235,251,59,.35)'">Reveal My Ballpark Price Range</button>
 </form>
 <!-- Result box -->
@@ -1009,6 +1010,7 @@ async function cRevealPrice(){
   fd.append('estimated_range',data.estimatedRange);
   fd.append('low_rate_per_sqft',data.lowRate);fd.append('high_rate_per_sqft',data.highRate);
   if(cSelectedColor)fd.append('selected_floor_color',cSelectedColor);
+  const botField=document.getElementById('cBotField');fd.append('bot-field',botField?botField.value:'');
   smeAppendConsent(fd,'c');
   fd.append('lead_source','Show Me Epoxy Website Calculator');fd.append('page_url',window.location.href);
   try{await smeSubmitLead('calculator',fd);}catch(e){ smeLeadError(btn,'Reveal My Ballpark Price Range'); return; }

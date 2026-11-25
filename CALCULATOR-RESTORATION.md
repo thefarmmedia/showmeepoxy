@@ -39,3 +39,22 @@ workflow completion are different: no live test lead has been submitted.
 Netlify was publishing the October 21 review deployment when this work began;
 the October 23 and October 26 builds remained available in the deploy history.
 The restored build must publish the latest code and this change together.
+
+## Temporary Netlify Forms routing — November 25, 2026
+
+The GoHighLevel sub-account is unavailable, so calculator leads (calculator page
+and homepage) are stored in Netlify Forms under `calculator-leads` instead.
+`lead-submit.js` posts them URL-encoded to `/` with `form-name`, and the price
+is revealed only after Netlify answers 2xx; a 404 (form not registered) or any
+other failure keeps the visitor's details and asks them to retry or call.
+The hidden form that registers `calculator-leads` and its fields is at the end
+of `calculator.html`; every field the calculator sends must be listed there.
+Spam protection is Netlify's honeypot (`bot-field`).
+
+The GoHighLevel relay is kept, switched off: `netlify/functions/submit-lead.mjs`
+answers 503 and forwards nothing unless the Netlify environment variable
+`GHL_RELAY_ENABLED` is `true`. To restore GoHighLevel, set that variable, set
+`SME_LEAD_DESTINATION` in `lead-submit.js` to `'ghl-relay'`, and redeploy.
+
+The quote modal and contact page use the FloorNexus embed, which does not go
+through GoHighLevel, so they were not changed.
